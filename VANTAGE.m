@@ -30,23 +30,23 @@ classdef VANTAGE < handle
         % @param      sampleparameter sampledescription
         %
         % @return     samplereturn
-        function TimeStampSync()
+        function TimeStampSync(obj)
             
         end
         
-        function TOFPropagate()
+        function TOFPropagate(obj)
             
         end
         
-        function SensorFusion()
+        function SensorFusion(obj)
             
         end
         
-        function PredictionModel()
+        function PredictionModel(obj)
             
         end
         
-        function OutputStateVector()
+        function OutputStateVector(obj)
             
         end
         
