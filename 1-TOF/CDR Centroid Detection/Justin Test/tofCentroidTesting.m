@@ -17,8 +17,7 @@ clearvars tmp1 tmp2 tmp3 tmp
 
 %[ptNew] = ptRot(ptNew,[0 0 0 pi/5 pi/8 0],1);
 
-%% z plane
-% Identify plane normal to z
+%% plane 1
 maxDistance = 0.008;
 
 [model1,inlierIndices,outlierIndices] = pcfitplane(ptNew,...
@@ -31,8 +30,7 @@ remainPtCloud = select(ptNew,outlierIndices);
 p1 = fit( double([plane1.Location(:,1), plane1.Location(:,2)]), double(plane1.Location(:,3)), 'poly11');
 
 
-%% y plane
-% Identify plane normal to y
+%% plane 2
 [model2,inlierIndices,outlierIndices] = pcfitplane(remainPtCloud,...
             maxDistance);
 plane2 = select(remainPtCloud,inlierIndices);
@@ -42,8 +40,7 @@ remainPtCloud = select(remainPtCloud,outlierIndices);
 % Identify plane normal
 p2 = fit( double([plane2.Location(:,1), plane2.Location(:,2)]), double(plane2.Location(:,3)), 'poly11');
 
-%% x plane
-% Identify plane normal to x
+%% plane 3
 maxDistance = 0.008;
 referenceVector = [1,0,0];
 maxAngularDistance = 5;
