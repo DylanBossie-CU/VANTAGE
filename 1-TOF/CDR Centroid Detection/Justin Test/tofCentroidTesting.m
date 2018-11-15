@@ -26,7 +26,7 @@ plane1 = select(ptNew,inlierIndices);
 plane1 = pcdenoise(plane1);
 remainPtCloud = select(ptNew,outlierIndices);
 
-% Identify plane normal
+% Fit plane
 p1 = fit( double([plane1.Location(:,1), plane1.Location(:,2)]), double(plane1.Location(:,3)), 'poly11');
 
 
@@ -37,7 +37,7 @@ plane2 = select(remainPtCloud,inlierIndices);
 plane2 = pcdenoise(plane2);
 remainPtCloud = select(remainPtCloud,outlierIndices);
 
-% Identify plane normal
+% Fit plane
 p2 = fit( double([plane2.Location(:,1), plane2.Location(:,2)]), double(plane2.Location(:,3)), 'poly11');
 
 %% plane 3
@@ -51,7 +51,7 @@ plane3 = select(remainPtCloud,inlierIndices);
 plane3 = pcdenoise(plane3);
 remainPtCloud = select(remainPtCloud,outlierIndices);
 
-% Find plane boundary and center
+% Fit plane
 p3 = fit( double([plane3.Location(:,1), plane3.Location(:,2)]), double(plane3.Location(:,3)), 'poly11');
 
 %% Plane intersection
