@@ -1,7 +1,7 @@
 
 % Variable cleanup
 clearvars
-
+tic
 % Load data
 filename = './Test Data/ZGap_Near/Ctube_05.ply';
 %filename = './Test Data/Separation/DRSep_2_in.ply';
@@ -15,7 +15,7 @@ tmp = logical(tmp1.*tmp2.*tmp3);
 ptNew = pointCloud(ptCloud.Location(tmp,:));
 clearvars tmp1 tmp2 tmp3 tmp
 
-%[ptNew] = ptRot(ptNew,[0 0 0 pi/5 pi/8 0],1);
+[ptNew] = ptRot(ptNew,[0 0 0 pi/5 pi/8 0],1);
 
 %% plane 1
 maxDistance = 0.008;
@@ -63,6 +63,8 @@ A = [p10,p01,-ones(3,1)];
 b = -p00;
 
 ptIntersect = (A\b)';
+
+toc
 
 %% Plotting
 
