@@ -13,6 +13,12 @@ function pos = centroid1(ptCloud,planes,u)
     face = polyshape(inPlane(I_bound,1),inPlane(I_bound,2));
     [x,y] = centroid(face);
     
+    % Convert centroid to 3d point
     outPlane = [x,y]*planes.V';
+    
+    figure
+    pcshow(ptCloud)
+    hold on
+    plot3(outPlane(:))
     
 end

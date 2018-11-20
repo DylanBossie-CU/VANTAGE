@@ -33,7 +33,7 @@ for i = 16:numFrame
             [planes,numPlanes] = fitPlanes(cubesats(j).ptCloud);
             
             if numPlanes==0
-                break; 
+                break;
             end
             
             % Choose centroid determination method
