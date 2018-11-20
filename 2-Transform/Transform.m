@@ -3,24 +3,48 @@
 % Modified: 11/19/2019
 %
 % Transform
-% [VT] = Transform(TARGFRAME,VS,SRCFRAME) with VS a 3xn vector in the
-% SRCFRAME, VT a 3xn vector in the TARGFRAME
+% [VT] = Transform(TARGFRAME,VS,SRCFRAME) with VS a 3xn set of vectors
+% in the SRCFRAME, VT a 3xn set of vectors in the TARGFRAME
 %
-% [VT] = Transform(TARGFRAME,VS,SRCFRAME,'transform') with VS a 3xn 
-% vector in the SRCFRAME, VT a 3xn vector in the TARGFRAME, this is the
-% default behavior
+% [VT] = Transform(TARGFRAME,VS,SRCFRAME,'transform') with VS a 3xn set 
+% of vectors in the SRCFRAME, VT a 3xn set of vectors in the TARGFRAME, 
+% this is the default behavior
 %
-% Transform(TARGFRAME,celldata,SRCFRAME,'set') with celldata{1}
-% a 3x3 transform matrix and celldata{2} a 3x1 translation vector, will
+% Transform(TARGFRAME,CELLDATA,SRCFRAME,'set') with CELLDATA{1}
+% a 3x3 transform matrix and CELLDATA{2} a 3x1 translation vector, will
 % save celldata{1} as the transform between SRCFRAME and TARGFRAME and 
 % celldata{2} as the vector (in SRCFRAME) from the origin of SRCFRAME to
-% the origin of TARGFRAME
+% the origin of TARGFRAME, also saves all necessary data for a transform
+% from TARGFRAME to SRCFRAME
 %
-% Purpose:
+% Purpose: This function is used to save transform information from the
+% cartesian 3-dimensional frame srcFrame to the cartesian 3-dimensional
+% frame targFrame.  It is then used to transform a set of data in srcFrame
+% to a set of data in targFrame.
+%
+% NOTE:
+%   - mode 0 denotes standard behavior, transforming input data to the
+%   target frame and producing output data
+%   - mode 1 denotes 'set' behavior, saving the transform and translation
+%   from srcFrame to targFrame
 %
 % Inputs:
+%   targFrame - identifier for the target frame, char
+%   data      - mode 0: data is a 3xn set of vectors in the srcFrame to be
+%                       transformed to the targFrame, matrix
+%               mode 1: data is a 1x2 cell, data{1} is the 3x3 transformation
+%                       matrix from srcFrame to targFrame and data{2} is a 3x1
+%                       translation vector from the origin of srcFrame to
+%                       the origin of targFrame, cell
+%   srcFrame  - identifier for the source frame, char
+%   varargin  - empty      : mode = 0
+%               'transform': mode = 0
+%               'set'      : mode = 1
 %
 % Outputs:
+%   output    - mode 0: output is a 3xn set of vectors in the targFrame,
+%                       matrix
+%               mode 1: output is empty
 %
 function [output] = Transform(targFrame,data,srcFrame,varargin)
 %% Allocation 
