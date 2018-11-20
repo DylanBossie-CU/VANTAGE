@@ -34,15 +34,6 @@ maxNomen = 10;
 % transform operation (mode=0) or 'set' operation (mode=1)
 mode = 0;
 
-% Initialize nomen with the Camera Angular Frame (CAF) and VANTAGE
-% Cartesian Frame (VCF), because it is a unique transformation and will
-% therefore be baked into the function
-if isempty(nomen)
-  nomen{1,1} = 'VCF';
-  nomen{2,1} = 'CAF';
-end
-
-
 %% Process varargin
 minArgs = 3;
 maxArgs = 4;
@@ -101,9 +92,23 @@ if mode == 1
   end
 end
 
-
-%% Save transform matrices and translation vectors if in 'set' mode
-if mode == 1
+%% Perform operations based on mode
+if mode == 0
+  %% Perform transformation and translation if in 'transform' or default mode
+  % Identify src-to-targ indices in TF struct using nomen
+  src  = findNomen(srcFrame,nomen);
+  targ = findNomen(targFrame,nomen);
+  
+  % Check that this particular src-to-targ is populated
+  if ~src || ~targ
+    error(['The requested transformation does not have a '...
+      'transform matrix or translation vector set'])
+  end
+  
+  % Produced transformed/translated output data
+  output = TF(src,targ).C*(data-TF(src,targ).V);
+elseif mode == 1
+  %% Save transform matrices and translation vectors if in 'set' mode
   % Make new entry for srcFrame if not already in nomen
   if ~findNomen(srcFrame,nomen)
     nomen{size(nomen,1)+1,1} = srcFrame;
@@ -122,24 +127,8 @@ if mode == 1
   TF(findNomen(targFrame,nomen),findNomen(srcFrame,nomen)).C = data{1}';
   TF(findNomen(targFrame,nomen),findNomen(srcFrame,nomen)).V = data{1}*(-data{2});
 end
-
-%% Perform transformation and translation if in 'transform' or default mode
-if mode == 0
-  % Identify src-to-targ indices in TF struct using nomen
-  src  = findNomen(srcFrame,nomen);
-  targ = findNomen(targFrame,nomen);
-  
-  % Check that this particular src-to-targ is populated
-  if ~src || ~targ
-    error(['The requested transformation does not have a '...
-      'transform matrix or translation vector set'])
-  end
-  
-  % Produced transformed/translated output data
-  output = TF(src,targ).C*(data-TF(src,targ).V);
-end
-
 end % Transform
+
 
 %% Return row number of string location in nomen
 function [row] = findNomen(str,nomen)

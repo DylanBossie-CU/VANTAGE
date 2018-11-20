@@ -1,4 +1,5 @@
 close all
+clear Transform
 
 % Frame 1
 F1 = eye(3);
@@ -20,6 +21,8 @@ v1 = [-3 4 1]';
 
 % Frame 2 vector
 v2 = C*(v1-V);
+Transform('F2',{C,V},'F1','set');
+v2 = Transform('F2',v1,'F1');
 
 % plot
 lims = [-5 5];
@@ -36,8 +39,8 @@ plot3([0 v1(1)],[0 v1(2)],[0 v1(3)],'color','black')
 plot3([0 F2(1,1)]+V(1),[0 F2(1,2)]+V(2),[0 F2(1,3)]+V(3),'color','red')
 plot3([0 F2(2,1)]+V(1),[0 F2(2,2)]+V(2),[0 F2(2,3)]+V(3),'color','green')
 plot3([0 F2(3,1)]+V(1),[0 F2(3,2)]+V(2),[0 F2(3,3)]+V(3),'color','green')
-v2 = C'*v2;
-plot3([0 v2(1)] + V(1),[0 v2(2)]+V(2),[0 v2(3)]+V(3),'color','magenta')
+v3 = C'*v2;
+plot3([0 v3(1)] + V(1),[0 v3(2)]+V(2),[0 v3(3)]+V(3),'color','magenta')
 xlabel('x')
 ylabel('y')
 zlabel('z')
