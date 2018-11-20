@@ -5,7 +5,7 @@ function [planes,numPlanes] = fitPlanes(ptCloud)
     
     % Initialize planes structure
     numPlanes = 3;
-    planes(3) = struct('p',[],'n',[],'V',[],'planeCloud',[]);
+    planes(3) = struct('o',[],'n',[],'V',[],'planeCloud',[]);
 
     % Fit plane to data
     [~,inlierIndices,outlierIndices] = pcfitplane(ptCloud,...
@@ -25,7 +25,7 @@ function [planes,numPlanes] = fitPlanes(ptCloud)
 
     % Fit sfit plane to point cloud plane
     %planes(1).p = fit( double([plane.Location(:,1), plane.Location(:,2)]), double(plane.Location(:,3)), 'poly11');
-    [planes(1).n,planes(1).V,planes(1).p] = affine_fit(plane.Location);
+    [planes(1).n,planes(1).V,planes(1).o] = affine_fit(plane.Location);
     
     for i = 2:3
         
@@ -64,7 +64,7 @@ function [planes,numPlanes] = fitPlanes(ptCloud)
 
         % Fit sfit plane to point cloud plane
         %planes(i).p = fit( double([plane.Location(:,1), plane.Location(:,2)]), double(plane.Location(:,3)), 'poly11');
-        [planes(i).n,planes(i).V,planes(i).p] = affine_fit(plane.Location);
+        [planes(i).n,planes(i).V,planes(i).o] = affine_fit(plane.Location);
         
     end
     
