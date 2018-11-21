@@ -23,9 +23,9 @@ function [centroids] = TOF_centroid(filestrs,dataType)
 for i = 1:length(filestrs)
   %% Load data
   if strcmpi(dataType,'sim')
-    ptCloud(i) = loadSimToF(filestrs{i});
+    ptCloud = loadSimToF(filestrs{i});
   elseif strcmpi(dataType,'test')
-    ptCloud(i) = loadTestData(filestrs{i});
+    ptCloud = loadTestData(filestrs{i});
   else
     error('Invalid dataType')
   end
