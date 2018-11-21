@@ -1,7 +1,7 @@
 function [planes,numPlanes] = fitPlanes(ptCloud)
 
     % Initialize fit parameters
-    maxDistance = 0.008;
+    maxDistance = 0.001;
     
     % Initialize planes structure
     numPlanes = 3;
@@ -40,7 +40,7 @@ function [planes,numPlanes] = fitPlanes(ptCloud)
         dx = max(remainPtCloud.Location(:,1)) - min(remainPtCloud.Location(:,1));
         dy = max(remainPtCloud.Location(:,2)) - min(remainPtCloud.Location(:,2));
         dz = max(remainPtCloud.Location(:,3)) - min(remainPtCloud.Location(:,3));
-        if sum([dx dy dz]<=0.025)<=2
+        if sum([dx dy dz]>=0.003)<=2
             numPlanes = i-1;
             break;
         end
@@ -55,9 +55,6 @@ function [planes,numPlanes] = fitPlanes(ptCloud)
         
         % Store point cloud of plane in output
         planes(i).planeCloud = plane;
-        
-        % Find plane normal
-        planes(i).n = sfitNorm(planes(i).p);
 
         % Store remaining points
         remainPtCloud = select(ptCloud,outlierIndices);

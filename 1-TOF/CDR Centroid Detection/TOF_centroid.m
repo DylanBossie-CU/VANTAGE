@@ -37,11 +37,11 @@ for i = 1:length(filestrs)
         
         %% Loop through cubesats
         for j = 1:numel(cubesats)
+            %% Fit planes to point cloud
+            [planes,numPlanes] = Copy_of_fitPlanes(cubesats(j).ptCloud);
+            
             %% Find size of cubesat
             centroids(j).u(i) = findCubesatSize(cubesats(j).ptCloud);
-            
-            %% Fit planes to point cloud
-            [planes,numPlanes] = fitPlanes(cubesats(j).ptCloud);
             
             %% Do not proceed if no planes are identified
             if numPlanes==0
