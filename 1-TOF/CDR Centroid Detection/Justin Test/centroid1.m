@@ -1,7 +1,5 @@
 function pos = centroid1(ptCloud,planes,u)
 
-    planes = planes(1);
-
     % Project points onto 2d plane
     plane = planes.planeCloud;
     inPlane = double( (plane.Location-planes.o)*planes.V );
