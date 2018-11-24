@@ -1,15 +1,14 @@
 %%  Author: Justin Fay and Joshua Kirby
 %  Created: 
-% Modified: 11/23/2018
+% Modified: 11/24/2018
 %
 % Purpose:
 %
 % Inputs:
-%   
 %
 % Outputs:
 %   
-function pos = centroid1(ptCloud,planes,u)
+function pos = centroid1(ptCloud,planes,u,SET)
 %% Project points onto 2d plane
 plane = planes(1).planeCloud;
 inPlane = double( (plane.Location-planes(1).o)*planes(1).V );
@@ -36,6 +35,9 @@ tmp = smooth(abs(gradient(r,theta)));
 locs = locs - 10;
 
 %% Identify centroid, algorithm varies based on number of corners found
+% NOTE: THIS NEEDS TO BE CHANGED TO USE THE IDENTIFIED U OF THE CUBESAT IN
+% ORDER TO ACCOUNT FOR ERRORS FROM TOF DATA NOT COVERING FULL SIDE OF
+% CUBESAT
 switch length(locs)
   % Four Corners
   case 4
@@ -91,7 +93,7 @@ end
 outPlane = planes(1).o + (x*planes(1).V(:,1))' + (y*planes(1).V(:,2))';
 
 %% Project inward to volumetric centroid
-d = distInFromFace(face,u);
+d = distInFromFace(face,u,SET);
 pos = outPlane + d.*(sign(dot(outPlane,planes(1).n))*planes(1).n)';
 
 end
