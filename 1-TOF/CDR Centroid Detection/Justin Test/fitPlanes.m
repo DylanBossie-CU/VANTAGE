@@ -27,6 +27,13 @@ function [planes,numPlanes] = fitPlanes(ptCloud)
     %planes(1).p = fit( double([plane.Location(:,1), plane.Location(:,2)]), double(plane.Location(:,3)), 'poly11');
     [planes(1).n,planes(1).V,planes(1).o] = affine_fit(plane.Location);
     
+    % Adjust normal to face inward
+    [~,I] = max(abs(planes(1).n));
+    if sign(planes(1).n(I))==-1
+        planes(1).n = -planes(1).n;
+        planes(1).V = -planes(1).V;
+    end
+    
     for i = 2:3
         
         if isempty(outlierIndices) || numel(outlierIndices)<=250
@@ -65,6 +72,13 @@ function [planes,numPlanes] = fitPlanes(ptCloud)
         % Fit sfit plane to point cloud plane
         %planes(i).p = fit( double([plane.Location(:,1), plane.Location(:,2)]), double(plane.Location(:,3)), 'poly11');
         [planes(i).n,planes(i).V,planes(i).o] = affine_fit(plane.Location);
+        
+         % Adjust normal to face inward
+        [~,I] = max(abs(planes(i).n));
+        if sign(planes(i).n(I))==-1
+            planes(i).n = -planes(i).n;
+            planes(i).V = -planes(i).V;
+        end
         
     end
     
