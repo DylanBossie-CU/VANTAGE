@@ -9,16 +9,17 @@
 %
 % Inputs:
 %   filestrs  - cell array of n TOF files to process, cell
+%   truth     - 
 %   dataType  - 'sim' : indicates that the source data came from the
 %                       VANTAGE simulation
 %               'test': indicates that the source data came from test data
 %                       obtained using Prof McMahon's TOF camera
 %
 % Outputs:
-%   centroids - length n cell array containing a 3xm set of vectors defining the 
+%   centroids - length n struct containing a 3xm set of vectors defining the 
 %               location of m identified cubesats in each TOF file
 %
-function [centroids] = TOF_centroid(filestrs,dataType)
+function [centroids] = TOF_centroid(filestrs,truth,dataType)
 %% Loop through files
 for i = 1:length(filestrs)
   %% Load data
@@ -37,11 +38,11 @@ for i = 1:length(filestrs)
         
         %% Loop through cubesats
         for j = 1:numel(cubesats)
-            %% Find size of cubesat
-            centroids(j).u(i) = findCubesatSize(cubesats(j).ptCloud);
-            
             %% Fit planes to point cloud
-            [planes,numPlanes] = fitPlanes(cubesats(j).ptCloud);
+            [planes,numPlanes] = Copy_of_fitPlanes(cubesats(j).ptCloud);
+            
+            %% Find size of cubesat
+            centroids(i).u(j) = findCubesatSize(cubesats(j).ptCloud);
             
             %% Do not proceed if no planes are identified
             if numPlanes==0
@@ -49,13 +50,12 @@ for i = 1:length(filestrs)
             end
             
             %% Find centroid based on number of identified planes
-            u = mode( centroids(j).u(centroids(j).u~=0) );
             if numPlanes==1
-                centroids(j).pos(i,:) = centroid1(cubesats(j).ptCloud,planes,u);
+                centroids(i).pos(:,j) = centroid1(cubesats(j).ptCloud,planes,centroids(i).u(j));
             elseif numPlanes==2
-                
+                centroids(i).pos(:,j) = centroid2(cubesats(j).ptCloud,planes,centroids(i).u(j));
             elseif numPlanes==3
-                centroids(j).pos(i,:) = centroid3(cubesats(j).ptCloud,planes,u);
+                centroids(i).pos(:,j) = centroid3(cubesats(j).ptCloud,planes,centroids(i).u(j));
             end
         end
     end
