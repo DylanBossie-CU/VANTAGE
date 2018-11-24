@@ -52,4 +52,7 @@ function [cubesats] = ptSplit(ptCloud)
     else
         cubesats.ptCloud = ptCloud; 
     end
+    
+    % Reverse order so cubesats are ordered first-out to last-out
+    cubesats = flip(cubesats);
 end

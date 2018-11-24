@@ -1,7 +1,7 @@
-function [d] = distInFromFace(face,u)
+function [d] = distInFromFace(face,u,SET)
     
     % Calculate standard areas
-    Avec = (1:3).*0.1.^2;
+    Avec = SET.CSPARAMS.A;
     
     % Calculate face area
     A = area(face);
@@ -13,7 +13,7 @@ function [d] = distInFromFace(face,u)
     [~,I] = min(dA);
     
     % Set distance in for centroid
-    dVec = 0.5.*(1:3).*0.1;
+    dVec = 0.5.*SET.CSPARAMS.L;
     if u==1
         d = dVec(1);
     else
