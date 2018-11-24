@@ -19,7 +19,7 @@ minPoints   = 10;
 
 % Initialize planes structure
 numPlanes = 0;
-planes(3) = struct('o',[],'n',[],'V',[],'planeCloud',[]);
+planes = struct;
 
 % Tracking of points not associated with any plane
 remainPtCloud = ptCloud;
@@ -27,7 +27,9 @@ remainPtCloud = ptCloud;
 %% Find planes until no more planes exist
 while remainPtCloud.Count > minPoints
   %% Fit a plane to the ptCloud
+  warning('off','vision:pointcloud:notEnoughInliers')
   [~,inlierIndices,outlierIndices] = pcfitplane(remainPtCloud,maxDistance);
+  warning('on','vision:pointcloud:notEnoughInliers')
   
   %% Quit now if no significant planes found
   if isempty(inlierIndices) || numel(inlierIndices) < minPoints
@@ -39,8 +41,6 @@ while remainPtCloud.Count > minPoints
   %% Extract plane from ptCloud
   % extract
   plane = select(remainPtCloud,inlierIndices);
-  % denoise
-  plane = pcdenoise(plane);
   % store in output
   planes(numPlanes).planeCloud = plane;
   
@@ -55,12 +55,17 @@ while remainPtCloud.Count > minPoints
   for i = 1:numPlanes-1
     % if normal is within 45 deg of prior plane's normal or antinormal
     if acosd(dot(planes(numPlanes).n,planes(i).n)) < 45 || acosd(dot(planes(numPlanes).n,planes(i).n)) > 135
-      % delete this plane
-      planes(numPlanes).n = [];
-      planes(numPlanes).V = [];
-      planes(numPlanes).o = [];
-      planes(numPlanes).planeCloud = [];
-      numPlanes = numPlanes -1;
+      % if this plane is smaller than previous plane
+      if planes(numPlanes).planeCloud.Count <= planes(i).planeCloud.Count
+        % delete this plane
+        planes(numPlanes) = [];
+        numPlanes = numPlanes -1;
+      % if the previous plane is smaller than this plane
+      else
+        % replace previous plane with this plane and delete this plane
+        planes(i) = planes(numPlanes);
+        planes(numPlanes) = [];
+      end
     end
   end
   

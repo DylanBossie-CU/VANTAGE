@@ -3,24 +3,34 @@ function [cubesats] = ptSplit(ptCloud)
     % Pull out z values
     z = sort(ptCloud.Location(:,3));
     
-    % Calculate k-squares density
-    [zDense,zBin] = ksdensity(z);
+    %% Start the loop
+    NPeaks = Inf;
+    bw = 0.005;
+    counter = 0;
+    while NPeaks > 3
+      % Calculate k-squares density
+      [zDense,zBin] = ksdensity(z,'bandwidth',bw,'function','pdf');
+
+      % Identify split locations
+      c = 0;
+      [~,locs] = findpeaks(-zDense,zBin,'MinPeakProminence',c);
+      
+      % Update bandwidth
+      NPeaks = length(locs);
+      bw = length(locs)/3*bw;
+      
+      % give up if too many tries
+      counter = counter + 1;
+      if counter > 10
+        error('Bandwidth for point splitting ksdensity function did not converge in 10 tries, implement a better bw update')
+      end
+    end
     
-    %{
-    figure
-    plot(zBin,-zDense);
-    xlabel('z (m)')
-    ylabel('Percent point density')
-    %}
-    
-    % Identify split locations
-    c = 0.05;
-    %{
-    findpeaks(-zDense,zBin,'MinPeakProminence',c,'NPeaks',3);
-    xlim([0 3])
-    pause(1)
-    %}
-    [~,locs] = findpeaks(-zDense,zBin,'MinPeakProminence',c,'NPeaks',3);
+  %     figure
+  %     plot(zBin,-zDense);
+  %     xlabel('z (m)')
+  %     ylabel('Percent point density')
+  
     nSplit = numel(locs);
     
     % Separate point cloud by split planes
