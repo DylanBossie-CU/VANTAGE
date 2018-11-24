@@ -16,7 +16,7 @@ plotBinarized = 0;
 
 %%% Search desired image folder for relevant images
 imageDirectory = 'Images/';
-images = strcat(imageDirectory,'8*');
+images = strcat(imageDirectory,'3*');
 imageFiles = dir(images);
 
 %Preallocate array to store number of pixels for the cubesats in each image
