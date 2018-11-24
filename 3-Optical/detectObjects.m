@@ -1,10 +1,12 @@
-function detectedObject = detectObjects(I_boundaries,s,~)
+function detectedObjects = detectObjects(I_boundaries,s,~)
 maxBoundary = max(s);
-pixelThreshold = 0.1*maxBoundary;
-detectedObject = [];
+pixelThreshold = 0.3*maxBoundary;
+j = 1;
 for i=1:length(s)
+    disp(s(i))
     if s(i) > pixelThreshold
-        detectedObject = [detectedObject I_boundaries(i)];
+        detectedObjects{j} = I_boundaries{i};
+        j = j + 1;
     end
 end
 

@@ -201,8 +201,9 @@ end
 figure
 imshow(I_gray)
 hold on
-plot(rectx,recty)
+plot(rectx,recty,'LineWidth',2)
 plot(x,y)
 title('CubeSat Boundary with Minimum Bounding Rectangle')
+saveas(gcf,['BoundingImageOutputs/MultiObject','boundingRectangle',num2str(i),'.jpg'])
 end % mainline end
 

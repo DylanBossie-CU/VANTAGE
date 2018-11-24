@@ -3,7 +3,7 @@ function FindCentroid(imageFiles,plotGrayscale,~,plotBinarized,imageDirectory)
 for i=1:length(imageFiles)
     I = imread(strcat(imageDirectory,imageFiles(i).name));
     %%%%% Remove camera blur from raw image
-    I = DeblurImage(I);
+    %I = DeblurImage(I);
     I_gray = rgb2gray(I);
     
     binaryTolerance = 0.3;
@@ -22,7 +22,7 @@ for i=1:length(imageFiles)
     objects = detectObjects(I_boundaries,s,si);
     
     for j =1:length(objects)
-        findCorners(objects(i),I_gray)
+        boundingRectangles = findBoundingRectangles(objects(j),I_gray);
     end
     
     if plotGrayscale == 1
