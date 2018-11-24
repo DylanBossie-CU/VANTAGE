@@ -1,4 +1,4 @@
-function [cubesats] = ptSplit(ptCloud)
+function [cubesats,numCubesats] = ptSplit(ptCloud,prevNumCubesats)
 
     % Pull out z values
     z = sort(ptCloud.Location(:,3));
@@ -20,7 +20,7 @@ function [cubesats] = ptSplit(ptCloud)
     xlim([0 3])
     pause(1)
     %}
-    [~,locs] = findpeaks(-zDense,zBin,'MinPeakProminence',c,'NPeaks',3);
+    [~,locs] = findpeaks(-zDense,zBin,'MinPeakProminence',c,'NPeaks',2);
     nSplit = numel(locs);
     
     % Separate point cloud by split planes
@@ -42,4 +42,13 @@ function [cubesats] = ptSplit(ptCloud)
     else
         cubesats.ptCloud = ptCloud; 
     end
+    
+    % Adjust for losing sight of cubesats
+    numCubesats = numel(cubesats);
+    if numCubesats<prevNumCubesats
+        cubesats (numCubesats:prevNumCubesats) = struct('ptCloud',[]);
+        numCubesats = prevNumCubesats;
+    end
+    cubesats = flipud(cubesats);
+    
 end

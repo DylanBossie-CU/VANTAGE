@@ -44,4 +44,13 @@ function pos = centroid1(ptCloud,planes,u)
     d = distInFromFace(face,u);
     pos = outPlane + d.*(planes.n)';
     
+    %{
+    close all
+    figure
+    pcshow(ptCloud)
+    hold on
+    plot3(pos(1),pos(2),pos(3),'ko')
+    plot3(0,0,0,'k*')
+    pause(1)
+    %}
 end

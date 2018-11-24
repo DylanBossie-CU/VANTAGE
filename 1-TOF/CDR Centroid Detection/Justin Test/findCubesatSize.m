@@ -1,7 +1,7 @@
 function u = findCubesatSize(ptCloud)
 
     % Initialize standard cubesat lengths
-    uz = [10 20 30];
+    uz = (1:3)*0.1;
     
     %dx = max(ptCloud.Location(:,1)) - min(ptCloud.Location(:,1));
     %dy = max(ptCloud.Location(:,2)) - min(ptCloud.Location(:,2));
