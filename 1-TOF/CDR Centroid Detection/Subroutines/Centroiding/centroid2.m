@@ -59,7 +59,15 @@ function pos = centroid2(ptCloud,planes,u)
       offI = [1 2];
       offI = offI(offI~=bestI); % this index is the other plane
       bestSize = J(bestI); % this value says whether bestI is a 1U, 2U, or 3U length side
-      [~,offSize]  = min(abs((1:3).*0.1-lengthIntersect)); % this value says whether offI is a 1U, 2U, or 3U side
+      switch bestSize
+        case 1
+          % If bestSize is 1 then offSize is just the other size in J
+          offSize = J(offI);
+        case {2,3} % If bestSize is 2 or 3 then offSize could be 1 or (2 or 3) depending on length of the Intersect
+          [~,offSize]  = min(abs((1:3).*0.1-lengthIntersect)); % this value says whether offI is a 1U, 2U, or 3U side
+        otherwise
+          error('Invalid bestSize')
+      end
       % mid-plane diagonal unit vector
       innerDiag = (offSize*n(:,bestI) + bestSize*n(:,offI))./norm(bestSize*n(:,bestI) + offSize*n(:,offI));
       % centroid (project along innerDiag by half a diagonal face length)
