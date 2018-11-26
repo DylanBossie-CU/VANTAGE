@@ -14,7 +14,7 @@
 %   truth    - length n struct containing a 3xm set of vectors defining the 
 %               location of m identified cubesats in each TOF file
 %
-function [TRUTH] = generateSimTruth(filestrs)
+function [TRUTH] = generateSimTruth(filestrs,R0)
 %% For all filestrs
 for i = 1:length(filestrs)
   % repackage
@@ -36,7 +36,8 @@ for i = 1:length(filestrs)
   tube = str2num(str(j+5));
   str = str(j+6:end);
   % find num cubesats and u
-  j = strfind(str,'U');
+  k = strfind(str,'V');
+  j = strfind(str(1:k),'U');
   numSats = length(j);
   for k = 1:length(j)
     u(k) = str2num(str(j(k)-1));
@@ -55,16 +56,16 @@ for i = 1:length(filestrs)
   vz = str2num(str(j+3:k-1)); % m/s
   V = [vx vy vz]'; % m/s
   % Find cubesat angular velocity
-  j = strfind(str,'WX_');
-  k = strfind(str,'_WY');
-  wx = str2num(str(j+3:k-1)); % rad/s
-  j = strfind(str,'WY_');
-  k = strfind(str,'_WZ');
-  wy = str2num(str(j+3:k-1)); % rad/s
-  j = strfind(str,'WZ_');
-  k = strfind(str,'_SE.');
-  wz = str2num(str(j+3:k-1)); % rad/s
-  W = [wx wy wz]'; % rad/s
+%   j = strfind(str,'WX_');
+%   k = strfind(str,'_WY');
+%   wx = str2num(str(j+3:k-1)); % rad/s
+%   j = strfind(str,'WY_');
+%   k = strfind(str,'_WZ');
+%   wy = str2num(str(j+3:k-1)); % rad/s
+%   j = strfind(str,'WZ_');
+%   k = strfind(str,'_SE.');
+%   wz = str2num(str(j+3:k-1)); % rad/s
+%   W = [wx wy wz]'; % rad/s
   % Find separation
   j = strfind(str,'SE._');
   k = strfind(str,'_F');
@@ -76,9 +77,6 @@ for i = 1:length(filestrs)
   % Find time
   t = frame/fps; % s
   % Find centroid
-  R0 = [13.1 0 -3.625;13.1 0 -24.5;13.1 0 -56.625]'./100; % m
-  warning('Initial position currently hard coded')
-  R0(3,:) = R0(3,:) - 3.625/100;
   for j = 1:numSats
     TRUTH(i).pos(:,j) = R0(:,j) + V*t; % m
   end
