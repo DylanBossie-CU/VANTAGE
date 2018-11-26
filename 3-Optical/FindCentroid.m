@@ -1,4 +1,5 @@
-function FindCentroid(imageFiles,plotGrayscale,~,plotBinarized,imageDirectory)
+function FindCentroid(imageFiles,plotGrayscale,~,plotBinarized,...
+    imageDirectory,imageType)
 
 for i=1:length(imageFiles)
     I = imread(strcat(imageDirectory,imageFiles(i).name));
@@ -12,52 +13,46 @@ for i=1:length(imageFiles)
     
     %%%%% Find the largest boundaries (the cubesats)
     [s,~] = cellfun(@size,I_boundaries);
-    [~,si] = sort(s,'descend');
+    [s,si] = sort(s,'descend');
     I_boundaries = I_boundaries(si,:);
     
-    %%%%% Smooth the boundaries found in the image (currently operates on
-    %%%%% the first boundary only)
-    %smoothBoundary = smoothBoundaries(I_boundaries,I_gray);
+    %%%%% Smooth the boundaries found in the image (currently extremely
+    %%%%% broken lol)
+    %I_boundaries = smoothBoundaries(I_boundaries,I_gray);
 
     objects = detectObjects(I_boundaries,s,si);
     
-    for j =1:length(objects)
-        boundingRectangles = findBoundingRectangles(objects(j),I_gray);
-    end
-    
+    boundingRectangles = findBoundingRectangles(objects,I_gray);
+    %{
     if plotGrayscale == 1
         figure
         imshow(I_gray,'InitialMagnification',800);
         hold on
         sz = 600;
     end
-    
+    %}
     for j=1:length(objects)
-        b = objects{j};
+        %objectBoundary = objects{j};
+        boundingRectangle = boundingRectangles{j};
         %%%% Plotting grayscale image overlaid with cube outline
         %%%% and geometric centroid overlaid
         if plotGrayscale == 1
-            scatter(mean(b(:,2)),mean(b(:,1)),sz,'r','+','LineWidth',5);
-            str = num2str(j);
-            text(mean(b(:,2)),mean(b(:,1))+200,str,'Color','red',...
-                'FontSize',60);
-            plot(b(:,2),b(:,1),'g','LineWidth',3);
+            %plotEdgeCentroid(objectBoundary,j)
+            plotBoundingCentroid(boundingRectangle,j)
         end
     end
-    
     [object_pixels,image_cropped] = FindCubeSatPixels(objects,I_binarized);
     
     if plotGrayscale == 1
         for j = 1:length(object_pixels)
             xLocation = 1*j;
-            yLocation = 60*j;
+            yLocation = 300*j;
             str = strcat(num2str(j),':  ', num2str(object_pixels(j)),'px');
             text(xLocation,yLocation,str,'Color','red',...
                     'FontSize',30);
         end
-        title(['Image ' , num2str(i)]);
-        saveas(gcf,['OutlinedImageOutputs/','outlined_'...
-            ,imageFiles(i).name]);
+        saveas(gcf,['BoundingImageOutputs/',imageType,'/',...
+            imageType,num2str(i),'.jpg'])
     end
     
     if plotBinarized == 1

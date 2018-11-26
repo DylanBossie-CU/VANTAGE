@@ -196,14 +196,7 @@ for i = 1:nang
   end
 end
 % get the final rect
-
-% all done
-figure
-imshow(I_gray)
-hold on
 plot(rectx,recty,'LineWidth',2)
-plot(x,y)
-title('CubeSat Boundary with Minimum Bounding Rectangle')
-saveas(gcf,['BoundingImageOutputs/MultiObject','boundingRectangle',num2str(i),'.jpg'])
+%plot(x,y)
 end % mainline end
 
