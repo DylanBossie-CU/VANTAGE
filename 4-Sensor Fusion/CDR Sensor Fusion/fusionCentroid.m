@@ -1,3 +1,31 @@
+%%  Author: Justin Fay
+%  Created: 11/26/2018
+% Modified: 11/26/2018
+%
+% fusionCentroid
+%
+% Assumptions: 
+%   We're assuming that the centroid lies on the plane normal to the camera
+%   line. This could potentially be updated in the future if it makes more
+%   sense to do something else
+% 
+% Purpose:
+%   This function calculates an error-weighted centroid based on the
+%   vector output from the VANTAGE camera processing and the position
+%   output from the VANTAGE time of flight processing.
+%
+% Inputs:
+%   camOrigin - origin point of camera
+%   camVec    - vector from camera to visual cetroid of cubesat
+%   pos_TOF   - position output from time of flight processing
+%   sig_cam   - uncertainty in camera centroid
+%   sig_TOF   - uncertainty in TOF centroid
+% Outputs:
+%   pos - centroid position of cubesat after sensor fusion
+% Notes:
+%   sig_cam and sig_TOF should use the same units or be a weighted score
+%   for the uncertainties.
+
 function [pos] = fusionCentroid(camOrigin, camVec, pos_TOF, sig_cam, sig_TOF)
 
     % Define line vector
@@ -14,7 +42,11 @@ function [pos] = fusionCentroid(camOrigin, camVec, pos_TOF, sig_cam, sig_TOF)
     
     % Calculate distance along line for weigthed center point
     d = norm(vec) / norm(a);
-    q = sig_TOF./(sig_cam+sig_TOF);
+    if sig_TOF~=0
+        q = sig_TOF./(sig_cam+sig_TOF);
+    else
+        q = 0;
+    end
     d_q = d.*q;
     
     % Calculate error-weighted centroid position
