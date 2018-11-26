@@ -21,7 +21,7 @@ for i = 1:30
   end
 end
 
-filestrs = {[direc,'30FPS_Tube_2_3U_2U_1U_VX_0_VY_0_VZ_001_WX_0_WY_0_WZ_0_SEP_0P03_F00040.pcd']};
+filestrs = {[direc,'30FPS_Tube_2_3U_2U_1U_VX_0_VY_0_VZ_001_WX_0_WY_0_WZ_0_SEP_0P03_F00050.pcd']};
 
 
 %% Get truth data
