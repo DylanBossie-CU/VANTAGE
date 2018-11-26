@@ -27,8 +27,11 @@ filestrs = {[direc,'30FPS_Tube_2_3U_2U_1U_VX_0_VY_0_VZ_001_WX_0_WY_0_WZ_0_SEP_0P
 %% Get truth data
 [truth] = generateSimTruth(filestrs);
 
+%% Initialize
+SET = CDR_TOF_initialize();
+
 %% Find centroids
-[centroids] = TOF_centroid(filestrs,truth,'sim');
+[CENTROID] = TOF_centroid(SET.filestrs,SET,SET.dataType);
  
 %% Show results
 % For single file testing
@@ -39,7 +42,7 @@ if length(filestrs)==1
   h = pcshow(ptCloud);
   for i = 1:length(filestrs)
     plot3(truth(i).pos(1,:),truth(i).pos(2,:),truth(i).pos(3,:),'b.','markersize',8)
-    plot3(centroids(i).pos(1,:),centroids(i).pos(2,:),centroids(i).pos(3,:),'r.','markersize',8)
+    plot3(CENTROID(i).pos(1,:),CENTROID(i).pos(2,:),CENTROID(i).pos(3,:),'r.','markersize',8)
   end
   xlabel('x')
   ylabel('y')
@@ -58,8 +61,8 @@ hold on
 grid on
 grid minor
 for i = 1:length(filestrs)
-  for j = 1:length(centroids(i).u)
-    res(i,j) = norm(truth(i).pos(:,j)-centroids(i).pos(:,4-j));
+  for j = 1:length(CENTROID(i).u)
+    %res(i,j) = norm(truth(i).pos(:,j)-centroids(i).pos(:,4-j));
   end
 end
 plot(res(:,1))

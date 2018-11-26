@@ -1,7 +1,7 @@
 %%%%%Dylan Bossie
 %%%%%10/7/2018
 %%%%%VANTAGE
-%%%%%PDR Object Detection Feasibility
+%%%%%CDR Object Detection Solution
 clc
 close all
 clear
@@ -10,18 +10,25 @@ clear
 %jerry = 7360*4912;
 
 %%% Options to plot grayscale centroid and binarized images
-plotGrayscale = 0;
+plotGrayscale = 1;
 plotBinarized = 0;
 
 
 %%% Search desired image folder for relevant images
 imageDirectory = 'Images/';
-images = strcat(imageDirectory,'8*');
+imageSet = '3*';
+if strcmp(imageSet,'8*')
+    imageType = 'RealImages';
+else
+    imageType = 'MultiObject';
+end
+images = strcat(imageDirectory,imageSet);
 imageFiles = dir(images);
 
 %Preallocate array to store number of pixels for the cubesats in each image
 tic
 number_of_pixels = zeros(length(imageFiles),1);
-FindCentroid(imageFiles,plotGrayscale,number_of_pixels,plotBinarized,imageDirectory);
+FindCentroid(imageFiles,plotGrayscale,number_of_pixels,plotBinarized,...
+    imageDirectory,imageType);
 toc
 fprintf('Number of images processed: %d\n',length(imageFiles));

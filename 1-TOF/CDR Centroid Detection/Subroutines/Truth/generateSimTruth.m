@@ -14,7 +14,7 @@
 %   truth    - length n struct containing a 3xm set of vectors defining the 
 %               location of m identified cubesats in each TOF file
 %
-function [truth] = generateSimTruth(filestrs)
+function [TRUTH] = generateSimTruth(filestrs)
 %% For all filestrs
 for i = 1:length(filestrs)
   % repackage
@@ -41,7 +41,7 @@ for i = 1:length(filestrs)
   for k = 1:length(j)
     u(k) = str2num(str(j(k)-1));
   end
-  truth(i).u = flip(u);
+  TRUTH(i).u = flip(u);
   str = str(j(end)+1:end);
   % find cubesat velocity
   j = strfind(str,'VX_');
@@ -80,7 +80,7 @@ for i = 1:length(filestrs)
   warning('Initial position currently hard coded')
   R0(3,:) = R0(3,:) - 3.625/100;
   for j = 1:numSats
-    truth(i).pos(:,j) = R0(:,j) + V*t; % m
+    TRUTH(i).pos(:,j) = R0(:,j) + V*t; % m
   end
   
   
