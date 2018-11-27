@@ -82,10 +82,11 @@ vel_fusion = sqrt(sum(diff(pos_fusion).^2,2))./diff(t);
 vBar_TOF = mean(vel_TOF);
 vBar_fusion = mean(vel_fusion);
 
-% Error results
+% Position error results
 err_TOF = pos_TOF - pos_truth; err_TOF = sqrt(sum(err_TOF.^2,2));
 err_fusion = pos_fusion - pos_truth; err_fusion = sqrt(sum(err_fusion.^2,2));
 
+% Velocity error results
 vErr_TOF = abs(vel_TOF - norm(V_truth));
 vErr_fusion = abs(vel_fusion - norm(V_truth));
 
