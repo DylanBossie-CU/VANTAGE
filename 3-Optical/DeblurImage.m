@@ -1,6 +1,6 @@
 function I_deblurred = DeblurImage(I)
-    radius = 1;
-    PSF = fspecial('disk',radius);
-    I_deblurred = deconvwnr(I,PSF,0.05);
+    PSF = fspecial('gaussian',50,2);
+    INITPSF = ones(size(PSF));
+    I_deblurred = deconvblind(I,INITPSF,5);
     return
 end

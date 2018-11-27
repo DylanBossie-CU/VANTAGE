@@ -50,12 +50,12 @@ n(:,1) = sign(dot(meanpt,planes(1).n))*planes(1).n;
 n(:,2) = sign(dot(meanpt,planes(2).n))*planes(2).n;
 switch u
   % 1U Cubesat
-  case 0
+  case 1
     % mid-plane diagonal unit vector
     innerDiag = (n(:,1)+n(:,2))./norm(n(:,1)+n(:,2));
     % centroid (project along innerDiag by half a diagonal face length)
-    pos       = meanpt + 0.5*SET.CSPARAMS.D_short*innerDiag;
-  case {1,2,3,4,5,6}
+    pos       = meanpt + 0.5*SET.CSPARAMS.D*innerDiag;
+  case {2,3}
     % Make best guess at which face is which
     As = SET.CSPARAMS.A;
     for i = 1:2
@@ -70,19 +70,19 @@ switch u
     offI = [1 2];
     offI = offI(offI~=bestI); % this index is the other plane
     bestSize = J(bestI); % this value says whether bestI is a 1U, 2U, or 3U length side
-    if bestSize == 1 && u ~= 1
-      bestSize = 7;
-    end
     switch bestSize
-      case {1,2,3,4,5,6}
-        [~,offSize]  = min(abs(SET.CSPARAMS.L-lengthIntersect)); % this value says the U of the off-size
-      case 7
-        offSize = u;
+      case 1
+        % If bestSize is 1 then offSize is just the other size in J
+        offSize = J(offI);
+      case {2,3} % If bestSize is 2 or 3 then offSize could be 1 or (2 or 3) depending on length of the Intersect
+        [~,offSize]  = min(abs(SET.CSPARAMS.L-lengthIntersect)); % this value says whether offI is a 1U, 2U, or 3U side
+      otherwise
+        error('Invalid bestSize')
     end
-      % mid-plane diagonal unit vector
-    innerDiag = unitvec(SET.CSPARAMS.L(offSize)*n(:,bestI) + SET.CSPARAMS.L(bestSize)*n(:,offI));
+    % mid-plane diagonal unit vector
+    innerDiag = (offSize*n(:,bestI) + bestSize*n(:,offI))./norm(bestSize*n(:,bestI) + offSize*n(:,offI));
     % centroid (project along innerDiag by half a diagonal face length)
-    pos = meanpt + 0.5*sqrt((SET.CSPARAMS.L(offSize))^2+(SET.CSPARAMS.L(bestSize))^2)*innerDiag;
+    pos = meanpt + 0.5*sqrt((offSize*SET.CSPARAMS.u)^2+(bestSize*SET.CSPARAMS.u)^2)*innerDiag;
   otherwise
     error('Invalid u has been given as an input')
 end
