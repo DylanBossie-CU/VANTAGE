@@ -69,5 +69,5 @@ function [pos] = fusionCentroid(camOrigin, camVec, pos_TOF, sig_cam, sig_TOF)
     grid on
     title('Sensor Fusion Visualization')
     xlabel('x (m)'); ylabel('y (m)'); zlabel('z (m)')
-    legend('Camera origin','Camera vector','Position from TOF','Position from camera','Shortest distance line','Error-weighted centroid')
+    %legend('Camera origin','Camera vector','Position from TOF','Position from camera','Shortest distance line','Error-weighted centroid')
 end
