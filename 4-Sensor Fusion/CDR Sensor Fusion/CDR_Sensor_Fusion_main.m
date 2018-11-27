@@ -74,28 +74,46 @@ for i = 1:numFrame
     benchTime(i) = toc;
 end
 
+% Calculate velocity for different estimates
+vel_TOF = sqrt(sum(diff(pos_TOF).^2,2))./diff(t);
+vel_fusion = sqrt(sum(diff(pos_fusion).^2,2))./diff(t);
+
+% Calculate average velocities
+vBar_TOF = mean(vel_TOF);
+vBar_fusion = mean(vel_fusion);
+
 % Error results
 err_TOF = pos_TOF - pos_truth; err_TOF = sqrt(sum(err_TOF.^2,2));
-err_cam = pos_cam - pos_truth; err_cam = sqrt(sum(err_cam.^2,2));
 err_fusion = pos_fusion - pos_truth; err_fusion = sqrt(sum(err_fusion.^2,2));
+
+vErr_TOF = abs(vel_TOF - norm(V_truth));
+vErr_fusion = abs(vel_fusion - norm(V_truth));
 
 % Plotting
 figure
 plot(err_TOF)
 hold on
-plot(err_cam)
 plot(err_fusion)
 xlabel('Frame')
 ylabel('Magnitude error (m)')
-title('Effectiveness of Sensor Fusion')
-legend('TOF','Camera','Fusion','Location','Best')
+title('Position Error of Sensor Fusion')
+legend('TOF','Fusion','Location','Best')
+
+figure
+plot(vErr_TOF)
+hold on
+plot(vErr_fusion)
+xlabel('Frame')
+ylabel('Magnitude error (m/s)')
+title('Velocity Error of Sensor Fusion')
+legend('TOF','Fusion','Location','Best')
 %{
 figure
 loglog(benchTime)
 xlabel('Frame')
 ylabel('Runtime (s)')
 title('Sensor Fusion Runtime')
-
+%
 figure
 plot3(pos_truth(:,1),pos_truth(:,2),pos_truth(:,3),'r.')
 hold on
