@@ -1,6 +1,6 @@
 function detectedObjects = detectObjects(I_boundaries,s,~)
 maxBoundary = max(s);
-pixelThreshold = 0.1*maxBoundary;
+pixelThreshold = 0.2*maxBoundary;
 j = 1;
 for i=1:length(s)
     if s(i) > pixelThreshold

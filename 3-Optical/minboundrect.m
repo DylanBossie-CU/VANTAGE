@@ -1,4 +1,4 @@
-function [rectx,recty,area,perimeter] = minboundrect(x,y,metric,I_gray)
+function [rectx,recty,area,perimeter] = minboundrect(x,y,metric,~)
 % minboundrect: Compute the minimal bounding rectangle of points in the plane
 % usage: [rectx,recty,area,perimeter] = minboundrect(x,y,metric)
 %

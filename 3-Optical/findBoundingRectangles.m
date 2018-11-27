@@ -10,5 +10,4 @@ for i = 1:length(boundaryPixels)
     boundingRectangles{i} = [rectx,recty];
 end
 title('CubeSat Boundary with Minimum Bounding Rectangle')
-%saveas(gcf,['BoundingImageOutputs/RealImage','BoundingRectangle',num2str(i),'.jpg'])
 end
