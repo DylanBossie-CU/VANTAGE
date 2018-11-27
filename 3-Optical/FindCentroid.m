@@ -14,7 +14,7 @@ for i=1:length(imageFiles)
     %}
     I_gray = rgb2gray(I);
     
-    binaryTolerance = 0.1;
+    binaryTolerance = 0.3;
     I_binarized = imbinarize(I_gray,binaryTolerance);
     %imshow(I_binarized)
     [I_boundaries,~,~,~] = bwboundaries(I_binarized);
@@ -35,12 +35,12 @@ for i=1:length(imageFiles)
     boundingRectangles = findBoundingRectangles(objects,I_binarized);
 
     for j=1:length(objects)
-        objectBoundary = objects{j};
+        %objectBoundary = objects{j};
         boundingRectangle = boundingRectangles{j};
         %%%% Plotting grayscale image overlaid with cube outline
         %%% and geometric centroid overlaid
         if plotGrayscale == 1
-            plotEdgeCentroid(objectBoundary,j)
+            %plotEdgeCentroid(objectBoundary,j)
             plotBoundingCentroid(boundingRectangle,j)
         end
     end
