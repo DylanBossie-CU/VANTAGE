@@ -4,13 +4,13 @@ close all
 clear
 % Define outputs from camera
 camOrigin = [0 0 0];
-camVec = {[1 .5 0],[1 1 0]};
+camVec = {[1 .5 0],[1 1 0],[1 2.2 0]};
 
 % Define output from TOF
-pos_TOF = {[1 0.75 0],[1 1.9 0]};
+pos_TOF = {[1 0.75 0],[1 1.9 0],[1 2.4 0]};
 
 % Define timestamps
-time = [1 2];
+time = [1 2 2.5];
 
 % Define uncertainties
 sig_cam = 0.01;
@@ -20,7 +20,6 @@ sig_TOF = 0.05;
 pos = zeros(length(time),3);
 for i = 1:length(time)
     [pos(i,:)] = fusionCentroid(camOrigin, camVec{i}, pos_TOF{i}, sig_cam, sig_TOF);
-    if i > 1
-        [vel] = calculateVelocity(pos,time);
-    end
 end
+
+[vel] = calculateVelocity(pos,time)
