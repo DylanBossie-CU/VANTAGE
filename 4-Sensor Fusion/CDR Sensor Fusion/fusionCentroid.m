@@ -26,7 +26,10 @@
 %   sig_cam and sig_TOF should use the same units or be a weighted score
 %   for the uncertainties.
 
-function [pos] = fusionCentroid(camOrigin, camVec, pos_TOF, sig_cam, sig_TOF)
+function [pos] = fusionCentroid(camOrigin, camVec, pos_TOF, sig_cam, sig_TOF, pos_truth)
+
+    % Normalize camera vector
+    camVec = camVec./norm(camVec);
 
     % Define line vector
     a = camOrigin - camVec;
@@ -37,9 +40,6 @@ function [pos] = fusionCentroid(camOrigin, camVec, pos_TOF, sig_cam, sig_TOF)
     % Calculate vector cross product
     vec = cross(a,b);
     
-    % Calculate position for camera
-    pos_cam = pos_TOF-cross(vec,a);
-    
     % Calculate distance along line for weigthed center point
     d = norm(vec) / norm(a);
     if sig_TOF~=0
@@ -49,15 +49,22 @@ function [pos] = fusionCentroid(camOrigin, camVec, pos_TOF, sig_cam, sig_TOF)
     end
     d_q = d.*q;
     
+    % Calculate position for camera
+    mag_TOF = norm(pos_TOF);
+    mag_cam = sqrt(mag_TOF.^2 - d.^2);
+    pos_cam = camOrigin + mag_cam.*camVec;
+    
     % Calculate error-weighted centroid position
-    pos = pos_TOF - cross(vec,a).*d_q./d;
+    posDir = pos_cam - pos_TOF; posDir = posDir./norm(posDir);
+    pos = pos_TOF + posDir.*d_q;
     
     % Plotting
+    %{
+    figure
     aVec = [camOrigin;camVec];
     bVec = [pos_TOF;camVec];
     cam = [camOrigin;camVec];
     posVec = [pos_TOF;pos_cam];
-    figure
     plot3(camOrigin(1),camOrigin(2),camOrigin(3),'r*')
     hold on
     plot3(cam(:,1),cam(:,2),cam(:,3),'r-')
@@ -65,9 +72,12 @@ function [pos] = fusionCentroid(camOrigin, camVec, pos_TOF, sig_cam, sig_TOF)
     plot3(posVec(2,1),posVec(2,2),posVec(2,3),'ro')
     plot3(posVec(:,1),posVec(:,2),posVec(:,3),'m--')
     plot3(pos(1),pos(2),pos(3),'k*')
+    plot3(pos_truth(1),pos_truth(2),pos_truth(3),'g*')
     axis equal
     grid on
     title('Sensor Fusion Visualization')
     xlabel('x (m)'); ylabel('y (m)'); zlabel('z (m)')
-    legend('Camera origin','Camera vector','Position from TOF','Position from camera','Shortest distance line','Error-weighted centroid')
+    legend('Camera origin','Camera vector','Position from TOF','Position from camera','Shortest distance line','Error-weighted centroid','Truth data')
+    %}   
+    
 end
