@@ -1,4 +1,4 @@
-function [rectx,recty,area,perimeter] = minboundrect(x,y,metric,~)
+function [rectx,recty,area,perimeter] = minboundrect(x,y,metric,I_gray)
 % minboundrect: Compute the minimal bounding rectangle of points in the plane
 % usage: [rectx,recty,area,perimeter] = minboundrect(x,y,metric)
 %
@@ -196,7 +196,13 @@ for i = 1:nang
   end
 end
 % get the final rect
-plot(rectx,recty,'LineWidth',2)
-%plot(x,y)
+
+% all done
+figure
+imshow(I_gray)
+hold on
+plot(rectx,recty)
+plot(x,y)
+title('CubeSat Boundary with Minimum Bounding Rectangle')
 end % mainline end
 

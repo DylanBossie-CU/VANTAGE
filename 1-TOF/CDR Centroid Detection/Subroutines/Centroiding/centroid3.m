@@ -10,16 +10,17 @@
 %
 function pos = centroid3(ptCloud,planes,u,SET)
 %% Find plane intersection
-C = [planes(1).n; planes(2).n; planes(3).p];
-px = C(:,1);
-py = C(:,2);
-pz = C(:,3);
-A = [px,py,pz];
+
+for i = 1:3
+  A(i,1:3) = planes(i).n;
+  b(i,1)   = planes(i).n(1)*planes(i).o(1) + planes(i).n(2)*planes(i).o(2) + planes(i).n(3)*planes(i).o(3);
+end
+
 if rank(A) ~= 3
   error('Planes do not intersect in the expected way')
 end
-b = [0;0;0];
-ptIntersect = (A\b)';
+
+ptIntersect = (A\b);
 
 %% Find Best-Guess Face
 % ensure that unitvectors are inward facing
@@ -51,7 +52,7 @@ for i = [1:I-1 I+1:3]
   
   % Make best guess at which face this is
   switch bestSize
-    case 1
+    case {1,7}
       offI(c)    = i;
       offSize(c) = u;
     case u
@@ -60,23 +61,19 @@ for i = [1:I-1 I+1:3]
     otherwise
       error('Best-guess for face size does not match an allowable size (1 or U)')
   end
-end
-
-%% Error checking
-if sum([offSize bestSize]) ~= [2+u]
-  error('Invalid geometry was identified, improve the face-sizing algorithm')
+  c = c + 1;
 end
 
 %% Find volumetric centroid
 % volumetric diagonal
 switch bestSize
-  case 1
-    innerDiag = unitvec(n(:,bestI)*u + n(:,offI(1))*bestSize + n(:,offI(2))*bestSize);
+  case {1,7}
+    innerDiag = unitvec(n(:,bestI)*SET.CSPARAMS.u_long*u + n(:,offI(1))*SET.CSPARAMS.L(bestSize) + n(:,offI(2))*SET.CSPARAMS.L(bestSize));
   case u
-    innerDiag = unitvec(n(:,bestI) + n(:,offI(1))*offSize(2) + n(:,offI(2))*offSize(1));
+    innerDiag = unitvec(n(:,bestI)*SET.CSPARAMS.L(7) + n(:,offI(1))*SET.CSPARAMS.L(offSize(2)) + n(:,offI(2))*SET.CSPARAMS.L(offSize(1)));
   otherwise
     error('Best-guess for face size does not match an allowable size (1 or U)')
 end
-pos = ptIntersect + 0.5*sqrt((bestSize*SET.CSPARAMS.u)^2+(offSize(1)*SET.CSPARAMS.u)^2+(offSize(2)*SET.CSPARAMS.u)^2)*innerDiag;
+pos = ptIntersect + 0.5*sqrt((u*SET.CSPARAMS.u_long)^2+2*(SET.CSPARAMS.u_short)^2)*innerDiag;
     
 end
