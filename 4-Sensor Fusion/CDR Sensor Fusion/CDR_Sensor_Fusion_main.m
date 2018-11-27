@@ -2,6 +2,7 @@
 clc
 close all
 clear
+%{
 % Define outputs from camera
 camOrigin = [0 0 0];
 camVec = [1 2 0];
@@ -36,13 +37,13 @@ V_truth = [0 0 1];
 pos_truth = pos_init + V_truth.*t;
 
 % Define error parameters
-errMag_TOF = 0.02;
+errMag_TOF = sqrt(sum(pos_truth,2))*0.01;
 errX_TOF = 10;
 errY_TOF = 10;
 errZ_TOF = 2;
 errDir_TOF = [errX_TOF, errY_TOF, errZ_TOF];
 
-errMag_cam = 0.02;
+errMag_cam = sqrt(sum(pos_truth,2))*0.01;
 errX_cam = 2;
 errY_cam = 2;
 errZ_cam = 10;
@@ -69,7 +70,7 @@ pos_fusion = zeros(numFrame,3);
 benchTime = zeros(numFrame,1);
 for i = 1:numFrame
     tic
-    pos_fusion(i,:) = fusionCentroid(camOrigin, pos_cam(i,:), pos_TOF(i,:), 0.5, 0.5, pos_truth(i,:));
+    pos_fusion(i,:) = fusionCentroid(camOrigin, pos_cam(i,:), pos_TOF(i,:), errMag_cam(i), errMag_TOF(i), pos_truth(i,:));
     benchTime(i) = toc;
 end
 
@@ -87,7 +88,7 @@ plot(err_fusion)
 xlabel('Frame')
 ylabel('Magnitude error (m)')
 title('Effectiveness of Sensor Fusion')
-legend('TOF','Camera','Fusion')
+legend('TOF','Camera','Fusion','Location','Best')
 %{
 figure
 loglog(benchTime)
