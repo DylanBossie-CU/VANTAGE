@@ -30,15 +30,15 @@ for i=1:length(imageFiles)
 
     objects = detectObjects(I_boundaries,s,si);
     
-    edgeImage = createEdgeImage(objects{1},I_gray);
+    %edgeImage = createEdgeImage(objects{1},I_gray);
     
-    boundingRectangles = findBoundingRectangles(objects,I_gray);
+    boundingRectangles = findBoundingRectangles(objects,I_binarized);
 
     for j=1:length(objects)
         objectBoundary = objects{j};
         boundingRectangle = boundingRectangles{j};
         %%%% Plotting grayscale image overlaid with cube outline
-        %%%% and geometric centroid overlaid
+        %%% and geometric centroid overlaid
         if plotGrayscale == 1
             plotEdgeCentroid(objectBoundary,j)
             plotBoundingCentroid(boundingRectangle,j)
@@ -48,12 +48,13 @@ for i=1:length(imageFiles)
     
     if plotGrayscale == 1
         for j = 1:length(object_pixels)
-            xLocation = 1*j;
-            yLocation = 300*j;
+            xLocation = 0*j;
+            yLocation = 0.2*j;
             str = strcat(num2str(j),':  ', num2str(object_pixels(j)),'px');
             text(xLocation,yLocation,str,'Color','red',...
-                    'FontSize',30);
+                    'FontSize',10,'Units','normalized');
         end
+        title(['Image ' num2str(i)])
         saveas(gcf,['BoundingImageOutputs/',imageType,'/',...
             imageType,num2str(i),'.jpg'])
     end

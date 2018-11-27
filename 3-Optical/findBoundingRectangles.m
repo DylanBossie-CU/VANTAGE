@@ -9,5 +9,4 @@ for i = 1:length(boundaryPixels)
         minboundrect(boundary(:,2),boundary(:,1),'p',I_gray);
     boundingRectangles{i} = [rectx,recty];
 end
-title('CubeSat Boundary with Minimum Bounding Rectangle')
 end

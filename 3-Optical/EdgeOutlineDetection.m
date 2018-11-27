@@ -19,8 +19,10 @@ imageDirectory = 'Images/';
 imageSet = 'occ*';
 if strcmp(imageSet,'8*')
     imageType = 'RealImages';
-else
+elseif strcmp(imageSet,'multi')
     imageType = 'MultiObject';
+else
+    imageType = 'Misc';
 end
 images = strcat(imageDirectory,imageSet);
 imageFiles = dir(images);
