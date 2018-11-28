@@ -92,20 +92,20 @@ vErr_fusion = abs(vel_fusion - norm(V_truth));
 
 % Plotting
 figure
-plot(err_TOF)
+plot(sqrt(sum(pos_truth.^2,2)),err_TOF.*100)
 hold on
-plot(err_fusion)
-xlabel('Frame')
-ylabel('Magnitude error (m)')
+plot(sqrt(sum(pos_truth.^2,2)),err_fusion.*100)
+xlabel('Downrange Distance (m)')
+ylabel('Magnitude error (cm)')
 title('Position Error of Sensor Fusion')
 legend('TOF','Fusion','Location','Best')
 
 figure
-plot(vErr_TOF)
+plot(sqrt(sum(pos_truth(2:end,:).^2,2)),vErr_TOF.*100)
 hold on
-plot(vErr_fusion)
-xlabel('Frame')
-ylabel('Magnitude error (m/s)')
+plot(sqrt(sum(pos_truth(2:end,:).^2,2)),vErr_fusion.*100)
+xlabel('Downrange Distance (m)')
+ylabel('Magnitude error (cm/s)')
 title('Velocity Error of Sensor Fusion')
 legend('TOF','Fusion','Location','Best')
 %{
