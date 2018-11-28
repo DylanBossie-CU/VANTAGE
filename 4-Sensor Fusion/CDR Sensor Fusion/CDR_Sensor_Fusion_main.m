@@ -52,7 +52,7 @@ errDir_cam = [errX_cam, errY_cam, errZ_cam];
 % Create TOF data with error
 errMagVec = (rand(numFrame,1)-0.5).*2.*errMag_TOF;
 
-errDirVec = rand(numFrame,3).*errDir_TOF;
+errDirVec = (rand(numFrame,3)-0.5).*2.*errDir_TOF;
 errDirVec = errDirVec./sqrt(errDirVec(:,1).^2 + errDirVec(:,2).^2 + errDirVec(:,3).^2);
 errVec = errDirVec.*errMagVec;
 pos_TOF = pos_truth + errVec;
@@ -60,7 +60,7 @@ pos_TOF = pos_truth + errVec;
 % Create camera data with error
 errMagVec = (rand(numFrame,1)-0.5).*2.*errMag_cam;
 
-errDirVec = rand(numFrame,3).*errDir_cam;
+errDirVec = (rand(numFrame,3)-0.5).*2.*errDir_cam;
 errDirVec = errDirVec./sqrt(errDirVec(:,1).^2 + errDirVec(:,2).^2 + errDirVec(:,3).^2);
 errVec = errDirVec.*errMagVec;
 pos_cam = pos_truth + errVec;
@@ -114,13 +114,16 @@ loglog(benchTime)
 xlabel('Frame')
 ylabel('Runtime (s)')
 title('Sensor Fusion Runtime')
-%
+%}
 figure
 plot3(pos_truth(:,1),pos_truth(:,2),pos_truth(:,3),'r.')
 hold on
 plot3(pos_TOF(:,1),pos_TOF(:,2),pos_TOF(:,3),'b.')
 plot3(pos_cam(:,1),pos_cam(:,2),pos_cam(:,3),'g.')
 plot3(pos_fusion(:,1),pos_fusion(:,2),pos_fusion(:,3),'k.')
-
-
-%}
+plot3(camOrigin(1), camOrigin(2), camOrigin(3),'k*')
+plot3(pos_init(1), pos_init(2), pos_init(3),'r*')
+xlabel('x (m)'); ylabel('y (m)'); zlabel('z (m)')
+legend('True position','TOF position','Camera position','Fusion position','Camera Origin','Launch position','Location','best')
+grid on
+%
