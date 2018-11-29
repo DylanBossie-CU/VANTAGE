@@ -4,14 +4,14 @@ function FindCentroid(imageFiles,plotGrayscale,~,plotBinarized,...
 for i=1:length(imageFiles)
     I = imread(strcat(imageDirectory,imageFiles(i).name));
     %%%% Remove camera blur from raw image
-    {
+    %{
     imshow(I)
     title('Blurry')
     I = DeblurImage(I);
     figure
     imshow(I)
     title('Deblurry boi')
-    }
+    %}
     I_gray = rgb2gray(I);
     
     binaryTolerance = 0.3;
@@ -26,11 +26,11 @@ for i=1:length(imageFiles)
     
     %%%% Smooth the boundaries found in the image (currently extremely
     %%%% broken lol)
-    I_boundaries = smoothBoundaries(I_boundaries,I_gray);
+    %I_boundaries = smoothBoundaries(I_boundaries,I_gray);
 
     objects = detectObjects(I_boundaries,s,si);
     
-    edgeImage = createEdgeImage(objects{1},I_gray);
+    %edgeImage = createEdgeImage(objects{1},I_gray);
     
     boundingRectangles = findBoundingRectangles(objects,I_binarized);
 
@@ -40,7 +40,7 @@ for i=1:length(imageFiles)
         %%% Plotting grayscale image overlaid with cube outline
         %% and geometric centroid overlaid
         if plotGrayscale == 1
-            plotEdgeCentroid(objectBoundary,j)
+            %plotEdgeCentroid(objectBoundary,j)
             plotBoundingCentroid(boundingRectangle,j)
         end
     end
