@@ -1,4 +1,4 @@
-function FindCentroid_Video(I,plotGrayscale,~,plotBinarized,...
+function distanceError = FindCentroid_Video(I,plotGrayscale,~,plotBinarized,...
     ~,~,framecount)
 Isize = size(I);
 width = Isize(2);
@@ -34,10 +34,11 @@ objects = detectObjects(I_boundaries,s,si);
 %edgeImage = createEdgeImage(objects{1},I_gray);
 
 boundingRectangles = findBoundingRectangles(objects,I_binarized);
-
 for j=1:length(objects)
     %objectBoundary = objects{j};
     boundingRectangle = boundingRectangles{j};
+    centroid = [mean(boundingRectangle(1:end-1,1)),...
+        mean(boundingRectangle(1:end-1,2))];
     %%%% Plotting grayscale image overlaid with cube outline
     %%% and geometric centroid overlaid
     if plotGrayscale == 1
@@ -46,6 +47,8 @@ for j=1:length(objects)
     end
 end
 [object_pixels,image_cropped] = FindCubeSatPixels(objects,I_binarized);
+
+distanceError = errorAnalysis(centroid,centerpoint,boundingRectangle);
 
 if plotGrayscale == 1
     for j = 1:length(object_pixels)

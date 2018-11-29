@@ -25,7 +25,7 @@ grabFrames(video);
 %Preallocate array to store number of pixels for the cubesat+s in each image
 tic
 number_of_pixels = zeros(length(videoFiles),1);
-FindCentroid(videoFiles,plotGrayscale,number_of_pixels,plotBinarized,...
+distanceError = FindCentroid(videoFiles,plotGrayscale,number_of_pixels,plotBinarized,...
     videoDirectory,videoType);
 toc
 fprintf('Number of images processed: %d\n',length(videoFiles));
