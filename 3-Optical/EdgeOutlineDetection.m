@@ -19,7 +19,7 @@ imageDirectory = 'Images/';
 imageSet = 'multi*';
 if strcmp(imageSet,'8*')
     imageType = 'RealImages';
-elseif strcmp(imageSet,'multi')
+elseif strcmp(imageSet,'multi*')
     imageType = 'MultiObject';
 else
     imageType = 'Misc';
