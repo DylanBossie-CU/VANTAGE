@@ -16,7 +16,7 @@ plotBinarized = 0;
 
 %%% Search desired image folder for relevant images
 imageDirectory = 'Images/';
-imageSet = 'multi*';
+imageSet = '8396*';
 if strcmp(imageSet,'8*')
     imageType = 'RealImages';
 elseif strcmp(imageSet,'multi*')
