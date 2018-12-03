@@ -6,7 +6,7 @@ height = Isize(1);
 centerpoint = [ceil(width/2),ceil(height/2)];
 %%%%% Remove camera blur from raw image
 %{
-imshow(I)
+imshow(I)   
 title('Blurry')
 I = DeblurImage(I);
 figure
@@ -17,7 +17,7 @@ I_gray = rgb2gray(I);
 
 binaryTolerance = 0.3;
 I_binarized = imbinarize(I_gray,binaryTolerance);
-%imshow(I_binarized)
+imshow(I_binarized)
 [I_boundaries,~,~,~] = bwboundaries(I_binarized);
 
 %%%%% Find the largest boundaries (the cubesats)
@@ -33,7 +33,7 @@ objects = detectObjects(I_boundaries,s,si);
 
 %edgeImage = createEdgeImage(objects{1},I_gray);
 
-boundingRectangles = findBoundingRectangles(objects,I_binarized);
+boundingRectangles = findBoundingRectangles_Video(objects,I_binarized);
 for j=1:length(objects)
     %objectBoundary = objects{j};
     boundingRectangle = boundingRectangles{j};
@@ -58,8 +58,7 @@ if plotGrayscale == 1
         text(xLocation,yLocation,str,'Color','red',...
                 'FontSize',10,'Units','normalized');
     end
-    
-    scatter(centerpoint(1),centerpoint(2),'+','LineWidth',10')
+    scatter(centerpoint(1),centerpoint(2),'+','r','LineWidth',10')
     title(['Straighton Video - Frame ',num2str(framecount)])
     saveas(gcf,['StraightOn/VideoFrame_',num2str(framecount),'.jpg'])
 end
