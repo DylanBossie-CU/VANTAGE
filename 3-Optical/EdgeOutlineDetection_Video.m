@@ -9,7 +9,8 @@ clear
 %Resolution of Jerry's camera
 %jerry = 7360*4912;
 
-%%% Options to plot grayscale centroid and binarized images
+%%% Options to plot.
+grayscale centroid and binarized images
 plotGrayscale = 1;
 plotBinarized = 0;
 
