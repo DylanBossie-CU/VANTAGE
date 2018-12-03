@@ -12,7 +12,16 @@ videoFile = 'Videos/vantagecamstraighttraj.mp4';
 videoType = 'StraightOn';
 video = VideoReader(videoFile);
 
-grabFrames(video);
+distanceError = grabFrames(video);
+
+DR6_1 = ones(100,1)*10;
+
+figure
+plot(DR6_1)
+hold on
+plot(distanceError)
+
+
 
 %Preallocate array to store number of pixels for the cubesat+s in each image
 %{
