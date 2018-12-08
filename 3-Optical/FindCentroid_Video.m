@@ -18,6 +18,7 @@ I_gray = rgb2gray(I);
 binaryTolerance = 0.3;
 I_binarized = imbinarize(I_gray,binaryTolerance);
 imshow(I_binarized)
+hold on
 [I_boundaries,~,~,~] = bwboundaries(I_binarized);
 
 %%%%% Find the largest boundaries (the cubesats)
@@ -48,7 +49,8 @@ for j=1:length(objects)
 end
 [object_pixels,image_cropped] = FindCubeSatPixels(objects,I_binarized);
 
-distanceError = errorAnalysis(centroid,centerpoint,boundingRectangle);
+distanceError = errorAnalysis(centroid,centerpoint,boundingRectangle,...
+    framecount/30);
 
 if plotGrayscale == 1
     for j = 1:length(object_pixels)

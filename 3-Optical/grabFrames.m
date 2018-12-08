@@ -1,6 +1,6 @@
-function grabFrames(video)
+function distanceError = grabFrames(video)
 %%% Options to plot grayscale centroid and binarized images
-plotGrayscale = 1;
+plotGrayscale = 0;
 plotBinarized = 0;
 i = 1;
 distanceError = [];
