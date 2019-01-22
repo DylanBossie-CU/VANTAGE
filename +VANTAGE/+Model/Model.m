@@ -1,18 +1,18 @@
 classdef Model
     properties (SetAccess = public)
-        
+        Deployer
     end
     properties (SetAccess = protected)
         Transform
+    end
+    properties (SetAccess = private)
         Optical
         TOF
     end
-    properties (SetAccess = private)
-        Deployer
-    end
+
     methods
         %%%% Class Constructor:
-        % @param      Deployer      The deployer tube VANTAGE is mounted in
+        % @param      Deployer      The deployer class
         % @param      Transform     Transform class for all coordinate transformations
         % @param      Optical       Optical camera class used for image capture
         % @param      TOF           TOF camera class used for point cloud capture
@@ -23,7 +23,7 @@ classdef Model
         % @date       01/22/2019
         %%%%
         function obj = Model()
-            obj.Deployer = 1;
+            %obj.Deployer = 
             %obj.Transform = 
             %obj.Optical = 
             %obj.TOF = 
