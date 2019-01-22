@@ -13,7 +13,8 @@ function [SET] = CDR_TOF_initialize()
 SET.CSPARAMS = CubesatParams;
 
 %% Define files to be analyzed
-direc = 'Simulation Data/Tube 6/';
+datapath = '../../../Data/Prototyping Data/';
+direc = [datapath,'Simulation Data/Tube 6/'];
 ls = dir(direc);
 c = 1;
 for i = 15:33
@@ -23,7 +24,7 @@ for i = 15:33
   end
 end
 
-directest = 'Test Data/';
+directest = [datapath,'Test Data/'];
 SET.filestrs = {[direc,'30FPS_Tube_2_3U_2U_1U_VX_0_VY_0_VZ_001_WX_0_WY_0_WZ_0_SEP_0P03_F00040.pcd']};
 SET.filestrs = {[direc,'30FPS_Tube_6_3U_2U_1U_VX_0_VY_0_VZ_001_WX1U_0p1_WY1U_0p1_WZ1U_0p1_SEP_0P03_F00060.pcd']};
 %SET.filestrs = {[directest,'DRSep_2_in_CROP.ply']};
