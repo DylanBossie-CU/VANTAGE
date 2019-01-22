@@ -1,9 +1,14 @@
-classdef Model < handle
-    properties
-        Deployer
+classdef Model
+    properties (SetAccess = public)
+        
+    end
+    properties (SetAccess = protected)
         Transform
         Optical
         TOF
+    end
+    properties (SetAccess = private)
+        Deployer
     end
     methods
         %%%% Class Constructor:
@@ -45,11 +50,43 @@ classdef Model < handle
         
         % A method for approximating a cubesat centroid using a weighted centroiding method
         %
-        % @param      sampleparameter sampledescription
+        % @param      camOrigin camera origin in the VANTAGE Cartesian Frame
+        % @param      camVec    vector pointing from camera origin to estimated centroid in VCF
+        % @param      pos_TOF   VCF position estimate from the TOF sensor suite
+        % @param      sig_cam   uncertainty in camera estimate in the VCF
+        % @param      sig_TOF   uncertainty in the TOF estimate in the VCF
         %
-        % @return     samplereturn
-        function SensorFusion(obj)
+        % @return     pos       position estimate of cubesat centroid in the VCF frame using both sensor method returns
+        function [pos] = SensorFusion(obj, camOrigin, camVec, pos_TOF, sig_cam, sig_TOF)
+            % Normalize camera vector
+            camVec = camVec./norm(camVec);
+
+            % Define line vector
+            a = camOrigin - camVec;
             
+            % Define vector from line to TOF point
+            b = pos_TOF - camVec;
+            
+            % Calculate vector cross product
+            vec = cross(a,b);
+            
+            % Calculate distance along line for weigthed center point
+            d = norm(vec) / norm(a);
+            if sig_TOF~=0
+                q = sig_TOF./(sig_cam+sig_TOF);
+            else
+                q = 0;
+            end
+            d_q = d.*q;
+            
+            % Calculate position for camera
+            mag_TOF = norm(pos_TOF);
+            mag_cam = sqrt(mag_TOF.^2 - d.^2);
+            pos_cam = camOrigin + mag_cam.*camVec;
+            
+            % Calculate error-weighted centroid position
+            posDir = pos_cam - pos_TOF; posDir = posDir./norm(posDir);
+            pos = pos_TOF + posDir.*d_q;
         end
         
         % I don't know what exactly this method is supposed to do
