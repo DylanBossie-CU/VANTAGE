@@ -1,23 +1,32 @@
 classdef Model
+    % Model is a class used to store the estimation methods that utilize both
+    % TOF and camera data.
+
     properties (SetAccess = public)
+        % Deployer class
         Deployer
     end
     properties (SetAccess = protected)
+        % Transform class
         Transform
     end
     properties (SetAccess = private)
+        % Optical camera class
         Optical
+
+        % TOF camera class
         TOF
     end
 
     methods
-        % %% Class Constructor:
+        % Class Constructor:
         % @param      Deployer   The deployer class
         % @param      Transform  Transform class for all coordinate transformations
         % @param      Optical    Optical camera class used for image capture
         % @param      TOF        TOF camera class used for point cloud capture
         %
         % @return     A reference to an initialized model object
+        %
         function obj = Model()
             %obj.Deployer = 
             %obj.Transform = 
@@ -74,7 +83,7 @@ classdef Model
         % @param      sig_TOF    uncertainty in the TOF estimate in the VCF
         %
         % @return     pos       position estimate of cubesat centroid in the VCF
-        %             frame using both sensor method returns
+        %                       frame using both sensor method returns
         %
         function [pos] = SensorFusion(obj, camOrigin, camVec, pos_TOF, sig_cam, sig_TOF)
             % Normalize camera vector
