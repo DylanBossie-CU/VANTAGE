@@ -106,7 +106,12 @@ classdef TOF
         
         %% Identifying cubesats within point clouds
         %
-        % 
+        % Separates a raw point cloud into the points associated with
+        % distinct cubesats
+        %
+        % @param        raw point cloud from file
+        %
+        % @return       
         
         %% Identifying visible planes for each cubesat
         %
