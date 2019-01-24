@@ -1,9 +1,34 @@
 classdef TOF 
-  %
-  % A clas representing the Time of Flight Camera used by VANTAGE
+  %% Classdef
+  % A class representing the Time of Flight Camera used by VANTAGE
   %
   % 
-  
-  properties (SetAccess = public)
+  %% Properties
+  properties
+    %
+    % Maximum range within which TOF data is considered valid, m
+    maxAllowableRange = 8
     
-    % a
+    % The transform class used for frame changes
+    % @see Transform
+    Transform
+    
+  end
+  
+  
+  
+  
+  
+  
+  %% Methods
+  methods
+    
+    
+    
+    
+    
+  end
+  
+  
+  
+end % classdef
