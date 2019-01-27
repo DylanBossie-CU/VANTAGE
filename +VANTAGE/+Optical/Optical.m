@@ -20,6 +20,11 @@ classdef Optical
     
     % Desired FPS
     DesiredFPS
+    
+    % Plotting option (binarized images)
+    PlotBinarizedImages
+    
+    PlotCentroids
   end
   
   
@@ -38,12 +43,6 @@ classdef Optical
         if mod(obj.Video.CurrentTime,obj.DesiredFPS) == 0
             %Process image
             image = obj.ImageProcessing(frame);
-            %{
-            distanceErrorFrame = FindCentroid_Video(frame,...
-                plotGrayscale,1,plotBinarized,1,1,i);
-            distanceError = [distanceError distanceErrorFrame];
-            %imshow(frame);
-            %}
         end
     end
     
@@ -53,22 +52,113 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         24-Jan-2019
-    function [image] = ImageProcessing(obj,frame)
-        image = frame;
-        imshow(image)
+    function [I_binarized] = ImageProcessing(obj,frame)
+        I = frame;
+        centerpoint = [ceil(obj.width/2),ceil(obj.height/2)];
+        I_gray = rgb2gray(I);
+        binaryTolerance = 0.3;
+        I_binarized = imbinarize(I_gray,binaryTolerance);
+        I_boundaries = bwboundaries(I_binarized);
+        
+        %Isolate boundaries corresponding to CubeSats (remove noise)
+        CubeSats = obj.detectObjects(I_boundaries);
+        
+        %Find CubeSat centroids
+        centroids = obj.findCentroids(CubeSats);
+        if obj.PlotBinarizedImages == 1
+            imshow(I_binarized);
+            title('Binarized Frame');
+            hold on
+            obj.plotObjectBoundaries(CubeSats,centerpoint,centroids)
+        end
     end
     
+    %% Plot boundaries
+    % Plot results from bwboundaries
+    % @param        I_boundaries     Contains a cell array of object
+    %                                boundaries found in the image
+    %
+    % @author       Dylan Bossie
+    % @date         26-Jan-2019
+    function plotObjectBoundaries(obj,CubeSats,centerpoint,centroids)
+        if obj.PlotCentroids == 1
+            scatter(centerpoint(1),centerpoint(2),'g','x','LineWidth',30)
+            text(centerpoint(1)+centerpoint(1)*.05,centerpoint(2)+...
+                centerpoint(2)*.05,'Truth Centroid','Color','g')
+        end
+        for i = 1:length(CubeSats)
+            %bwboundaries has an odd convention for placing X in col. 2 and
+            %Y in col. 1
+            X = CubeSats{i}(:,2);
+            Y = CubeSats{i}(:,1);
+            plot(X,Y)
+            
+            if obj.PlotCentroids == 1
+                scatter(centroids(i,1),centroids(i,2),'r','+','LineWidth',30)
+                text(centroids(i,1)+centroids(i,1)*.05,centroids(i,2)+...
+                    centroids(i,2)*.05,'Calculated Centroid','Color','r')
+            end
+        end
+    end
+    
+    %% Find Object Centroids
+    % Use CubeSat boundaries to determine their respective centroid
+    % locations in the image
+    % @param        CubeSats        Boundaries of each CubeSat
+    %
+    % @author       Dylan Bossie
+    % @date         26-Jan-2019
+    function centroids = findCentroids(obj,CubeSats)
+        centroids = [];
+        for i = 1:length(CubeSats)
+            centroids = [centroids mean(CubeSats{i}(:,2)),...
+                mean(CubeSats{i}(:,1))];
+        end
+    end
+    %% Detect Objects
+    % Remove noisy boundaries found in the image, leaving only distinct
+    % boundaries corresponding to CubeSats
+    % @param        I_boundaries     Contains a cell array of object
+    %                                boundaries found in the image
+    %
+    % @author       Dylan Bossie
+    % @date         26-Jan-2019
+    function CubeSats = detectObjects(obj,I_boundaries)
+        if isempty(I_boundaries)
+            return
+        end
+        objectSizes = ones(length(I_boundaries),1);
+        for i = 1:length(I_boundaries)
+            objectSizes(i) = bwarea(I_boundaries{i});
+        end
+        %Set minimum size an object must meet relative to largest object to
+        %be considered for processing
+        objectSizeThreshold = 0.8*max(objectSizes);
+        
+        CubeSats = [];
+        for i = 1:length(objectSizes)
+            if objectSizes(i) >= objectSizeThreshold
+                CubeSats = [CubeSats I_boundaries(i)];
+            end
+        end
+    end
     %% Set desired initial properties of the class
     %
     % Records transform matrices and translation vectors between specific
     % frames in TDATA
     %
-    % @param        Sets timesteps for video frames to be processed (FPS)
+    % @param        DesiredFPS      Sets timesteps for video frames to be 
+    %                               processed (FPS)
+    % @param        PlotBinarizedImages     Set if user desires for plots
+    %                               to be generated
     %
     % @author       Dylan Bossie
     % @date         24-Jan-2019
-    function obj = setOpticalData(obj,DesiredFPS)
+    function obj = setOpticalData(obj,DesiredFPS,PlotBinarizedImages,...
+            PlotCentroids)
         obj.DesiredFPS = DesiredFPS;
+        obj.PlotBinarizedImages = PlotBinarizedImages;
+        obj.PlotCentroids = PlotCentroids;
     end
     
 end

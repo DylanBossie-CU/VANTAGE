@@ -14,7 +14,10 @@ Optical.Video = Video;
 
 %Set P.P. to only process video at 1FPS (skip frames in between)
 DesiredFPS = 1;
-Optical = Optical.setOpticalData(DesiredFPS);
+PlotBinarizedImages = 1;
+PlotCentroids = 1;
+Optical = Optical.setOpticalData(DesiredFPS,PlotBinarizedImages,...
+    PlotCentroids);
 
 %%% Process input video frames through Optical class
 Optical.CurrentFrame = 1;
