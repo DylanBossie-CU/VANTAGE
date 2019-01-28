@@ -75,8 +75,12 @@ classdef Optical
     
     %% Plot boundaries
     % Plot results from bwboundaries
-    % @param        I_boundaries     Contains a cell array of object
+    % @param        CubeSats         Contains a cell array of object
     %                                boundaries found in the image
+    % @param        centerpoint      Pixel location of image center
+    %
+    % @param        centroids        Centroid locations of objects
+    %                                found in image
     %
     % @author       Dylan Bossie
     % @date         26-Jan-2019
