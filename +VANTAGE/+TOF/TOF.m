@@ -111,8 +111,64 @@ classdef TOF
         %
         % @param        raw point cloud from file
         %
-        % @return       
-        
+        % @return       vector of identified cubesats (TOF.CubeSat class)
+        function CubeSats = cubesatPointsFromPC(pc)
+            % Pull out z values
+            z = sort(pc.Location(:,3));
+
+            % Start the loop
+            NPeaks = Inf;
+            bw = 0.005;
+            counter = 0;
+            while NPeaks > 3
+              % Calculate k-squares density
+              [zDense,zBin] = ksdensity(z,'bandwidth',bw,'function','pdf');
+
+              % Identify split locations
+              c = 0;
+              [~,locs] = findpeaks(-zDense,zBin,'MinPeakProminence',c);
+
+              % Update bandwidth
+              NPeaks = length(locs);
+              bw = length(locs)/3*bw;
+
+              % give up if too many tries
+              counter = counter + 1;
+              if counter > 10
+                error('Bandwidth for point splitting ksdensity function did not converge in 10 tries, implement a better bw update')
+              end
+            end
+
+            %       figure
+            %       plot(zBin,-zDense);
+            %       xlabel('z (m)')
+            %       ylabel('Percent point density')
+
+            nSplit = numel(locs);
+
+            % Separate point cloud by split planes
+            if nSplit>0
+                for i = 1:nSplit
+                    if i==1
+                        I = pc.Location(:,3)<=locs(i);
+                        CubeSats(i).pc = pointCloud(pc.Location(I,:));
+                    else
+                        I = pc.Location(:,3)<=locs(i);
+                        CubeSats(i).pc = pointCloud(pc.Location(I,:));
+                        I = CubeSats(i).pc.Location(:,3)>locs(i-1);
+                        CubeSats(i).pc = pointCloud(CubeSats(i).pc.Location(I,:));
+                    end
+                end
+                I = pc.Location(:,3)>locs(nSplit);
+                CubeSats(nSplit+1).pc = pointCloud(pc.Location(I,:));
+            else
+                CubeSats.sat1 = CubeSat;
+                CubeSats.sat1.pc = pc;
+            end
+
+            % Reverse order so CubeSats are ordered first-out to last-out
+            CubeSats = flip(CubeSats);
+        end
         %% Identifying visible planes for each cubesat
         %
         
