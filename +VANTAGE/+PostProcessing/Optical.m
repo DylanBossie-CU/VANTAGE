@@ -16,10 +16,13 @@ classdef Optical
     Video
     
     % Current frame of input video
-    CurrentFrame
+    CurrentFrameCount
     
     % Desired FPS
     DesiredFPS
+    
+    % Current frame
+    Frame
     
     % Plotting option (binarized images)
     PlotBinarizedImages
@@ -37,10 +40,13 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         24-Jan-2019
-    function [output] = readInputFrame(obj)
+    function [obj,didRead] = readInputFrame(obj)
+        didRead = false;
         frame = readFrame(obj.Video);
         %Grab data in intervals of the desired FPS
         if mod(obj.Video.CurrentTime,obj.DesiredFPS) == 0
+            didRead = true;
+            obj.Frame = frame;
             %Process image
             image = obj.ImageProcessing(frame);
         end
@@ -65,7 +71,7 @@ classdef Optical
         
         %Find CubeSat centroids
         centroids = obj.findCentroids(CubeSats);
-        if obj.PlotBinarizedImages == 1
+        if obj.PlotBinarizedImages
             imshow(I_binarized);
             title('Binarized Frame');
             hold on
@@ -85,7 +91,7 @@ classdef Optical
     % @author       Dylan Bossie
     % @date         26-Jan-2019
     function plotObjectBoundaries(obj,CubeSats,centerpoint,centroids)
-        if obj.PlotCentroids == 1
+        if obj.PlotCentroids
             scatter(centerpoint(1),centerpoint(2),'g','x','LineWidth',30)
             text(centerpoint(1)+centerpoint(1)*.05,centerpoint(2)+...
                 centerpoint(2)*.05,'Truth Centroid','Color','g')
@@ -97,7 +103,7 @@ classdef Optical
             Y = CubeSats{i}(:,1);
             plot(X,Y)
             
-            if obj.PlotCentroids == 1
+            if obj.PlotCentroids
                 scatter(centroids(i,1),centroids(i,2),'r','+','LineWidth',30)
                 text(centroids(i,1)+centroids(i,1)*.05,centroids(i,2)+...
                     centroids(i,2)*.05,'Calculated Centroid','Color','r')

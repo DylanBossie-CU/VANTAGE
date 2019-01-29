@@ -8,20 +8,20 @@ Video = VideoReader(VideoFile);
 
 %%% Define optical camera class to perform post-processing of the input
 %%% video
-Optical = VANTAGE.Optical.Optical;
+Optical = VANTAGE.PostProcessing.Optical;
 
 Optical.Video = Video;
 
 %Set P.P. to only process video at 1FPS (skip frames in between)
-DesiredFPS = 1;
-PlotBinarizedImages = 1;
-PlotCentroids = 1;
+DesiredFPS = true;
+PlotBinarizedImages = true;
+PlotCentroids = true;
 Optical = Optical.setOpticalData(DesiredFPS,PlotBinarizedImages,...
     PlotCentroids);
 
 %%% Process input video frames through Optical class
-Optical.CurrentFrame = 1;
+Optical.CurrentFrameCount = 1;
 while hasFrame(Optical.Video)
-    Optical.readInputFrame()
-    Optical.CurrentFrame = Optical.CurrentFrame + 1;
+    [Optical,didRead] = Optical.readInputFrame();
+    Optical.CurrentFrameCount = Optical.CurrentFrameCount + 1;
 end
