@@ -63,9 +63,9 @@ classdef CubeSat
         % @param      occlusion   The occlusion
         % @param      expectedU   The expected U
         %
-        % @return     A reference to an initialized Cubesat object
+        % @return     A reference to an initialized CubeSat object
         %
-        function obj = Cubesat(name, rangeOrder, pos_init, expectedU)
+        function obj = CubeSat(name, rangeOrder, pos_init, expectedU)
             obj.name = name;
             obj.rangeOrder = rangeOrder;
             obj.pos_init = pos_init;
