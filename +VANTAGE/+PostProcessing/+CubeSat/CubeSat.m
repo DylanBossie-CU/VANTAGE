@@ -5,6 +5,23 @@ classdef CubeSat
     %
     %% Properties
     properties
+        %% Pre-defined Properties
+        %
+        % string containing cubesat name
+        name
+
+        % expected range ordered position (integer)
+        rangeOrder
+
+        % initial position vector in VCF
+        pos_init
+
+        % occlusion tracking (integer)
+        occlusion
+
+        % expected cubesat size in U
+        expectedU
+
         %% Calculated Properties
         %
         % point cloud comprising cubesat
@@ -38,7 +55,23 @@ classdef CubeSat
     
     %% Methods
     methods
-        
+        % Class Constructor:
+        %
+        % @param      name        The name
+        % @param      rangeOrder  The range order
+        % @param      pos_init    The initial position
+        % @param      occlusion   The occlusion
+        % @param      expectedU   The expected U
+        %
+        % @return     A reference to an initialized model object
+        %
+        function obj = Model(name, rangeOrder, pos_init, occlusion, expectedU)
+            obj.name = name;
+            obj.rangeOrder = rangeOrder;
+            obj.pos_init = pos_init;
+            obj.occlusion = occlusion;
+            obj.expectedU = expectedU;
+        end
     end
     
     
