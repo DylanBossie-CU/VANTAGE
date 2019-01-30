@@ -25,7 +25,7 @@ classdef Model
         % @param      Optical    Optical camera class used for image capture
         % @param      TOF        TOF camera class used for point cloud capture
         %
-        % @return     A reference to an initialized model object
+        % @return     A reference to an initialized Model object
         %
         function obj = Model()
             %obj.Deployer = 
