@@ -16,9 +16,6 @@ classdef CubeSat
         % initial position vector in VCF
         pos_init
 
-        % occlusion tracking (integer)
-        occlusion
-
         % expected cubesat size in U
         expectedU
 
@@ -49,6 +46,9 @@ classdef CubeSat
         
         % true centroid if known (here for aggregation/debugging)
         trueCentroid_TCF
+
+        % occlusion tracking (integer)
+        occlusion
         
         
     end
@@ -65,11 +65,10 @@ classdef CubeSat
         %
         % @return     A reference to an initialized Cubesat object
         %
-        function obj = Cubesat(name, rangeOrder, pos_init, occlusion, expectedU)
+        function obj = Cubesat(name, rangeOrder, pos_init, expectedU)
             obj.name = name;
             obj.rangeOrder = rangeOrder;
             obj.pos_init = pos_init;
-            obj.occlusion = occlusion;
             obj.expectedU = expectedU;
         end
     end
