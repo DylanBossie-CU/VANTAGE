@@ -14,7 +14,6 @@ classdef TOF
         
     end
     
-    
     %% Methods
     methods
         %% Getters
@@ -48,12 +47,10 @@ classdef TOF
             
         end
         
-        
-        
     end
     
     %% Private Methods
-    methods (Access = private)
+    methods % (Access = private)
         %% Loading point clouds from files
         %
         % Loads data from a simulation file
@@ -64,30 +61,26 @@ classdef TOF
         %
         % @author       Joshua Kirby
         % @date         24-Jan-2019
-        function pc = loadSimFile(filename)
-            error('unimplemented')
-            % LEGACY CODE
-            %{
-            function ptNew = loadSimToF(filename)
+        function pc = loadSimFile(obj,filename)
+           
             ptCloud = pcread(filename);
             
             if sum(sum(sum(~isnan(ptCloud.Location))))==0
-                ptNew = struct('Count',0);
+                pc = struct('Count',0);
             else
                 % Filter extraneous points
                 pts = reshape(ptCloud.Location,ptCloud.Count,3);
                 I = logical(prod(~isnan(pts),2));
-                ptNew = pointCloud([pts(I,1:2),-pts(I,3)]);
+                pc = pointCloud([pts(I,1:2),-pts(I,3)]);
             end
             
             
             figure
-            pcshow(ptNew)
+            pcshow(pc)
             hold on
             plot3(0,0,0,'k*')
             grid on
             axis equal
-            %}
             
         end
         
@@ -112,7 +105,7 @@ classdef TOF
         % @param        raw point cloud from file
         %
         % @return       vector of identified cubesats (TOF.CubeSat class)
-        function CubeSats = cubesatPointsFromPC(pc)
+        function CubeSats = cubesatPointsFromPC(obj,pc)
             % Pull out z values
             z = sort(pc.Location(:,3));
 
@@ -149,6 +142,7 @@ classdef TOF
             % Separate point cloud by split planes
             if nSplit>0
                 for i = 1:nSplit
+                    CubeSats(i) = VANTAGE.PostProcessing.CubeSat.CubeSat;
                     if i==1
                         I = pc.Location(:,3)<=locs(i);
                         CubeSats(i).pc = pointCloud(pc.Location(I,:));
@@ -162,8 +156,8 @@ classdef TOF
                 I = pc.Location(:,3)>locs(nSplit);
                 CubeSats(nSplit+1).pc = pointCloud(pc.Location(I,:));
             else
-                CubeSats.sat1 = CubeSat;
-                CubeSats.sat1.pc = pc;
+                CubeSats = CubeSat;
+                CubeSats.pc = pc;
             end
 
             % Reverse order so CubeSats are ordered first-out to last-out
