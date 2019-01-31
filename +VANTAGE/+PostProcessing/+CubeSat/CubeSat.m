@@ -5,6 +5,20 @@ classdef CubeSat
     %
     %% Properties
     properties
+        %% Pre-defined Properties
+        %
+        % string containing cubesat name
+        name
+
+        % expected range ordered position (integer)
+        rangeOrder
+
+        % initial position vector in VCF
+        pos_init
+
+        % expected cubesat size in U
+        expectedU
+
         %% Calculated Properties
         %
         % point cloud comprising cubesat
@@ -32,13 +46,33 @@ classdef CubeSat
         
         % true centroid if known (here for aggregation/debugging)
         trueCentroid_TCF
+
+        % occlusion tracking (integer)
+        occlusion
         
         
     end
     
     %% Methods
     methods
-        
+        % Class Constructor:
+        %
+        % @param      name        The name
+        % @param      rangeOrder  The range order
+        % @param      pos_init    The initial position
+        % @param      occlusion   The occlusion
+        % @param      expectedU   The expected U
+        %
+        % @return     A reference to an initialized CubeSat object
+        %
+        function obj = CubeSat(name, rangeOrder, pos_init, expectedU)
+            if nargin == 4
+                obj.name = name;
+                obj.rangeOrder = rangeOrder;
+                obj.pos_init = pos_init;
+                obj.expectedU = expectedU;
+            end
+        end
     end
     
     
