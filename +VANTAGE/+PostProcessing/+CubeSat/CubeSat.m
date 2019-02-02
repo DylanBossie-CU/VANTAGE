@@ -1,17 +1,78 @@
 classdef CubeSat
     %% Classdef
-    % <DESCRIPTION>
+    % A class representing cubesats found in TOF images, for use only in
+    % the TOF class
     %
     %% Properties
-    properties 
+    properties
+        %% Pre-defined Properties
         %
-        % 
+        % string containing cubesat name
+        name
+
+        % expected range ordered position (integer)
+        rangeOrder
+
+        % initial position vector in VCF
+        pos_init
+
+        % expected cubesat size in U
+        expectedU
+
+        %% Calculated Properties
+        %
+        % point cloud comprising cubesat
+        pc
+        
+        % number of identified visible planes
+        numVisiblePlanes
+        
+        % guess at U inferred from geometry
+        inferredU
+        
+        % point clouds comprising identified planes/faces, cell
+        pc_face
+        
+        % struct containing information about each plane/face
+        face
+        
+        % inferred plane/face U
+        faceU
+        
+        %% True Properties
+        %
+        % true U if known (here for aggregation/debugging)
+        trueU
+        
+        % true centroid if known (here for aggregation/debugging)
+        trueCentroid_TCF
+
+        % occlusion tracking (integer)
+        occlusion
+        
         
     end
     
     %% Methods
     methods
-        
+        % Class Constructor:
+        %
+        % @param      name        The name
+        % @param      rangeOrder  The range order
+        % @param      pos_init    The initial position
+        % @param      occlusion   The occlusion
+        % @param      expectedU   The expected U
+        %
+        % @return     A reference to an initialized CubeSat object
+        %
+        function obj = CubeSat(name, rangeOrder, pos_init, expectedU)
+            if nargin == 4
+                obj.name = name;
+                obj.rangeOrder = rangeOrder;
+                obj.pos_init = pos_init;
+                obj.expectedU = expectedU;
+            end
+        end
     end
     
     
