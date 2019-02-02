@@ -34,18 +34,27 @@ classdef Test_Optical < matlab.unittest.TestCase
             OpticalTest = OpticalTest.setOpticalData(DesiredFPS,PlotBinarizedImages,...
                 PlotCentroids);
             
+            
+            
             %%% Process input video frames through Optical class
             OpticalTest.CurrentFrameCount = 1;
+            FirstFrameGrabbed = false;
             while hasFrame(OpticalTest.Video)
                 [OpticalTest,didRead] = OpticalTest.readInputFrame();
-                if didRead
+                if didRead && FirstFrameGrabbed == false
+                    FirstFrame = OpticalTest.Frame;
+                    FirstFrameGrabbed = true;
+                end
+                
+                if didRead && OpticalTest.PlotBinarizedImages == false
                     break
                 end
+
                 OpticalTest.CurrentFrameCount = OpticalTest.CurrentFrameCount + 1;
             end
             
             % Perform comparison
-            testCase.verifyEqual(OpticalTest.Frame,testFrame.frame)
+            testCase.verifyEqual(FirstFrame,testFrame.frame)
         end
 
     end
