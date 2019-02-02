@@ -15,6 +15,9 @@ classdef Optical
     % Container for the input video
     Video
     
+    % General description of the input video
+    VideoType
+    
     % Current frame of input video
     CurrentFrameCount
     
@@ -26,6 +29,9 @@ classdef Optical
     
     % Processed frame
     Image
+    
+    % Timesteps corresponding to desired FPS
+    FrameIntervals
     
     % Plotting option (binarized images)
     PlotBinarizedImages
@@ -47,7 +53,9 @@ classdef Optical
         didRead = false;
         frame = readFrame(obj.Video);
         %Grab data in intervals of the desired FPS
-        if mod(obj.Video.CurrentTime,obj.DesiredFPS) == 0
+        FrameTimeStep = obj.Video.CurrentTime - ...
+            floor(obj.Video.CurrentTime);
+        if any(FrameTimeStep==obj.FrameIntervals)
             didRead = true;
             obj.Frame = frame;
             %Process image
@@ -76,13 +84,14 @@ classdef Optical
         %Find CubeSat centroids
         centroids = obj.findCentroids(CubeSats);
         if obj.PlotBinarizedImages
+            close all
             imshow(I_binarized);
             title('Binarized Frame');
             hold on
             obj.plotObjectBoundaries(CubeSats,centerpoint,centroids)
             
             saveas(gcf,...
-                        ['OpticalImageOutputs/' 'OpticalTest' ...
+                        ['OpticalImageOutputs/' obj.VideoType ...
                         num2str(obj.CurrentFrameCount) '.jpg'])
         end
     end
@@ -99,11 +108,6 @@ classdef Optical
     % @author       Dylan Bossie
     % @date         26-Jan-2019
     function plotObjectBoundaries(obj,CubeSats,centerpoint,centroids)
-        if obj.PlotCentroids
-            scatter(centerpoint(1),centerpoint(2),'g','x','LineWidth',30)
-            text(centerpoint(1)+centerpoint(1)*.05,centerpoint(2)+...
-                centerpoint(2)*.05,'Truth Centroid','Color','g')
-        end
         for i = 1:length(CubeSats)
             %bwboundaries has an odd convention for placing X in col. 2 and
             %Y in col. 1
@@ -127,10 +131,10 @@ classdef Optical
     % @author       Dylan Bossie
     % @date         26-Jan-2019
     function centroids = findCentroids(obj,CubeSats)
-        centroids = [];
+        centroids = zeros(length(CubeSats),2);
         for i = 1:length(CubeSats)
-            centroids = [centroids mean(CubeSats{i}(:,2)),...
-                mean(CubeSats{i}(:,1))];
+            centroids(i,1) = mean(CubeSats{i}(:,2));
+            centroids(i,2) = mean(CubeSats{i}(:,1));
         end
     end
     %% Detect Objects
@@ -151,7 +155,7 @@ classdef Optical
         end
         %Set minimum size an object must meet relative to largest object to
         %be considered for processing
-        objectSizeThreshold = 0.8*max(objectSizes);
+        objectSizeThreshold = 0.1*max(objectSizes);
         
         CubeSats = [];
         for i = 1:length(objectSizes)
@@ -173,10 +177,12 @@ classdef Optical
     % @author       Dylan Bossie
     % @date         24-Jan-2019
     function obj = setOpticalData(obj,DesiredFPS,PlotBinarizedImages,...
-            PlotCentroids)
+            PlotCentroids,VideoType,FrameIntervals)
         obj.DesiredFPS = DesiredFPS;
         obj.PlotBinarizedImages = PlotBinarizedImages;
         obj.PlotCentroids = PlotCentroids;
+        obj.VideoType = VideoType;
+        obj.FrameIntervals = FrameIntervals;
     end
     
 end

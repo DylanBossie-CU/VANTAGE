@@ -12,6 +12,7 @@ classdef Test_Optical < matlab.unittest.TestCase
         %% Test input frame reading
         % This function tests if the code grabs the first frame of a video
         % correctly, based on a provided FPS to be examined
+        %{
         function testReadInputFrame(testCase)
             import VANTAGE.PostProcessing.Optical
             
@@ -28,11 +29,12 @@ classdef Test_Optical < matlab.unittest.TestCase
             OpticalTest.Video = Video;
             
             %Set P.P. to only process video at 1FPS (skip frames in between)
-            DesiredFPS = true;
-            PlotBinarizedImages = true;
-            PlotCentroids = true;
+            DesiredFPS = 1;
+            PlotBinarizedImages = false;
+            PlotCentroids = false;
+            VideoType = 'StraightOn';
             OpticalTest = OpticalTest.setOpticalData(DesiredFPS,PlotBinarizedImages,...
-                PlotCentroids);
+                PlotCentroids,VideoType);
             
             
             
@@ -55,6 +57,37 @@ classdef Test_Optical < matlab.unittest.TestCase
             
             % Perform comparison
             testCase.verifyEqual(FirstFrame,testFrame.frame)
+        end
+        %}
+        function testMultiObjectDetection(testCase)
+            close all
+            import VANTAGE.PostProcessing.Optical
+            
+            %Define test video path
+            VideoPath = 'Data/';
+            VideoFile = strcat(VideoPath,'TwoObjectsRender.mp4');
+            Video = VideoReader(VideoFile);
+            
+            %Create optical class to be tested
+            OpticalTest = Optical;
+            OpticalTest.Video = Video;
+            
+            %Set P.P. to only process video at desired FPS, skipping frames
+            %Cannot set higher than actual camera FPS
+            DesiredFPS = 10;
+            FrameIntervals = linspace(0,1,DesiredFPS+1);
+            PlotBinarizedImages = true;
+            PlotCentroids = true;
+            VideoType = 'TwoObjectsRender';
+            OpticalTest = OpticalTest.setOpticalData(DesiredFPS,PlotBinarizedImages,...
+                PlotCentroids,VideoType,FrameIntervals);
+            
+            %%% Process input video frames through Optical class
+            OpticalTest.CurrentFrameCount = 1;
+            while hasFrame(OpticalTest.Video)
+                [OpticalTest,~] = OpticalTest.readInputFrame();
+                OpticalTest.CurrentFrameCount = OpticalTest.CurrentFrameCount + 1;
+            end
         end
 
     end
