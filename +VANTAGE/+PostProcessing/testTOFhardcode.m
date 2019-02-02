@@ -7,6 +7,10 @@ pc = TOF.loadSimFile(['Data/Prototyping Data/Simulation Data/Tube 6/',...
              
 CubeSats = TOF.cubesatPointsFromPC(pc);
 
+for i = 1:length(CubeSats)
+    CubeSats(i) = TOF.fitPlanesToCubesat(CubeSats(i));
+end
+
 figure
 subplot(1,2,1)
 pcshow(pc,'markersize',15)

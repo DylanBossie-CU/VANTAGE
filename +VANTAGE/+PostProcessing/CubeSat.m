@@ -25,16 +25,13 @@ classdef CubeSat
         pc
         
         % number of identified visible planes
-        numVisiblePlanes
+        numVisibleFaces
         
         % guess at U inferred from geometry
         inferredU
         
-        % point clouds comprising identified planes/faces, cell
-        pc_face
-        
         % struct containing information about each plane/face
-        face
+        faces
         
         % inferred plane/face U
         faceU
