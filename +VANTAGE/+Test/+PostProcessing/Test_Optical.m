@@ -12,7 +12,7 @@ classdef Test_Optical < matlab.unittest.TestCase
         %% Test input frame reading
         % This function tests if the code grabs the first frame of a video
         % correctly, based on a provided FPS to be examined
-        %{
+        
         function testReadInputFrame(testCase)
             import VANTAGE.PostProcessing.Optical
             
@@ -30,13 +30,12 @@ classdef Test_Optical < matlab.unittest.TestCase
             
             %Set P.P. to only process video at 1FPS (skip frames in between)
             DesiredFPS = 1;
+            FrameIntervals = linspace(0,1,DesiredFPS+1);
             PlotBinarizedImages = false;
             PlotCentroids = false;
             VideoType = 'StraightOn';
             OpticalTest = OpticalTest.setOpticalData(DesiredFPS,PlotBinarizedImages,...
-                PlotCentroids,VideoType);
-            
-            
+                PlotCentroids,VideoType,FrameIntervals);
             
             %%% Process input video frames through Optical class
             OpticalTest.CurrentFrameCount = 1;
@@ -58,7 +57,7 @@ classdef Test_Optical < matlab.unittest.TestCase
             % Perform comparison
             testCase.verifyEqual(FirstFrame,testFrame.frame)
         end
-        %}
+        
         function testMultiObjectDetection(testCase)
             close all
             import VANTAGE.PostProcessing.Optical
