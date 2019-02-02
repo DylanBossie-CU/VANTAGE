@@ -8,7 +8,17 @@ pc = TOF.loadSimFile(['Data/Prototyping Data/Simulation Data/Tube 6/',...
 CubeSats = TOF.cubesatPointsFromPC(pc);
 
 figure
-pcshow(CubeSats(1).pc)
-
-figure
-pcshow(CubeSats(2).pc)
+subplot(1,2,1)
+pcshow(pc,'markersize',15)
+title('Raw Pointcloud')
+subplot(1,2,2)
+grid on
+grid minor
+title('Identified CubeSats')
+hold on
+CubeSats(1).pc.Color = uint8([255 0 0].*ones(CubeSats(1).pc.Count,3));
+CubeSats(2).pc.Color = uint8([0 0 255].*ones(CubeSats(2).pc.Count,3));
+pcshow(CubeSats(1).pc,'markersize',15)
+pcshow(CubeSats(2).pc,'markersize',15)
+legend('CubeSat 1','CubeSat 2','location','southeast')
+hold off

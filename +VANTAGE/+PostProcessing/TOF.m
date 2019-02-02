@@ -12,6 +12,9 @@ classdef TOF
         % @see Transform
         Transform
         
+        % Maximum allowed distance from a plane to be considered part of the plane
+        ptMaxDistFromPlane = 0.001;
+        
     end
     
     %% Methods
@@ -165,13 +168,10 @@ classdef TOF
         end
         %% Identifying visible planes for each cubesat
         %
-        function [planes,numPlanes] = fitPlanesToCubesat(ptCloud)
+        function [planes,numPlanes] = fitPlanesToCubesat(obj,ptCloud)
             %%% Allocation
-            % Maximum allowed distance from a plane to be considered part of the plane
-            maxDistance = 0.001;
-
             % Initial value for minimum number of points considered to make up a plane
-            minPoints   = 10;
+            minPtsInPlane   = 10;
 
             % Initialize planes structure
             numPlanes = 0;
@@ -181,14 +181,14 @@ classdef TOF
             remainPtCloud = ptCloud;
 
             %%% Find planes until no more planes exist
-            while remainPtCloud.Count > minPoints
+            while remainPtCloud.Count > minPtsInPlane
                 %%% Fit a plane to the ptCloud
                 warning('off','vision:pointcloud:notEnoughInliers')
-                [~,inlierIndices,outlierIndices] = pcfitplane(remainPtCloud,maxDistance);
+                [~,inlierIndices,outlierIndices] = pcfitplane(remainPtCloud,obj.ptMaxDistFromPlane);
                 warning('on','vision:pointcloud:notEnoughInliers')
                 
                 %%% Quit now if no significant planes found
-                if isempty(inlierIndices) || numel(inlierIndices) < minPoints
+                if isempty(inlierIndices) || numel(inlierIndices) < minPtsInPlane
                     break
                 else
                     numPlanes = numPlanes + 1; % add a plane if one was found
@@ -229,7 +229,7 @@ classdef TOF
                 % Take minPoints to be one-tenth the number of points found in the first
                 % plane
                 if numPlanes == 1
-                    minPoints = round(planes(numPlanes).planeCloud.Count/10);
+                    minPtsInPlane = round(planes(numPlanes).planeCloud.Count/10);
                 end
             end
 
