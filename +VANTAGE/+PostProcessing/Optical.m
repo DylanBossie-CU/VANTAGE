@@ -24,6 +24,9 @@ classdef Optical
     % Current frame
     Frame
     
+    % Processed frame
+    Image
+    
     % Plotting option (binarized images)
     PlotBinarizedImages
     
@@ -49,6 +52,7 @@ classdef Optical
             obj.Frame = frame;
             %Process image
             image = obj.ImageProcessing(frame);
+            obj.Image = image;
         end
     end
     
@@ -76,6 +80,10 @@ classdef Optical
             title('Binarized Frame');
             hold on
             obj.plotObjectBoundaries(CubeSats,centerpoint,centroids)
+            
+            saveas(gcf,...
+                        ['OpticalImageOutputs/' 'OpticalTest' ...
+                        num2str(obj.CurrentFrameCount) '.jpg'])
         end
     end
     
