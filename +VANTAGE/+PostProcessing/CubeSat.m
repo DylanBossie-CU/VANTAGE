@@ -36,6 +36,9 @@ classdef CubeSat
         % inferred plane/face U
         faceU
         
+        % calculated centroid in TCF
+        centroid_TCF
+        
         %% True Properties
         %
         % true U if known (here for aggregation/debugging)
@@ -57,7 +60,7 @@ classdef CubeSat
         % @param      name        The name
         % @param      rangeOrder  The range order
         % @param      pos_init    The initial position
-        % @param      occlusion   The occlusion
+        % @param      occlusion   CubeSat occluded? 0,1
         % @param      expectedU   The expected U
         %
         % @return     A reference to an initialized CubeSat object
