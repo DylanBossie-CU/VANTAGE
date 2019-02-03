@@ -25,19 +25,19 @@ classdef CubeSat
         pc
         
         % number of identified visible planes
-        numVisiblePlanes
+        numVisibleFaces
         
         % guess at U inferred from geometry
         inferredU
         
-        % point clouds comprising identified planes/faces, cell
-        pc_face
-        
         % struct containing information about each plane/face
-        face
+        faces
         
         % inferred plane/face U
         faceU
+        
+        % calculated centroid in TCF
+        centroid_TCF
         
         %% True Properties
         %
@@ -60,7 +60,7 @@ classdef CubeSat
         % @param      name        The name
         % @param      rangeOrder  The range order
         % @param      pos_init    The initial position
-        % @param      occlusion   The occlusion
+        % @param      occlusion   CubeSat occluded? 0,1
         % @param      expectedU   The expected U
         %
         % @return     A reference to an initialized CubeSat object
