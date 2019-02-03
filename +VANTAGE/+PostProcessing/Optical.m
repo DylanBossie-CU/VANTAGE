@@ -74,7 +74,7 @@ classdef Optical
         I = frame;
         centerpoint = [ceil(obj.width/2),ceil(obj.height/2)];
         I_gray = rgb2gray(I);
-        binaryTolerance = 0.3;
+        binaryTolerance = 0.1;
         I_binarized = imbinarize(I_gray,binaryTolerance);
         I_boundaries = bwboundaries(I_binarized);
         
