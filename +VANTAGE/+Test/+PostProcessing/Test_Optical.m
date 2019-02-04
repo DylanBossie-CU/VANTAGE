@@ -14,6 +14,7 @@ classdef Test_Optical < matlab.unittest.TestCase
         % correctly, based on a provided FPS to be examined
         
         function testReadInputFrame(testCase)
+            return
             import VANTAGE.PostProcessing.Optical
             
             %Define test video path
@@ -59,6 +60,7 @@ classdef Test_Optical < matlab.unittest.TestCase
         end
         
         function testMultiObjectDetection(testCase)
+            return
             close all
             import VANTAGE.PostProcessing.Optical
             
@@ -89,6 +91,37 @@ classdef Test_Optical < matlab.unittest.TestCase
             end
         end
 
+        
+        function testAlignedCubeSats(testCase)
+            close all
+            import VANTAGE.PostProcessing.Optical
+            
+            %Define test video path
+            VideoPath = 'Data/';
+            VideoFile = strcat(VideoPath,'AlignedCubeSats.mp4');
+            Video = VideoReader(VideoFile);
+            
+            %Create optical class to be tested
+            OpticalTest = Optical;
+            OpticalTest.Video = Video;
+            
+            %Set P.P. to only process video at desired FPS, skipping frames
+            %Cannot set higher than actual camera FPS
+            DesiredFPS = 1;
+            FrameIntervals = linspace(0,1,DesiredFPS+1);
+            PlotBinarizedImages = true;
+            PlotCentroids = true;
+            VideoType = 'AlignedCubeSats';
+            OpticalTest = OpticalTest.setOpticalData(DesiredFPS,PlotBinarizedImages,...
+                PlotCentroids,VideoType,FrameIntervals);
+            
+            %%% Process input video frames through Optical class
+            OpticalTest.CurrentFrameCount = 1;
+            while hasFrame(OpticalTest.Video)
+                [OpticalTest,~] = OpticalTest.readInputFrame();
+                OpticalTest.CurrentFrameCount = OpticalTest.CurrentFrameCount + 1;
+            end
+        end
     end
     
     
