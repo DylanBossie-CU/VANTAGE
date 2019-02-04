@@ -31,10 +31,10 @@ classdef TOF
         % Produces centroids of all CubeSats naively identified in a single
         % point cloud
         %
-        % @param        filename, string
+        % @param    filename    filename, string
         %
-        % @return       3xn matrix of n CubeSat centroids in the TOF
-        %               Cartestian frame, m
+        % @return	3xn matrix of n CubeSat centroids in the TOF
+        %        	Cartestian frame, m
         function [CubeSats] = naiveFindCentroids(filename,TRUTH)
             % Ingest truth data and initialize CubeSats
             
@@ -64,9 +64,9 @@ classdef TOF
         %
         % Loads data from a simulation file
         %
-        % @param        filename, string
+        % @param    filename	filename, string
         % 
-        % @return       point cloud obtained from file
+        % @return	point cloud obtained from file
         %
         % @author       Joshua Kirby
         % @date         24-Jan-2019
@@ -96,9 +96,9 @@ classdef TOF
         %
         % Loads experimental data from a VANTAGE TOF file
         %
-        % @param        filename, string
+        % @param	filename    filename, string
         %
-        % @return       point cloud obtained from file
+        % @return	point cloud obtained from file
         %
         % @author       Joshua Kirby
         % @date         24-Jan-2019
@@ -111,9 +111,12 @@ classdef TOF
         % Separates a raw point cloud into the points associated with
         % distinct cubesats
         %
-        % @param        raw point cloud from file
+        % @param    pc          raw point cloud from file
         %
-        % @return       vector of identified cubesats (TOF.CubeSat class)
+        % @return	vector of identified cubesats (TOF.CubeSat class)
+        %
+        % @author   Joshua Kirby
+        % @date     03-Feb-2019
         function CubeSats = cubesatPointsFromPC(obj,pc)
             % Pull out z values
             z = sort(pc.Location(:,3));
@@ -173,8 +176,18 @@ classdef TOF
             CubeSats = flip(CubeSats);
         end
         
-        %% Identifying visible planes for each cubesat
+        %% Identifying visible planes for a cubesat
         %
+        % Identifies visible faces in a cubesat point cloud
+        %
+        % @param    CubeSat     CubeSat object to be analyzed
+        %                       @see CubeSat
+        %
+        % @return   CubeSat     CubeSat object with identified planes
+        %                       populated
+        %
+        % @author   Joshua Kirby
+        % @date     03-Feb-2019
         function [CubeSat] = fitPlanesToCubesat(obj,CubeSat)
             %%% Allocation
             % Initial value for minimum number of points considered to make up a plane
@@ -260,8 +273,18 @@ classdef TOF
 
         end
         
-        %% Calculating centroids from identified planes for each cubesat
+        %% Calculating centroids from identified planes for a cubesat
         %
+        % Calculates centroids in TCF for a cubesat based on identified faces
+        %
+        % @param    CubeSat     CubeSat object to be analyzed
+        %                       @see CubeSat
+        % 
+        % @return   CubeSat     CubeSat object with calculated centroid
+        %                       populated
+        %
+        % @author   Joshua Kirby
+        % @date     03-Feb-2019
         function [CubeSat] = findCentroidFromFaces(obj,CubeSat)
             % Find centroid based on number of identified faces
             if CubeSat.numVisibleFaces==1
@@ -275,24 +298,19 @@ classdef TOF
         
         %% Subroutines
         %
+        % Computes the plane that fits best (least square of the normal
+        % distance to the plane) a set of sample points.
+        %
+        % @param    X   a N by 3 matrix where each line is a sample point
+        %
+        % @return 	a unit(column) vector normal to the plane
+        % @return  	a 3 by 2 matrix, the columns of V form an
+        %           orthonormal basis of the plane
+        % @return  	a point belonging to the plane
+        %
+        % @author   Adrien Leygue
+        % @date     30-Aug-2013
         function [n,V,p] = affine_fit(obj,X)
-            %Computes the plane that fits best (lest square of the normal distance
-            %to the plane) a set of sample points.
-            %INPUTS:
-            %
-            %X: a N by 3 matrix where each line is a sample point
-            %
-            %OUTPUTS:
-            %
-            %n : a unit (column) vector normal to the plane
-            %V : a 3 by 2 matrix. The columns of V form an orthonormal basis of the
-            %plane
-            %p : a point belonging to the plane
-            %
-            %NB: this code actually works in any dimension (2,3,4,...)
-            %Author: Adrien Leygue
-            %Date: August 30 2013
-            
             %the mean of the samples belongs to the plane
             p = mean(X,1);
             
@@ -305,8 +323,22 @@ classdef TOF
             V = V(:,2:end);
         end
         
+        %
+        % Calculates the CubeSat centroid from a single identified face by
+        % projecting inward from the face to the centroid.  Assumes that
+        % the expectedU of the CubeSat is the actual U
+        %
+        % @param    CubeSat     CubeSat object to be analyzed
+        %                       @see CubeSat
+        %
+        % @return   CubeSat     CubeSat object with calculated TCF centroid
+        %                       populated
+        %
+        % @author   Joshua Kirby
+        % @date     03-Feb-2019
         function CubeSat = centroid1(obj,CubeSat)
             %%% Data extract
+            error('unfinished, working with distances')
             planes = CubeSat.faces;
             
             %%% Project points onto 2d plane
@@ -397,6 +429,189 @@ classdef TOF
             %%% Project inward to volumetric centroid
             d = distInFromFace(face,u,SET);
             CubeSat.centroid_TCF = outPlane + d.*(sign(dot(outPlane,planes(1).n))*planes(1).n)';
+            
+        end
+        
+        %
+        % Calculates the CubeSat centroid from two identified faces by
+        % projecting inward from the faces to the centroid.  Assumes that
+        % the expectedU of the CubeSat is the actual U
+        %
+        % @param    CubeSat     CubeSat object to be analyzed
+        %                       @see CubeSat
+        %
+        % @return   CubeSat     CubeSat object with calculated TCF centroid
+        %                       populated
+        %
+        % @author   Joshua Kirby
+        % @date     03-Feb-2019
+        function CubeSat = centroid2(obj,CubeSat)
+            %%% Extract data
+            error('unfinished, working with distances')
+            planes = CubeSat.faces;
+            
+            %%% Not currently used, but does check if planes intersect as expected
+            for i = 1:2
+                M(i,1:3) = planes(i).n;
+                c(i,1)   = planes(i).n(1)*planes(i).o(1) + planes(i).n(2)*planes(i).o(2) + planes(i).n(3)*planes(i).o(3);
+            end
+            
+            if rank(M) ~= 2
+                error('The two planes identified do not intersect as a line')
+            end
+            
+            %%% Determine parameters corresponding to the plane intersect
+            % unit vector parallel to intersection
+            V = cross(planes(1).n,planes(2).n);
+            
+            % project point cloud onto this unit vector direction
+            pc_alongIntersect = [planes(1).planeCloud.Location;planes(2).planeCloud.Location]*V;
+            
+            % Determine length of intersection
+            lengthIntersect   = max(pc_alongIntersect)-min(pc_alongIntersect);
+            
+            % Determine mean value along the intersection direction
+            mean_alongIntersect = 0.5*(max(pc_alongIntersect)+min(pc_alongIntersect));
+            
+            %%% Locate mean point along intersect
+            [min_alongIntersect,I]  = min(pc_alongIntersect);
+            tmp    = [planes(1).planeCloud.Location;planes(2).planeCloud.Location];
+            if I <= planes(1).planeCloud.Count % if point is in plane 1
+                t = (dot(planes(2).n,planes(2).o)-dot(planes(2).n,tmp(I,:)))/norm(planes(2).n)^2;
+                minpt = tmp(I,:)' + t*planes(2).n;
+            else % if point is in plane 2
+                t = (dot(planes(1).n,planes(1).o)-dot(planes(1).n,tmp(I,:)))/norm(planes(1).n)^2;
+                minpt = tmp(I,:)' + t*planes(1).n;
+            end
+            meanpt = minpt + (mean_alongIntersect-min_alongIntersect)*V;
+            
+            %%% Determine best-guess face size and calculate centroid
+            % ensure that unitvectors are inward facing
+            n(:,1) = sign(dot(meanpt,planes(1).n))*planes(1).n;
+            n(:,2) = sign(dot(meanpt,planes(2).n))*planes(2).n;
+            switch u
+                % 1U Cubesat
+                case 0
+                    % mid-plane diagonal unit vector
+                    innerDiag = (n(:,1)+n(:,2))./norm(n(:,1)+n(:,2));
+                    % centroid (project along innerDiag by half a diagonal face length)
+                    pos       = meanpt + 0.5*SET.CSPARAMS.D_short*innerDiag;
+                case {1,2,3,4,5,6}
+                    % Make best guess at which face is which
+                    As = SET.CSPARAMS.A;
+                    for i = 1:2
+                        inPlane = double( (planes(i).planeCloud.Location-planes(i).o)*planes(i).V );
+                        I_bound = boundary(inPlane(:,1),inPlane(:,2));
+                        face = polyshape(inPlane(I_bound,1),inPlane(I_bound,2),'simplify',false);
+                        A = area(face);
+                        [dAmin(i),J(i)] = min(abs(As-A));
+                    end
+                    [~,I] = min(dAmin);
+                    bestI = I; % this index is the plane corresonding to bestSize
+                    offI = [1 2];
+                    offI = offI(offI~=bestI); % this index is the other plane
+                    bestSize = J(bestI); % this value says whether bestI is a 1U, 2U, or 3U length side
+                    if bestSize == 1 && u ~= 1
+                        bestSize = 7;
+                    end
+                    switch bestSize
+                        case {1,2,3,4,5,6}
+                            [~,offSize]  = min(abs(SET.CSPARAMS.L-lengthIntersect)); % this value says the U of the off-size
+                        case 7
+                            offSize = u;
+                    end
+                    % mid-plane diagonal unit vector
+                    innerDiag = unitvec(SET.CSPARAMS.L(offSize)*n(:,bestI) + SET.CSPARAMS.L(bestSize)*n(:,offI));
+                    % centroid (project along innerDiag by half a diagonal face length)
+                    CubeSat.centroid_TCF = meanpt + 0.5*sqrt((SET.CSPARAMS.L(offSize))^2+(SET.CSPARAMS.L(bestSize))^2)*innerDiag;
+                otherwise
+                    error('Invalid u has been given as an input')
+            end
+        end
+        
+        %
+        % Calculates the CubeSat centroid from three identified faces by
+        % projecting inward from the faces to the centroid.  Assumes that
+        % the expectedU of the CubeSat is the actual U
+        %
+        % @param    CubeSat     CubeSat object to be analyzed
+        %                       @see CubeSat
+        %
+        % @return   CubeSat     CubeSat object with calculated TCF centroid
+        %                       populated
+        %
+        % @author   Joshua Kirby
+        % @date     03-Feb-2019
+        function CubeSat = centroid3(obj,CubeSat)
+            %%% Extract data
+            error('unfinished, working with distances')
+            planes = CubeSat.faces;
+            
+            %%% Find plane intersection
+            for i = 1:3
+                A(i,1:3) = planes(i).n;
+                b(i,1)   = planes(i).n(1)*planes(i).o(1) + planes(i).n(2)*planes(i).o(2) + planes(i).n(3)*planes(i).o(3);
+            end
+            
+            if rank(A) ~= 3
+                error('Planes do not intersect in the expected way')
+            end
+            
+            ptIntersect = (A\b);
+            
+            %%% Find Best-Guess Face
+            % ensure that unitvectors are inward facing
+            for i = 1:3
+                n(:,i) = sign(dot(ptIntersect,planes(i).n))*planes(i).n;
+            end
+            % Make best guess for which face is which
+            As = SET.CSPARAMS.A;
+            for i = 1:3
+                inPlane = double( (planes(i).planeCloud.Location-planes(i).o)*planes(i).V );
+                I_bound = boundary(inPlane(:,1),inPlane(:,2));
+                face = polyshape(inPlane(I_bound,1),inPlane(I_bound,2),'simplify',false);
+                A = area(face);
+                [dAmin(i),J(i)] = min(abs(As-A));
+            end
+            [~,I] = min(dAmin);
+            bestI = I; % this index is the plane corresonding to bestSize
+            bestSize = J(bestI); % this value says what U is bestI
+            
+            %%% Determine other face sizes based on intersect length with best-guess face
+            c = 1;
+            for i = [1:I-1 I+1:3]
+                % unit vector parallel to intersection
+                V = cross(planes(bestI).n,planes(i).n);
+                % project point cloud onto this unit vector direction
+                pc_alongIntersect = [planes(bestI).planeCloud.Location;planes(i).planeCloud.Location]*V;
+                % Determine length of intersection
+                lengthIntersect   = max(pc_alongIntersect)-min(pc_alongIntersect);
+                
+                % Make best guess at which face this is
+                switch bestSize
+                    case {1,7}
+                        offI(c)    = i;
+                        offSize(c) = u;
+                    case u
+                        offI(c)        = i;
+                        [~,offSize(c)] = min(abs(SET.CSPARAMS.L-lengthIntersect));
+                    otherwise
+                        error('Best-guess for face size does not match an allowable size (1 or U)')
+                end
+                c = c + 1;
+            end
+            
+            %%% Find volumetric centroid
+            % volumetric diagonal
+            switch bestSize
+                case {1,7}
+                    innerDiag = unitvec(n(:,bestI)*SET.CSPARAMS.u_long*u + n(:,offI(1))*SET.CSPARAMS.L(bestSize) + n(:,offI(2))*SET.CSPARAMS.L(bestSize));
+                case u
+                    innerDiag = unitvec(n(:,bestI)*SET.CSPARAMS.L(7) + n(:,offI(1))*SET.CSPARAMS.L(offSize(2)) + n(:,offI(2))*SET.CSPARAMS.L(offSize(1)));
+                otherwise
+                    error('Best-guess for face size does not match an allowable size (1 or U)')
+            end
+            CubeSat.centroid_TCF = ptIntersect + 0.5*sqrt((u*SET.CSPARAMS.u_long)^2+2*(SET.CSPARAMS.u_short)^2)*innerDiag;
             
         end
         

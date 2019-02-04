@@ -26,16 +26,16 @@ classdef Transform
         %% Execute transform
         % Execute transformations between frames
         %
-        % @param        identifier for the target frame, char
-        % @param        a 3xn set of vectors in the srcFrame to be transformed
-        %                 to the targFrame, matrix
-        % @param        identifier for the source frame, char
+        % @param	targFrame   identifier for the target frame, char
+        % @param    data        a 3xn set of vectors in the srcFrame to be transformed
+        %                       to the targFrame, matrix
+        % @param	srcFrame    identifier for the source frame, char
         %
-        % @return       a 3xn set of vectors in the targFrame,
-        %                       matrix
+        % @return	a 3xn set of vectors in the targFrame,
+        %           matrix
         %
-        % @author       Joshua Kirby
-        % @date         24-Jan-2019
+        % @author 	Joshua Kirby
+        % @date 	24-Jan-2019
         function [output] = tf(obj,targFrame,data,srcFrame)
             % Error catching
             if size(obj.nomen,1) > obj.maxNomen
@@ -85,16 +85,15 @@ classdef Transform
         % Records transform matrices and translation vectors between specific
         % frames in TDATA
         %
-        % @param        data is a 1x2 cell, data{1} is the  and data{2} is a
-        % @param        identifier for the target frame, char
-        % @param        3x3 transformation matrix from source frame to target
-        %                 frame
-        % @param        3x1 translation vector from the origin of srcFrame to
-        %                 the origin of targFrame, cell
-        % @param        identifier for the source frame, char
+        % @param	targFrame   identifier for the target frame, char
+        % @param	C           3x3 transformation matrix from source frame to target
+        %                       frame
+        % @param	V           3x1 translation vector from the origin of srcFrame to
+        %                       the origin of targFrame, cell
+        % @param    srcFrame    identifier for the source frame, char
         %
-        % @author       Joshua Kirby
-        % @date         24-Jan-2019
+        % @author	Joshua Kirby
+        % @date  	24-Jan-2019
         function obj = setTdata(obj,targFrame,C,V,srcFrame)
             % Error catching
             if size(C,1)~=3 || size(C,2)~=3
@@ -158,13 +157,13 @@ classdef Transform
         %
         % Return row number of string location in obj.nomen
         %
-        % @param        string to be found in obj.nomen
+        % @param	str     string to be found in obj.nomen
         %
-        % @return       index of string in obj.nomen, set to 0 if string not
-        %               found
+        % @return           index of string in obj.nomen, set to 0 if string not
+        %                   found
         %
-        % @author       Joshua Kirby
-        % @date         24-Jan-2019
+        % @author   Joshua Kirby
+        % @date 	24-Jan-2019
         function [row] = findNomen(obj,str)
             
             [row,~] = ind2sub(size(obj.nomen),find(strcmp(str,obj.nomen)));
