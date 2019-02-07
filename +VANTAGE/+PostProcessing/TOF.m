@@ -324,6 +324,38 @@ classdef TOF
         end
         
         %
+        % Bla
+        %
+        % @param   
+        %
+        % @return  
+        %
+        % @author   Joshua Kirby
+        % @date     07-Feb-2019
+        function [d] = distInFromFace(obj,CubeSat,face)
+            
+            % Calculate standard areas
+            Avec = CubeSat.Avec;
+            
+            % Calculate face area
+            A = area(face);
+            
+            % Calculate difference between area and standard areas
+            dA = abs(A-Avec);
+            
+            % Choose nearest size
+            [~,I] = min(dA);
+            
+            % Set distance in for centroid
+            dVec = 0.5.*CubeSat.Lvec;
+            if I==7
+                d = dVec(CubeSat.expectedU);
+            else
+                d = dVec(7);
+            end
+        end
+        
+        %
         % Calculates the CubeSat centroid from a single identified face by
         % projecting inward from the face to the centroid.  Assumes that
         % the expectedU of the CubeSat is the actual U
@@ -338,7 +370,7 @@ classdef TOF
         % @date     03-Feb-2019
         function CubeSat = centroid1(obj,CubeSat)
             %%% Data extract
-            error('unfinished, working with distances')
+            %error('unfinished, working with distances')
             planes = CubeSat.faces;
             
             %%% Project points onto 2d plane
@@ -427,7 +459,7 @@ classdef TOF
             outPlane = planes(1).o + (x*planes(1).V(:,1))' + (y*planes(1).V(:,2))';
             
             %%% Project inward to volumetric centroid
-            d = distInFromFace(face,u,SET);
+            d = obj.distInFromFace(CubeSat,face);
             CubeSat.centroid_TCF = outPlane + d.*(sign(dot(outPlane,planes(1).n))*planes(1).n)';
             
         end
