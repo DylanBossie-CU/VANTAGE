@@ -18,6 +18,9 @@ classdef CubeSat
 
         % expected cubesat size in U
         expectedU
+
+        % dimensions of cubesat in meters
+        actualDims
         
         % vector of face areas used in TOF, a better method for this should
         % be developed

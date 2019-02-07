@@ -6,6 +6,9 @@ classdef Deployer
 
     end
     properties (SetAccess = protected)
+        % Number corresponding to the deployment tube housing VANTAGE
+        VantageTube
+
         % Number corresponding to the deployment tube expected to launch
         DeploymentTube
 
