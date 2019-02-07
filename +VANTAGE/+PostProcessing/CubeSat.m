@@ -76,12 +76,13 @@ classdef CubeSat
         %
         % @return     A reference to an initialized CubeSat object
         %
-        function obj = CubeSat(name, rangeOrder, pos_init, expectedU)
-            if nargin == 4
+        function obj = CubeSat(name, rangeOrder, pos_init, expectedU, actualDims)
+            if nargin == 5
                 obj.name = name;
                 obj.rangeOrder = rangeOrder;
                 obj.pos_init = pos_init;
                 obj.expectedU = expectedU;
+                obj.actualDims = actualDims;
             end
             
             % (U)nit length
