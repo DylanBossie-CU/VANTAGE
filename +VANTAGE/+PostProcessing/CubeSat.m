@@ -19,13 +19,15 @@ classdef CubeSat
         % expected cubesat size in U
         expectedU
         
-        % vector of face areas used in TOF, a better method for this should
+        % Lots of geometric stuff...a better method for this should
         % be developed
         Avec
-        
-        % vector of face side lengths used in TOF, a better method for this
-        % should be developed
         Lvec
+        u_short
+        u_long
+        Dvec
+        D_short
+        D_long
 
         %% Calculated Properties
         %
@@ -81,21 +83,27 @@ classdef CubeSat
                 obj.expectedU = expectedU;
             end
             
+            % JMK HEY YOU, ALL THIS GEOMETRY SUCKS AND SHOULD BE TURNED INTO
+            % SOMETHING MUCH MORE INTELLIGENT
             % (U)nit length
-            u_short = 0.1; % m
-            u_long  = 0.1125; % m
+            obj.u_short = 0.1; % m
+            obj.u_long  = 0.1125; % m
             % U
             U = [1 2 3 4 5 6];
             % Side Lengths
-            L_short = u_short;
-            L_long  = u_long .*U;
+            L_short = obj.u_short;
+            L_long  = obj.u_long .*U;
             obj.Lvec = [L_long L_short];
             % Face Areas
-            A_short = u_short^2;
-            % Note this is a hack, A_long should use u_long but this works better for
+            A_short = obj.u_short^2;
+            % Note this is a hack, A_long should use obj.u_long but this works better for
             % now, should use better heuristics so this hack is not necessary
-            A_long  = U.*u_short^2;
+            A_long  = U.*obj.u_short^2;
             obj.Avec = [A_long A_short];
+            % Face Diagonals
+            obj.D_short = sqrt(obj.u_short^2 + L_short^2);
+            obj.D_long  = sqrt(obj.u_short^2 + L_long.^2);
+            obj.Dvec = [obj.D_long obj.D_short];
         end
     end
     

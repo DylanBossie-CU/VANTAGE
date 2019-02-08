@@ -479,7 +479,6 @@ classdef TOF
         % @date     03-Feb-2019
         function CubeSat = centroid2(obj,CubeSat)
             %%% Extract data
-            error('unfinished, working with distances')
             planes = CubeSat.faces;
             
             %%% Not currently used, but does check if planes intersect as expected
@@ -521,16 +520,16 @@ classdef TOF
             % ensure that unitvectors are inward facing
             n(:,1) = sign(dot(meanpt,planes(1).n))*planes(1).n;
             n(:,2) = sign(dot(meanpt,planes(2).n))*planes(2).n;
-            switch u
+            switch CubeSat.expectedU
                 % 1U Cubesat
                 case 0
                     % mid-plane diagonal unit vector
                     innerDiag = (n(:,1)+n(:,2))./norm(n(:,1)+n(:,2));
                     % centroid (project along innerDiag by half a diagonal face length)
-                    pos       = meanpt + 0.5*SET.CSPARAMS.D_short*innerDiag;
+                    pos       = meanpt + 0.5*CubeSat.D_short*innerDiag;
                 case {1,2,3,4,5,6}
                     % Make best guess at which face is which
-                    As = SET.CSPARAMS.A;
+                    As = CubeSat.Avec;
                     for i = 1:2
                         inPlane = double( (planes(i).planeCloud.Location-planes(i).o)*planes(i).V );
                         I_bound = boundary(inPlane(:,1),inPlane(:,2));
@@ -548,14 +547,14 @@ classdef TOF
                     end
                     switch bestSize
                         case {1,2,3,4,5,6}
-                            [~,offSize]  = min(abs(SET.CSPARAMS.L-lengthIntersect)); % this value says the U of the off-size
+                            [~,offSize]  = min(abs(CubeSat.Lvec-lengthIntersect)); % this value says the U of the off-size
                         case 7
                             offSize = u;
                     end
                     % mid-plane diagonal unit vector
-                    innerDiag = unitvec(SET.CSPARAMS.L(offSize)*n(:,bestI) + SET.CSPARAMS.L(bestSize)*n(:,offI));
+                    innerDiag = unitvec(CubeSat.Lvec(offSize)*n(:,bestI) + CubeSat.Lvec(bestSize)*n(:,offI));
                     % centroid (project along innerDiag by half a diagonal face length)
-                    CubeSat.centroid_TCF = meanpt + 0.5*sqrt((SET.CSPARAMS.L(offSize))^2+(SET.CSPARAMS.L(bestSize))^2)*innerDiag;
+                    CubeSat.centroid_TCF = meanpt + 0.5*sqrt((CubeSat.Lvec(offSize))^2+(CubeSat.Lvec(bestSize))^2)*innerDiag;
                 otherwise
                     error('Invalid u has been given as an input')
             end
@@ -576,7 +575,6 @@ classdef TOF
         % @date     03-Feb-2019
         function CubeSat = centroid3(obj,CubeSat)
             %%% Extract data
-            error('unfinished, working with distances')
             planes = CubeSat.faces;
             
             %%% Find plane intersection
@@ -597,7 +595,7 @@ classdef TOF
                 n(:,i) = sign(dot(ptIntersect,planes(i).n))*planes(i).n;
             end
             % Make best guess for which face is which
-            As = SET.CSPARAMS.A;
+            As = CubeSat.Avec;
             for i = 1:3
                 inPlane = double( (planes(i).planeCloud.Location-planes(i).o)*planes(i).V );
                 I_bound = boundary(inPlane(:,1),inPlane(:,2));
@@ -626,7 +624,7 @@ classdef TOF
                         offSize(c) = u;
                     case u
                         offI(c)        = i;
-                        [~,offSize(c)] = min(abs(SET.CSPARAMS.L-lengthIntersect));
+                        [~,offSize(c)] = min(abs(CubeSat.Lvec-lengthIntersect));
                     otherwise
                         error('Best-guess for face size does not match an allowable size (1 or U)')
                 end
@@ -637,13 +635,13 @@ classdef TOF
             % volumetric diagonal
             switch bestSize
                 case {1,7}
-                    innerDiag = unitvec(n(:,bestI)*SET.CSPARAMS.u_long*u + n(:,offI(1))*SET.CSPARAMS.L(bestSize) + n(:,offI(2))*SET.CSPARAMS.L(bestSize));
+                    innerDiag = unitvec(n(:,bestI)*CubeSat.u_long*u + n(:,offI(1))*CubeSat.Lvec(bestSize) + n(:,offI(2))*CubeSat.Lvec(bestSize));
                 case u
-                    innerDiag = unitvec(n(:,bestI)*SET.CSPARAMS.L(7) + n(:,offI(1))*SET.CSPARAMS.L(offSize(2)) + n(:,offI(2))*SET.CSPARAMS.L(offSize(1)));
+                    innerDiag = unitvec(n(:,bestI)*CubeSat.Lvec(7) + n(:,offI(1))*CubeSat.Lvec(offSize(2)) + n(:,offI(2))*CubeSat.Lvec(offSize(1)));
                 otherwise
                     error('Best-guess for face size does not match an allowable size (1 or U)')
             end
-            CubeSat.centroid_TCF = ptIntersect + 0.5*sqrt((u*SET.CSPARAMS.u_long)^2+2*(SET.CSPARAMS.u_short)^2)*innerDiag;
+            CubeSat.centroid_TCF = ptIntersect + 0.5*sqrt((u*CubeSat.u_long)^2+2*(CubeSat.u_short)^2)*innerDiag;
             
         end
         
