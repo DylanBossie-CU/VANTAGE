@@ -18,6 +18,9 @@ classdef CubeSat
 
         % expected cubesat size in U
         expectedU
+
+        % dimensions of cubesat in meters
+        actualDims
         
         % Lots of geometric stuff...a better method for this should
         % be developed
@@ -75,12 +78,13 @@ classdef CubeSat
         %
         % @return     A reference to an initialized CubeSat object
         %
-        function obj = CubeSat(name, rangeOrder, pos_init, expectedU)
-            if nargin == 4
+        function obj = CubeSat(name, rangeOrder, pos_init, expectedU, actualDims)
+            if nargin == 5
                 obj.name = name;
                 obj.rangeOrder = rangeOrder;
                 obj.pos_init = pos_init;
                 obj.expectedU = expectedU;
+                obj.actualDims = actualDims;
             end
             
             % JMK HEY YOU, ALL THIS GEOMETRY SUCKS AND SHOULD BE TURNED INTO
