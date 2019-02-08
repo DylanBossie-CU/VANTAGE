@@ -3,6 +3,13 @@ classdef TOF
     % A class representing the Time of Flight Camera used by VANTAGE
     %
     %% Properties
+    properties
+        %
+        % Current number of visible CubeSats, very mutable
+        currNumSatsVisible
+        
+    end
+        
     properties (Access = private)
         %
         % Maximum range within which TOF data is considered valid, m
@@ -35,9 +42,9 @@ classdef TOF
         %
         % @return	3xn matrix of n CubeSat centroids in the TOF
         %        	Cartestian frame, m
-        function [CubeSats] = naiveFindCentroids(filename,TRUTH)
-            % Ingest truth data and initialize CubeSats
-            
+        function [Deployer] = naiveFindCentroids(filename,Deployer)
+            % Extract CubeSats from Deployer
+            CubeSats = Deployer.CubesatArray;
             
             % Load point cloud from file
             warning('Load script is currently only designed to work with simulated .pcd files')
@@ -53,6 +60,9 @@ classdef TOF
                 % Calculate centroids by projecting from identified planes
                 CubeSats(i) = findCentroidFromFaces(CubeSats(i));
             end
+            
+            % Repackage CubeSats into Deployer
+            Deployer.CubesatArray = CubeSats;
             
         end
         
@@ -112,12 +122,14 @@ classdef TOF
         % distinct cubesats
         %
         % @param    pc          raw point cloud from file
+        % @param    CubeSats    array of initialized CubeSat objects
+        %                       @see CubeSat
         %
         % @return	vector of identified cubesats (TOF.CubeSat class)
         %
         % @author   Joshua Kirby
         % @date     03-Feb-2019
-        function CubeSats = cubesatPointsFromPC(obj,pc)
+        function [obj,CubeSats] = cubesatPointsFromPC(obj,pc,CubeSats)
             % Pull out z values
             z = sort(pc.Location(:,3));
 
@@ -149,31 +161,31 @@ classdef TOF
             %       xlabel('z (m)')
             %       ylabel('Percent point density')
 
+            locs = flip(locs);
             nSplit = numel(locs);
 
             % Separate point cloud by split planes
             if nSplit>0
                 for i = 1:nSplit
-                    CubeSats(i) = VANTAGE.PostProcessing.CubeSat;
                     if i==1
-                        I = pc.Location(:,3)<=locs(i);
+                        I = pc.Location(:,3)>=locs(i);
                         CubeSats(i).pc = pointCloud(pc.Location(I,:));
                     else
-                        I = pc.Location(:,3)<=locs(i);
+                        I = pc.Location(:,3)>=locs(i);
                         CubeSats(i).pc = pointCloud(pc.Location(I,:));
-                        I = CubeSats(i).pc.Location(:,3)>locs(i-1);
+                        I = CubeSats(i).pc.Location(:,3)<locs(i-1);
                         CubeSats(i).pc = pointCloud(CubeSats(i).pc.Location(I,:));
                     end
                 end
-                I = pc.Location(:,3)>locs(nSplit);
+                I = pc.Location(:,3)<locs(nSplit);
                 CubeSats(nSplit+1).pc = pointCloud(pc.Location(I,:));
             else
-                CubeSats = VANTAGE.PostProcessing.CubeSat;
                 CubeSats.pc = pc;
             end
-
-            % Reverse order so CubeSats are ordered first-out to last-out
-            CubeSats = flip(CubeSats);
+        
+        % Save number of visible CubeSats
+        obj.currNumSatsVisible = nSplit + 1;
+        
         end
         
         %% Identifying visible planes for a cubesat
@@ -353,6 +365,19 @@ classdef TOF
             else
                 d = dVec(7);
             end
+        end
+        
+        %
+        % Makes a unit vector
+        %
+        % @param    vec     A vector
+        % 
+        % @return   the norm of vec
+        %
+        % @author   Joshua Kirby
+        % @date     07-Feb-2019
+        function [uvec] = unitvec(obj,vec)
+            uvec = vec./norm(vec);
         end
         
         %
@@ -542,7 +567,7 @@ classdef TOF
                     offI = [1 2];
                     offI = offI(offI~=bestI); % this index is the other plane
                     bestSize = J(bestI); % this value says whether bestI is a 1U, 2U, or 3U length side
-                    if bestSize == 1 && u ~= 1
+                    if bestSize == 1 && CubeSat.expectedU ~= 1
                         bestSize = 7;
                     end
                     switch bestSize
@@ -552,7 +577,7 @@ classdef TOF
                             offSize = u;
                     end
                     % mid-plane diagonal unit vector
-                    innerDiag = unitvec(CubeSat.Lvec(offSize)*n(:,bestI) + CubeSat.Lvec(bestSize)*n(:,offI));
+                    innerDiag = obj.unitvec(CubeSat.Lvec(offSize)*n(:,bestI) + CubeSat.Lvec(bestSize)*n(:,offI));
                     % centroid (project along innerDiag by half a diagonal face length)
                     CubeSat.centroid_TCF = meanpt + 0.5*sqrt((CubeSat.Lvec(offSize))^2+(CubeSat.Lvec(bestSize))^2)*innerDiag;
                 otherwise

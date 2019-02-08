@@ -1,12 +1,15 @@
 clearvars;close all;clc
 
+Deployer = VANTAGE.PostProcessing.Deployer('manifestTest.json');
+CubeSats = Deployer.CubesatArray;
 TOF = VANTAGE.PostProcessing.TOF;
 pc = TOF.loadSimFile(['Data/Prototyping Data/Simulation Data/Tube 2/',...
                  '30FPS_Tube_2_3U_2U_1U_VX_0_VY_0_VZ_001_WX_0_WY_0_WZ_0_SEP_0P03_F00050.pcd']);
             
-CubeSats = TOF.cubesatPointsFromPC(pc);
+[TOF,CubeSats] = TOF.cubesatPointsFromPC(pc,CubeSats);
 
-for i = 1:length(CubeSats)
+CubesatIndexing = 1:TOF.currNumSatsVisible;
+for i = CubesatIndexing
     CubeSats(i) = TOF.fitPlanesToCubesat(CubeSats(i));
     CubeSats(i) = TOF.findCentroidFromFaces(CubeSats(i));
 end
@@ -27,13 +30,15 @@ grid minor
 title('Identified CubeSats','fontsize',fontsize)
 hold on
 colorcounter = 1;
-for i = 1:length(CubeSats)
+legendcounter = 1;
+for i = CubesatIndexing
     CubeSats(i).pc.Color = uint8(c(colorcounter,:).*255.*ones(CubeSats(i).pc.Count,3));
     pcshow(CubeSats(i).pc,'markersize',markersize)
-    legendStrings{i} = ['CubeSat ',num2str(i)];
+    legendStrings{legendcounter} = ['CubeSat ',num2str(i)];
     colorcounter = colorcounter+1;
+    legendcounter = legendcounter+1;
 end
-l=legend(legendStrings,'location','southeast');
+l=legend(legendStrings,'location','eastoutside');
 l.FontSize = legendfontsize;
 hold off
 
@@ -45,7 +50,7 @@ title({'Visible Faces','Per CubeSat'},'fontsize',fontsize)
 legendStrings = [];
 legendcounter = 1;
 colorcounter = 1;
-for i = 1:length(CubeSats)
+for i = CubesatIndexing
     plot3(CubeSats(i).centroid_TCF(1),CubeSats(i).centroid_TCF(2),CubeSats(i).centroid_TCF(3),'r.','markersize',25)
     for j = 1:CubeSats(i).numVisibleFaces
         CubeSats(i).faces(j).planeCloud.Color = uint8(c(colorcounter,:).*255.*ones(CubeSats(i).faces(j).planeCloud.Count,3));
@@ -56,6 +61,6 @@ for i = 1:length(CubeSats)
         legendcounter = legendcounter+2;
     end
 end
-l=legend(legendStrings,'location','southeast');
+l=legend(legendStrings,'location','eastoutside');
 l.FontSize = legendfontsize;
 hold off
