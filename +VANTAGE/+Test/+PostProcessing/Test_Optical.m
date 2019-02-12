@@ -130,7 +130,7 @@ classdef Test_Optical < matlab.unittest.TestCase
             
             %Define test video path
             VideoPath = 'Data/';
-            VideoType = 'AlignedCubeSats';
+            VideoType = 'TwoObjectsRender.mp4';
             VideoFile = strcat(VideoPath,VideoType);
             Video = VideoReader(VideoFile);
             

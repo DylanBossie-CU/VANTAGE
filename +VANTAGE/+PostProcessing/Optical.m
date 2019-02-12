@@ -83,6 +83,11 @@ classdef Optical
         
         %Find CubeSat centroids
         centroids = obj.findCentroids(CubeSats);
+        
+        %Perform object association
+        occlusion = [false,false];
+        obj.objectAssociation(centroids,centerpoint,occlusion)
+        
         if obj.PlotBinarizedImages
             close all
             imshow(I_binarized);
@@ -116,9 +121,9 @@ classdef Optical
             plot(X,Y)
             
             if obj.PlotCentroids
-                scatter(centroids(i,1),centroids(i,2),'r','+','LineWidth',30)
-                text(centroids(i,1)+centroids(i,1)*.05,centroids(i,2)+...
-                    centroids(i,2)*.05,'Calculated Centroid','Color','r')
+                scatter(centroids{i}(1),centroids{i}(2),'r','+','LineWidth',30)
+                text(centroids{i}(1)+centroids{i}(1)*.05,centroids{i}(2)+...
+                    centroids{i}(2)*.05,'Calculated Centroid','Color','r')
             end
         end
     end
@@ -131,10 +136,11 @@ classdef Optical
     % @author       Dylan Bossie
     % @date         26-Jan-2019
     function centroids = findCentroids(obj,CubeSats)
-        centroids = zeros(length(CubeSats),2);
+        centroids = cell(length(CubeSats));
         for i = 1:length(CubeSats)
-            centroids(i,1) = mean(CubeSats{i}(:,2));
-            centroids(i,2) = mean(CubeSats{i}(:,1));
+            centroids{i} = zeros(1,2);
+            centroids{i}(1) = mean(CubeSats{i}(:,2));
+            centroids{i}(2) = mean(CubeSats{i}(:,1));
         end
     end
     
@@ -151,9 +157,13 @@ classdef Optical
     %                             occluded bodies
     %
     % @author       Dylan Bossie
-    % @date         26-Jan-2019
-    function CubeSats = objectAssociation(centroids,centerpoint,occlusion)
-        
+    % @date         11-Feb-2019
+    function [] = objectAssociation(~,centroids,centerpoint,occlusion)
+        %Get distance from centerpoint for all objects
+        distance = zeros(length(centroids),1);
+        for i=1:length(centroids)
+            distance(i) = norm(abs(centerpoint-centroids{i}));
+        end
     end
     
     %% Detect Objects
@@ -214,7 +224,7 @@ end
   methods (Access = private)
     %% Index into nomen
     %
-    % Return row number of string location in obj.nomen
+    % Random example of a private method
     %
     % @param        string to be found in obj.nomen
     %
