@@ -137,6 +137,25 @@ classdef Optical
             centroids(i,2) = mean(CubeSats{i}(:,1));
         end
     end
+    
+    %% Object Association
+    % After bodies and their respective centroids have been identified,
+    % this function will associate them with relative identities based on
+    % their launch order 1-6 (1: first launched, 6: last launched)
+    % @param        centroids     Pixel location of centroid in image
+    %
+    % @param        centerpoint   Pixel location of image center
+    %
+    % @param        occlusion     Boolean array of tags descripting whether
+    %                             or not the respective centroid contains 
+    %                             occluded bodies
+    %
+    % @author       Dylan Bossie
+    % @date         26-Jan-2019
+    function CubeSats = objectAssociation(centroids,centerpoint,occlusion)
+        
+    end
+    
     %% Detect Objects
     % Remove noisy boundaries found in the image, leaving only distinct
     % boundaries corresponding to CubeSats
