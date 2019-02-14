@@ -91,7 +91,7 @@ classdef Optical
         %%%%% Fake occlusion results
         occlusion = [true,false];
         %%%%%
-        obj.objectAssociation(centroids,centerpoint,occlusion)
+        obj = obj.objectAssociation(centroids,centerpoint,occlusion);
         
         if obj.PlotBinarizedImages
             close all
@@ -117,7 +117,7 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         26-Jan-2019
-    function plotObjectBoundaries(obj,CubeSats,centerpoint,centroids)
+    function plotObjectBoundaries(obj,CubeSats,~,centroids)
         for i = 1:length(CubeSats)
             %bwboundaries has an odd convention for placing X in col. 2 and
             %Y in col. 1
@@ -162,8 +162,41 @@ classdef Optical
     %                             occluded bodies
     %
     % @author       Dylan Bossie
-    % @date         11-Feb-2019
-    function [] = objectAssociation(obj,centroids,centerpoint,occlusion)
+    % @date         14-Feb-2019
+    function obj = objectAssociation(obj,centroids,centerpoint,occlusion)
+        %Get distance from centerpoint for all objects
+        distance = zeros(length(centroids),1);
+        for i=1:length(centroids)
+            distance(i) = norm(abs(centerpoint-centroids{i}));
+        end
+        
+        j = 1;
+        for i=1:length(occlusion)
+            if occlusion(i) == false
+                obj.CubeSats{i}.centroid = centroids{j};
+                j = j + 1;
+            else
+                % Current CubeSat is occluded
+                obj.CubeSats{i}.centroid = [0 0];%obj.linearExtrapolation(obj.CubeSats{i})
+            end
+        end
+    end
+    
+    %% Linear Extrapolation
+    % For the case of an object being occluded, a linear extrapolation will
+    % be performed based on its velocity calculated in the previous frames
+    % to approximate its next centroid location
+    % @param        centroids     Pixel location of centroid in image
+    %
+    % @param        centerpoint   Pixel location of image center
+    %
+    % @param        occlusion     Boolean array of tags descripting whether
+    %                             or not the respective centroid contains 
+    %                             occluded bodies
+    %
+    % @author       Dylan Bossie
+    % @date         14-Feb-2019
+    function [] = linearExtrapolation(obj,centroids,centerpoint,occlusion)
         %Get distance from centerpoint for all objects
         distance = zeros(length(centroids),1);
         for i=1:length(centroids)
