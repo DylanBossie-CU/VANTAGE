@@ -88,7 +88,9 @@ classdef Optical
         centroids = obj.findCentroids(CubeSat_Boundaries);
         
         %Perform object association
-        occlusion = [false,false];
+        %%%%% Fake occlusion results
+        occlusion = [true,false];
+        %%%%%
         obj.objectAssociation(centroids,centerpoint,occlusion)
         
         if obj.PlotBinarizedImages
@@ -138,8 +140,8 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         26-Jan-2019
-    function centroids = findCentroids(obj,CubeSats)
-        centroids = cell(length(CubeSats));
+    function centroids = findCentroids(~,CubeSats)
+        centroids = cell(length(CubeSats),1);
         for i = 1:length(CubeSats)
             centroids{i} = zeros(1,2);
             centroids{i}(1) = mean(CubeSats{i}(:,2));
@@ -161,11 +163,22 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         11-Feb-2019
-    function [] = objectAssociation(~,centroids,centerpoint,occlusion)
+    function [] = objectAssociation(obj,centroids,centerpoint,occlusion)
         %Get distance from centerpoint for all objects
         distance = zeros(length(centroids),1);
         for i=1:length(centroids)
             distance(i) = norm(abs(centerpoint-centroids{i}));
+        end
+        
+        j = 1;
+        for i=1:length(occlusion)
+            if occlusion(i) == false
+                obj.CubeSats{i}.centroid = centroids{j};
+                j = j + 1;
+            else
+                % Current CubeSat is occluded
+                obj.CubeSats{i}.centroid = [0 0];%obj.linearExtrapolation(obj.CubeSats{i})
+            end
         end
     end
     
@@ -216,7 +229,7 @@ classdef Optical
         for i = 1:amount
             obj.CubeSats{i} = CubeSat_Optical;
             obj.CubeSats{i}.tag = i;
-            obj.CubeSats{i}.occluded = false;
+            obj.CubeSats{i}.centroid = [0,0];
         end
         
         obj.DesiredFPS = DesiredFPS;

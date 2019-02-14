@@ -9,8 +9,8 @@ classdef CubeSat_Optical
         % CubeSat identity (1-6, 1: first out, 6: last out)
         tag
         
-        % Occlusion tag (true: occluded by another sat, false: visible)
-        occluded
+        % Centroid pixel location
+        centroid
     end
     
     %% Methods
@@ -25,10 +25,10 @@ classdef CubeSat_Optical
         %
         % @return     A reference to an initialized CubeSat object
         %
-        function obj = CubeSat_Optical(tag, occluded)
+        function obj = CubeSat_Optical(tag, centroid)
             if nargin == 3
                 obj.tag = tag;
-                obj.occluded = occluded;
+                obj.centroid = centroid;
             end
         end
     end
