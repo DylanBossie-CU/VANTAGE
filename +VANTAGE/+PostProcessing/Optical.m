@@ -33,6 +33,9 @@ classdef Optical
     % Timesteps corresponding to desired FPS
     FrameIntervals
     
+    % CubeSat centroid data containers
+    CubeSats
+    
     % Plotting option (binarized images)
     PlotBinarizedImages
     
@@ -79,10 +82,10 @@ classdef Optical
         I_boundaries = bwboundaries(I_binarized);
         
         %Isolate boundaries corresponding to CubeSats (remove noise)
-        CubeSats = obj.detectObjects(I_boundaries);
+        CubeSat_Boundaries = obj.detectObjects(I_boundaries);
         
         %Find CubeSat centroids
-        centroids = obj.findCentroids(CubeSats);
+        centroids = obj.findCentroids(CubeSat_Boundaries);
         
         %Perform object association
         occlusion = [false,false];
@@ -93,7 +96,7 @@ classdef Optical
             imshow(I_binarized);
             title('Binarized Frame');
             hold on
-            obj.plotObjectBoundaries(CubeSats,centerpoint,centroids)
+            obj.plotObjectBoundaries(CubeSat_Boundaries,centerpoint,centroids)
             
             saveas(gcf,...
                         ['OpticalImageOutputs/' obj.VideoType ...
@@ -193,6 +196,7 @@ classdef Optical
             end
         end
     end
+    
     %% Set desired initial properties of the class
     %
     % Records transform matrices and translation vectors between specific
@@ -206,14 +210,21 @@ classdef Optical
     % @author       Dylan Bossie
     % @date         24-Jan-2019
     function obj = setOpticalData(obj,DesiredFPS,PlotBinarizedImages,...
-            PlotCentroids,VideoType,FrameIntervals)
+            PlotCentroids,VideoType,FrameIntervals,amount)
+        import VANTAGE.PostProcessing.CubeSat_Optical
+        obj.CubeSats = cell(amount,1);
+        for i = 1:amount
+            obj.CubeSats{i} = CubeSat_Optical;
+            obj.CubeSats{i}.tag = i;
+            obj.CubeSats{i}.occluded = false;
+        end
+        
         obj.DesiredFPS = DesiredFPS;
         obj.PlotBinarizedImages = PlotBinarizedImages;
         obj.PlotCentroids = PlotCentroids;
         obj.VideoType = VideoType;
         obj.FrameIntervals = FrameIntervals;
     end
-    
 end
     
     

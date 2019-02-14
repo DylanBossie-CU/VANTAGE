@@ -127,6 +127,7 @@ classdef Test_Optical < matlab.unittest.TestCase
         function testObjectAssociation(testCase)
             close all
             import VANTAGE.PostProcessing.Optical
+            import VANTAGE.PostProcessing.CubeSat_Optical
             
             %Define test video path
             VideoPath = 'Data/';
@@ -142,10 +143,15 @@ classdef Test_Optical < matlab.unittest.TestCase
             %Cannot set higher than actual camera FPS
             DesiredFPS = 1;
             FrameIntervals = linspace(0,1,DesiredFPS+1);
+            
+            %%%%% Deployment manifest dummy for CubeSat number
+            fakeDeploymentManifest = 6;
+            %%%%%
+            
             PlotBinarizedImages = true;
             PlotCentroids = true;
             OpticalTest = OpticalTest.setOpticalData(DesiredFPS,PlotBinarizedImages,...
-                PlotCentroids,VideoType,FrameIntervals);
+                PlotCentroids,VideoType,FrameIntervals,fakeDeploymentManifest);
             
             %%% Process input video frames through Optical class
             OpticalTest.CurrentFrameCount = 1;
