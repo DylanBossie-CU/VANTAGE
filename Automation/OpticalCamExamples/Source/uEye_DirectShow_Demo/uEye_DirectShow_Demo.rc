@@ -1,0 +1,240 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+#include "version.h"
+
+#define PROGRAM_NAME	"uEyeDirectShow"
+
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)\r\n"
+    "LANGUAGE 7, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\uEye_DirectShow_Demo.rc2""  // Nicht mit Microsoft Visual C++ bearbeitete Ressourcen\r\n"
+    "#include ""afxres.rc""         // Standardkomponenten\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\uEye_DirectShow_Demo.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Info über uEyeDirectShow Demo"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           PROGRAM_VERSION_TEXT, IDC_STATIC,40,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright © 2009 - ", IDC_STATIC_COPYRIGHT,40,25,64,8
+    LTEXT           CURRENT_YEAR,IDC_STATIC,104,25,26,8
+    LTEXT           PROGRAM_COMPANY,IDC_STATIC,40,40,150,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,16,WS_GROUP
+END
+
+IDD_UEYE_DIRECTSHOW_DEMO_DIALOG DIALOGEX 0, 0, 411, 222
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "uEyeDirectShow Demo"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    COMBOBOX        IDC_COMBO_VIDEOSOURCES,7,19,220,95,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "",IDC_STATIC_VIDEOVIEW,7,48,220,165,BS_NOTIFY,WS_EX_TRANSPARENT
+    PUSHBUTTON      "Start Graph",IDC_BUTTON_STARTGRAPH,245,48,70,20
+    PUSHBUTTON      "Pause Graph",IDC_BUTTON_PAUSEGRAPH,245,78,70,20
+    PUSHBUTTON      "Stop Graph",IDC_BUTTON_STOPGRAPH,245,108,70,20
+    LTEXT           "Select active video source:",IDC_STATIC,7,7,87,8
+    CONTROL         "",IDC_SLIDER_EXPOSURETIME,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,245,148,159,16
+    LTEXT           "Set exposure time [us]:",IDC_STATIC_EXPOSURETIME,245,136,89,8
+    LTEXT           "min",IDC_STATIC_MINEXPOSURETIME,245,163,70,8
+    LTEXT           "max",IDC_STATIC_MAXEXPOSURETIME,334,163,70,8,0,WS_EX_RIGHT
+    CTEXT           "cur",IDC_STATIC_CURRENTEXPOSURETIME,294,163,61,9
+    LTEXT           "no graph!",IDC_STATIC_GRAPHSTATE,245,19,159,12,WS_BORDER
+    PUSHBUTTON      "Exit",IDC_BUTTON_EXIT,334,195,70,19
+    PUSHBUTTON      "Pin Properties",IDC_BUTTON_PIN_PROPERTIES,334,48,70,20
+    PUSHBUTTON      "Filter Properties",IDC_BUTTON_FILTER_PROPERTIES,334,78,70,20
+    CONTROL         "Auto",IDC_CHECK_AUTO_EXPOSURE_CONTROL_ACTIVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,334,136,70,9
+    PUSHBUTTON      "Force Trigger",IDC_BUTTON_FORCE_TRIGGER,245,195,48,14
+    PUSHBUTTON      "Dump Graph",IDC_BUTTON_DUMP_GRAPH,334,109,70,20
+    LTEXT           "frame rate:",IDC_LABEL_FRAMERATE,245,180,42,8
+    CONTROL         "cur",IDC_STATIC_CURRENT_FRAMERATE,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,299,180,35,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION PROGRAM_VERSION_NUMBER
+ PRODUCTVERSION PROGRAM_VERSION_NUMBER
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040704e4"
+        BEGIN
+			VALUE "Comments", "C++ written Demo shows usage of uEye DirectShow Filter"
+            VALUE "CompanyName", PROGRAM_COMPANY
+            VALUE "FileDescription", PROGRAM_NAME
+		    VALUE "FileVersion", PROGRAM_VERSION_TEXT
+            VALUE "InternalName", PROGRAM_NAME
+            VALUE "LegalCopyright", "Copyright © 2009 - " CURRENT_YEAR
+			VALUE "LegalTrademarks", "uEye"
+            VALUE "OriginalFilename", "uEye_DirectShow_Demo.exe"
+            VALUE "ProductName", PROGRAM_NAME
+            VALUE "ProductVersion", PROGRAM_VERSION_TEXT
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x407, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_UEYE_DIRECTSHOW_DEMO_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 404
+        VERTGUIDE, 227
+        VERTGUIDE, 245
+        VERTGUIDE, 277
+        VERTGUIDE, 315
+        VERTGUIDE, 334
+        VERTGUIDE, 369
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 214
+        HORZGUIDE, 19
+        HORZGUIDE, 31
+        HORZGUIDE, 48
+        HORZGUIDE, 68
+        HORZGUIDE, 78
+        HORZGUIDE, 98
+        HORZGUIDE, 109
+        HORZGUIDE, 129
+        HORZGUIDE, 145
+        HORZGUIDE, 157
+        HORZGUIDE, 180
+        HORZGUIDE, 195
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&Info über uEyeDirectShow Demo..."
+END
+
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+LANGUAGE 7, 1
+#pragma code_page(1252)
+#include "res\uEye_DirectShow_Demo.rc2"  // Nicht mit Microsoft Visual C++ bearbeitete Ressourcen
+#include "afxres.rc"         // Standardkomponenten
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

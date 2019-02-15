@@ -1,0 +1,674 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+#include "version.h"
+
+#define PROGRAM_NAME	"uEyeMultiCam"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifndef APSTUDIO_INVOKED
+#include "targetver.h"
+#endif
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)\r\n"
+    "LANGUAGE 7, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\Multi_Cam.rc2""        // Nicht mit Microsoft Visual C++ bearbeitete Ressourcen\r\n"
+    "#include ""l.DEU\\afxres.rc""          // Standardkomponenten\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\Multi_Cam.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_MAINFRAME           BITMAP                  "res\\Toolbar_Enabled.bmp"
+IDB_BITMAP1             BITMAP                  "res\\ids_logo.bmp"
+IDB_BITMAP2             BITMAP                  "res\\Toolbar_Hot.bmp"
+IDB_BITMAP3             BITMAP                  "res\\Toolbar_Disabled.bmp"
+IDR_MAINFRAME_8BIT_DEPTH_DUMMY  BITMAP          "res\\Toolbar_Enabled_8bit_depth_dummy.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_MAINFRAME_8BIT_DEPTH_DUMMY TOOLBAR  36, 32
+BEGIN
+    BUTTON      ID_FILE_NEW
+    BUTTON      ID_FILE_CLOSE
+    BUTTON      ID_FILE_SETTINGS
+    SEPARATOR
+    BUTTON      ID_APP_ABOUT
+    SEPARATOR
+    BUTTON      ID_BUTTON_TRIGGER_CAPTURE
+    BUTTON      ID_BUTTON_TRIGGER_FREEZE
+    SEPARATOR
+    BUTTON      ID_BUTTON_SAVE
+    BUTTON      ID_BUTTON_PARAMETER
+END
+
+IDR_MAINFRAME TOOLBAR  36, 32
+BEGIN
+    BUTTON      ID_FILE_NEW
+    BUTTON      ID_FILE_CLOSE
+    BUTTON      ID_FILE_SETTINGS
+    SEPARATOR
+    BUTTON      ID_APP_ABOUT
+    SEPARATOR
+    BUTTON      ID_BUTTON_TRIGGER_CAPTURE
+    BUTTON      ID_BUTTON_TRIGGER_FREEZE
+    SEPARATOR
+    BUTTON      ID_BUTTON_SAVE
+    BUTTON      ID_BUTTON_PARAMETER
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "Open new camera\tStrg+N",     ID_FILE_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "&Close",                      ID_APP_EXIT
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
+        MENUITEM "Statusbar",                   ID_VIEW_STATUS_BAR
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&Information about uEyeMultiCam...", ID_APP_ABOUT
+    END
+END
+
+IDR_Multi_CamTYPE MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "Open new camera\tStrg+N",     ID_FILE_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "&Close",                      ID_APP_EXIT
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
+        MENUITEM "Statusbar",                   ID_VIEW_STATUS_BAR
+    END
+    POPUP "&Window"
+    BEGIN
+        MENUITEM "Cascade",                     ID_WINDOW_CASCADE
+        MENUITEM "&Tile",                       ID_WINDOW_TILE_HORZ
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&Information about ueyeMultiCam...", ID_APP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS 
+BEGIN
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY 
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 230, 68
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Information about uEyeMultiCam"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,161,46,62,15,WS_GROUP
+    CONTROL         "uEyeMultiCam",IDC_STATIC,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,7,7,114,8
+    LTEXT           "Copyright (C) 2012 - ",IDC_STATIC,7,18,111,8
+    LTEXT           CURRENT_YEAR,IDC_STATIC,75,18,26,8
+    LTEXT           PROGRAM_COMPANY,IDC_STATIC,7,30,117,8
+    CONTROL         139,IDC_STATIC,"Static",SS_BITMAP,162,7,61,23
+END
+
+IDD_DLGSELECTCAMERA DIALOGEX 0, 0, 299, 220
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Select camera"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&OK",IDOK,184,199,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,242,199,50,14
+    CONTROL         "",IDC_LIST_CAMERAS,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,8,7,283,185
+END
+
+IDD_DIALOG_TIMING DIALOGEX 0, 0, 311, 199
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Camera"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Pixel Clock",IDC_PIXEL_CLOCK,13,20,34,8
+    CONTROL         "",IDC_SLIDER_PIXELCLOCK,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,68,17,187,15
+    EDITTEXT        IDC_EDIT_PIXELCLOCK,255,17,41,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_PixelClock,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,286,17,10,14
+    RTEXT           "5 MHz",IDC_PIXEL_CLOCK_MIN,68,36,20,8
+    LTEXT           "48 MHz",IDC_PIXEL_CLOCK_MAX,231,36,24,8
+    LTEXT           "Frame Rate",IDC_STATIC_FRAMERATE,13,68,38,8
+    CONTROL         "",IDC_SLIDER_FRAMEDELAY,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,68,65,187,15
+    EDITTEXT        IDC_EDIT_FRAMERATE,255,65,41,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_FrameRate,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,286,65,10,14
+    RTEXT           "1.00 fps",IDC_STATIC_FRAMERATE_MIN,68,84,28,8
+    LTEXT           "30.00 fps",IDC_STATIC_FRAMERATE_MAX,223,84,32,8
+    LTEXT           "Expousure Time",IDC_STATIC_EXPOSURE,13,116,55,8
+    CONTROL         "",IDC_SLIDER_EXPOSURE,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,68,113,187,15
+    EDITTEXT        IDC_EDIT_EXPOSURE,255,113,41,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_Time,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,286,113,10,14
+    RTEXT           "1.00 ms",IDC_STATIC_EXPOSURE_MIN,68,132,26,8
+    LTEXT           "10000.0 ms",IDC_STATIC_EXPOSURE_MAX,217,132,38,8
+    GROUPBOX        "Timing",IDC_STATIC,7,7,297,155
+    PUSHBUTTON      "Default",IDC_BUTTON_DEFAULT,251,168,53,14
+END
+
+IDD_DIALOG_IMAGE DIALOGEX 0, 0, 316, 299
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Image"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Gain",IDC_STATIC,14,20,15,8
+    CONTROL         "",IDC_SLIDER_GAIN_MASTER,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,66,17,184,15
+    EDITTEXT        IDC_EDIT_MASTER,256,17,39,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_Gain,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,285,17,10,14
+    CONTROL         "Gain Boost",IDC_GAINBOOST,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,36,52,10
+    LTEXT           "0",IDC_STATIC_GAIN_MIN,72,36,8,8
+    RTEXT           "100",IDC_STATIC_GAIN_MAX,210,36,40,8,0,WS_EX_RIGHT
+    LTEXT           "Black Level",IDC_STATIC,14,56,36,8
+    CONTROL         "",IDC_SLIDER_BL_OFFSET,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,66,53,184,15
+    EDITTEXT        IDC_EDIT_BL_OFFSET,256,53,39,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_BlackLevel,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,285,53,10,14
+    LTEXT           "0",IDC_STATIC_BL_MIN,72,72,8,8
+    RTEXT           "255",IDC_STATIC_BL_MAX,210,72,40,8,0,WS_EX_RIGHT
+    LTEXT           "Red Gain",IDC_STATIC,14,104,30,8
+    CONTROL         "",IDC_SLIDER_GAIN_RED,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,66,101,184,15
+    EDITTEXT        IDC_EDIT_RED,256,101,39,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_RedGain,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,285,101,10,14
+    LTEXT           "0",IDC_STATIC_RED_MIN,72,121,8,8
+    RTEXT           "100",IDC_STATIC_RED_MAX,210,121,40,8
+    LTEXT           "Green Gain",IDC_STATIC,14,140,36,8
+    CONTROL         "",IDC_SLIDER_GAIN_GREEN,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,66,137,184,15
+    EDITTEXT        IDC_EDIT_GREEN,256,137,39,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_GreenGain,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,285,137,10,14
+    LTEXT           "0",IDC_STATIC_GREEN_MIN,72,156,8,8
+    RTEXT           "100",IDC_STATIC_GREEN_MAX,210,156,40,8
+    LTEXT           "Blue Gain",IDC_STATIC,14,176,30,8
+    CONTROL         "",IDC_SLIDER_GAIN_BLUE,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,66,173,184,15
+    EDITTEXT        IDC_EDIT_BLUE,256,173,39,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_BlueGain,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,284,173,11,14
+    LTEXT           "0",IDC_STATIC_BLUE_MIN,72,192,8,8
+    RTEXT           "100",IDC_STATIC_BLUE_MAX,210,192,40,8
+    CONTROL         "ON",IDC_CHECK_GAMMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,229,26,10
+    LTEXT           "Factor",IDC_STATIC,14,242,22,8
+    CONTROL         "",IDC_SLIDER_GAMMA,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,66,239,184,15
+    EDITTEXT        IDC_EDIT_GAMMA,256,239,39,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_Gamma,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,284,239,11,14
+    GROUPBOX        "Master Gain",IDC_STATIC,7,7,297,77
+    GROUPBOX        "Color Gain",IDC_STATIC,7,88,297,122
+    GROUPBOX        "Gamma",IDC_STATIC,7,213,297,51
+    PUSHBUTTON      "Default",IDC_BUTTON_DEFAULT,250,269,54,14
+END
+
+IDD_DIALOG_SIZE DIALOGEX 0, 0, 315, 270
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Size"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_SLIDER_WIDTH,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,60,23,186,15
+    EDITTEXT        IDC_EDIT_WIDTH,253,23,38,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN_WIDTH,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,291,23,10,14
+    RTEXT           "16",IDC_STATIC_BREITE_MIN,60,42,9,8
+    RTEXT           "5000",IDC_STATIC_BREITE_MAX,212,42,34,8
+    CONTROL         "",IDC_SLIDER_HIGH,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,60,65,186,15
+    EDITTEXT        IDC_EDIT_HEIGHT,253,65,38,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN_HEIGHT,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,291,65,10,14
+    RTEXT           "4",IDC_STATIC_HOEHE_MIN,60,84,8,8
+    RTEXT           "5000",IDC_STATIC_HOEHE_MAX,212,84,34,8
+    CONTROL         "",IDC_SLIDER_LEFT,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,60,107,186,15
+    EDITTEXT        IDC_EDIT_LEFT,253,107,38,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN_LEFT,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,291,107,10,14
+    RTEXT           "0",IDC_STATIC_LEFT_MIN,60,126,8,8
+    RTEXT           "5000",IDC_STATIC_LEFT_MAX,212,126,34,8
+    CONTROL         "",IDC_SLIDER_TOP,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,60,149,186,15
+    EDITTEXT        IDC_EDIT_TOP,253,149,38,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN_TOP,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,291,149,10,14
+    RTEXT           "0",IDC_STATIC_TOP_MIN,60,168,8,8
+    RTEXT           "5000",IDC_STATIC_TOP_MAX,212,168,34,8
+    LTEXT           "Width",IDC_STATIC,14,26,20,8
+    LTEXT           "Height",IDC_STATIC,14,68,22,8
+    LTEXT           "Left",IDC_STATIC,14,110,14,8
+    LTEXT           "Top",IDC_STATIC,14,152,13,8
+    PUSHBUTTON      "Default",IDC_BUTTON_DEFAULT,255,216,49,14
+    GROUPBOX        "Image (AOI)",IDC_STATIC,7,7,297,201
+    CONTROL         "Fit to Window",IDC_CHECK_WINDOW,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,14,193,60,10
+END
+
+IDD_DIALOG_TRIGGER DIALOGEX 0, 0, 311, 198
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Trigger"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Default",IDC_BUTTON_DEFAULT,254,172,50,14
+    GROUPBOX        "Modus",IDC_STATIC,7,7,297,156
+    CONTROL         "Software",IDC_RADIO_SOFTWARE,"Button",BS_AUTORADIOBUTTON,13,25,45,10
+    CONTROL         "Falling edge",IDC_RADIO_FALLING,"Button",BS_AUTORADIOBUTTON,13,43,54,10
+    CONTROL         "Rising edge",IDC_RADIO_RISING,"Button",BS_AUTORADIOBUTTON,13,61,53,10
+    LTEXT           "Trigger delay",IDC_STATIC_DELAY,13,93,53,8
+    CONTROL         "",IDC_SLIDER_TRIGGER_DELAY,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,66,90,174,15
+    EDITTEXT        IDC_EDIT_TRIGGER_DELAY,242,90,52,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN_TRIGGER_DELAY,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,283,90,11,14
+    LTEXT           "Trigger timeout",IDC_STATIC,13,128,50,8
+    CONTROL         "",IDC_SLIDER_TRIGGER_TIMEOUT,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,66,125,174,15
+    EDITTEXT        IDC_EDIT_TRIGGER_TIMEOUT,242,125,52,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN_TRIGGER_TIMEOUT,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,283,125,11,14
+    CTEXT           "1 µs",IDC_STATIC_MIN_DELAY,66,108,18,8
+    LTEXT           "4000000 µs ",IDC_STATIC_MAX_DELAY,200,108,40,8
+    CTEXT           "100 ms",IDC_STATIC_MIN_TIMEOUT,66,144,27,8
+    LTEXT           "3600000 ms  (60 min)",IDC_STATIC_MAX_TIMEOUT,168,144,72,8
+    CONTROL         "Trigger delay ON",IDC_CHECK_TRIGGER_DELAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,170,61,70,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION PROGRAM_VERSION_NUMBER
+ PRODUCTVERSION PROGRAM_VERSION_NUMBER
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040704e4"
+        BEGIN
+            VALUE "CompanyName", PROGRAM_COMPANY
+            VALUE "FileDescription", PROGRAM_NAME
+            VALUE "FileVersion", PROGRAM_VERSION_TEXT
+            VALUE "InternalName", PROGRAM_NAME
+            VALUE "LegalCopyright", "Copyright © 2012 - " CURRENT_YEAR
+            VALUE "OriginalFilename", "uEyeMultiCam.exe"
+            VALUE "ProductName", PROGRAM_NAME
+            VALUE "ProductVersion", PROGRAM_VERSION_TEXT
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x407, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 223
+        VERTGUIDE, 162
+        VERTGUIDE, 211
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 61
+        HORZGUIDE, 18
+        HORZGUIDE, 30
+        HORZGUIDE, 42
+    END
+
+    IDD_DLGSELECTCAMERA, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 193
+    END
+
+    IDD_DIALOG_TIMING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 304
+        VERTGUIDE, 13
+        VERTGUIDE, 68
+        VERTGUIDE, 255
+        VERTGUIDE, 296
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 192
+        HORZGUIDE, 24
+        HORZGUIDE, 36
+        HORZGUIDE, 72
+        HORZGUIDE, 84
+        HORZGUIDE, 120
+        HORZGUIDE, 132
+        HORZGUIDE, 162
+        HORZGUIDE, 174
+        HORZGUIDE, 182
+        HORZGUIDE, 198
+    END
+
+    IDD_DIALOG_IMAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 310
+        VERTGUIDE, 14
+        VERTGUIDE, 66
+        VERTGUIDE, 72
+        VERTGUIDE, 210
+        VERTGUIDE, 256
+        VERTGUIDE, 295
+        VERTGUIDE, 304
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 292
+        HORZGUIDE, 24
+        HORZGUIDE, 36
+        HORZGUIDE, 60
+        HORZGUIDE, 72
+        HORZGUIDE, 108
+        HORZGUIDE, 121
+        HORZGUIDE, 144
+        HORZGUIDE, 156
+        HORZGUIDE, 180
+        HORZGUIDE, 192
+        HORZGUIDE, 234
+        HORZGUIDE, 246
+        HORZGUIDE, 264
+        HORZGUIDE, 276
+    END
+
+    IDD_DIALOG_SIZE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 308
+        VERTGUIDE, 14
+        VERTGUIDE, 60
+        VERTGUIDE, 212
+        VERTGUIDE, 246
+        VERTGUIDE, 253
+        VERTGUIDE, 291
+        VERTGUIDE, 304
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 263
+        HORZGUIDE, 30
+        HORZGUIDE, 42
+        HORZGUIDE, 72
+        HORZGUIDE, 84
+        HORZGUIDE, 114
+        HORZGUIDE, 126
+        HORZGUIDE, 156
+        HORZGUIDE, 168
+        HORZGUIDE, 186
+        HORZGUIDE, 198
+        HORZGUIDE, 216
+    END
+
+    IDD_DIALOG_TRIGGER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 304
+        VERTGUIDE, 13
+        VERTGUIDE, 66
+        VERTGUIDE, 240
+        VERTGUIDE, 242
+        VERTGUIDE, 294
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 191
+        HORZGUIDE, 30
+        HORZGUIDE, 48
+        HORZGUIDE, 66
+        HORZGUIDE, 97
+        HORZGUIDE, 108
+        HORZGUIDE, 132
+        HORZGUIDE, 144
+        HORZGUIDE, 179
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDR_MAINFRAME           "uEyeMultiCam"
+    IDR_MULTI_CAMTYPE       "\nMulti_Cam\nMulti_Cam\n\n\nMultiCam.Document\nMulti_Cam.Document"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_APP_TITLE       "uEyeMultiCam"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_NEW             "Open new camera"
+    ID_FILE_CLOSE           "Close the active documents.\nClose the activ Camera"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_BUTTON_TRIGGER_FREEZE 
+                            "Snapshot from all active Windows.\nTrigger - Stop Video"
+    ID_FILE_SETTINGS        "Open the Properties.\nProperties"
+    ID_BUTTON_TRIGGER_CAPTURE "Live Video.\nTrigger - Live Video"
+    ID_BUTTON_SAVE          "Save a picture.\nSave Picture"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_BUTTON_PARAMETER     "Load Parameter.\nLoad Parameter"
+    ID_BUTTON_SINGLE_TRIGGER 
+                            "Snapshot from the active Window. \nSingle - Trigger - Stop Video"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_APP_ABOUT            "Show Information about the Demo.\nInfo"
+    ID_APP_EXIT             "Close the Application.\nClose"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_MRU_FILE1       "Opens the document."
+    ID_FILE_MRU_FILE2       "Opens the document."
+    ID_FILE_MRU_FILE3       "Opens the document."
+    ID_FILE_MRU_FILE4       "Opens the document."
+    ID_FILE_MRU_FILE5       "Opens the document."
+    ID_FILE_MRU_FILE6       "Opens the document."
+    ID_FILE_MRU_FILE7       "Opens the document."
+    ID_FILE_MRU_FILE8       "Opens the document."
+    ID_FILE_MRU_FILE9       "Opens the document."
+    ID_FILE_MRU_FILE10      "Opens the document."
+    ID_FILE_MRU_FILE11      "Opens the document."
+    ID_FILE_MRU_FILE12      "Opens the document."
+    ID_FILE_MRU_FILE13      "Opens the document."
+    ID_FILE_MRU_FILE14      "Opens the document."
+    ID_FILE_MRU_FILE15      "Opens the document."
+    ID_FILE_MRU_FILE16      "Opens the document."
+END
+
+STRINGTABLE 
+BEGIN
+    ID_NEXT_PANE            "Moves to the next pane.\nNext Section"
+    ID_PREV_PANE            "Moves to the previous pane.\nPrevious Section"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_WINDOW_NEW           "Opens another Window for the active document.\nOpen new Camera"
+    ID_WINDOW_ARRANGE       "Arranges the icons in the bottom of the Window.\nArrange Icons"
+    ID_WINDOW_CASCADE       "Arranges the Windows overlap.\nOverlapping Windows"
+    ID_WINDOW_TILE_HORZ     "Arranges the Windows side by side.\nWindows Side by Side"
+    ID_WINDOW_TILE_VERT     "Arranges the Windows side by side.\nWindows Side by Side"
+    ID_WINDOW_SPLIT         "Splits the active window into areas.\nShare"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_CLEAR           "Deletes the selection.\nDelete"
+    ID_EDIT_CLEAR_ALL       "Deletes All.\nDelete All"
+    ID_EDIT_COPY            "Copies the selection.\nCopy"
+    ID_EDIT_CUT             "Transfers the selection.\nCut"
+    ID_EDIT_FIND            "Looks for the specified text.\nSearch"
+    ID_EDIT_PASTE           "Fügt den Inhalt der Zwischenablage ein.\nInsert"
+    ID_EDIT_REPEAT          "Repeats the last operation.\nRepeat"
+    ID_EDIT_REPLACE         "Replaces the specified text.\nReplace"
+    ID_EDIT_SELECT_ALL      "Selects the entire document.\nSelect All"
+    ID_EDIT_UNDO            "Undo the last operation.\nUndo"
+    ID_EDIT_REDO            "Repeats the last operation.\nRestore"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_TOOLBAR         "Shows or Hides the Toolbar.\nToolbar"
+    ID_VIEW_STATUS_BAR      "Shows or Hides the Statusbar.\nStatusbar"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCSIZE          "Changes the size of the Window."
+    AFX_IDS_SCMOVE          "Changes the position of the Window"
+    AFX_IDS_SCMINIMIZE      "Minimiert das Fenster."
+    AFX_IDS_SCMAXIMIZE      "Maximiert das Fenster."
+    AFX_IDS_SCNEXTWINDOW    "Move to the next document Window."
+    AFX_IDS_SCPREVWINDOW    "Move to the previous document Window."
+    AFX_IDS_SCCLOSE         "Closes the active Window and prompts to save the Document."
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCRESTORE       "Restores the original Window size again."
+    AFX_IDS_SCTASKLIST      "Enabled the Task List."
+    AFX_IDS_MDICHILD        "Activates this Window."
+END
+
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+LANGUAGE 7, 1
+#pragma code_page(1252)
+#include "res\Multi_Cam.rc2"        // Nicht mit Microsoft Visual C++ bearbeitete Ressourcen
+#include "l.DEU\afxres.rc"          // Standardkomponenten
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

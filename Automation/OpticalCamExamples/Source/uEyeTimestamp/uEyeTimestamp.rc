@@ -1,0 +1,246 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+#include "version.h"
+
+#define PROGRAM_NAME	"uEyeTimestamp"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\uEyeTimestamp.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_IDS_LOGO            BITMAP                  "res\\IDS_LOGO.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\uEyeTimestamp.ico"
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Englisch (USA) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_UEYETIMESTAMP_DIALOG DIALOGEX 0, 0, 443, 278
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "uEyeTimestamp"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_DISPLAY,"Static",SS_BLACKFRAME | SS_SUNKEN,7,7,320,264
+    PUSHBUTTON      "&Start capture",IDC_BUTTON_START,334,7,102,16
+    PUSHBUTTON      "S&top capture",IDC_BUTTON_STOP,334,27,102,16
+    CONTROL         "Trigger off",IDC_RADIO_OFF,"Button",BS_AUTORADIOBUTTON | WS_GROUP,338,47,78,10
+    CONTROL         "Software trigger",IDC_RADIO_SOFTWARE,"Button",BS_AUTORADIOBUTTON,338,59,78,10
+    CONTROL         "Hardware falling edge",IDC_RADIO_HI_LO,"Button",BS_AUTORADIOBUTTON,338,71,83,10
+    CONTROL         "Hardware rising edge",IDC_RADIO_LO_HI,"Button",BS_AUTORADIOBUTTON,338,83,82,10
+    LTEXT           "Frame events",IDC_STATIC_FRAME_EVENTS,339,100,44,8
+    EDITTEXT        IDC_EDIT_FRAME_EVENTS,388,98,29,12,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Trigger events",IDC_STATIC_TRIGGER_EVENTS,339,115,46,8
+    EDITTEXT        IDC_EDIT_TRIGGER_EVENTS,388,114,29,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Reset counters",IDC_BUTTON_RESET_COUNTERS,334,215,102,16
+    PUSHBUTTON      "&Load Parameters",IDC_BUTTON_LOAD_PARAMETER,334,235,102,16
+    PUSHBUTTON      "&Exit",IDC_BUTTON_EXIT,334,255,102,16
+    LTEXT           "Device timestamp",IDC_DEVICE_TIME,340,187,96,10
+    LTEXT           "Local timestamp",IDC_LOCAL_TIME,340,159,86,10
+    EDITTEXT        IDC_EDIT_LOCAL_TIMESTAMP,340,169,89,13,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT_DEVICE_TIMESTAMP,340,197,89,13,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT_PCTIME,340,141,89,13,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Local PC time",IDC_SYSTEM_TIME,340,131,88,9
+END
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 222, 54
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About uEyeTimestamp"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK2,152,33,64,14,WS_GROUP
+    LTEXT           "Copyright © 2004 - ",IDC_STATIC_COPYRIGHT,7,23,120,8
+    LTEXT           CURRENT_YEAR,IDC_STATIC,69,23,26,8
+    LTEXT           PROGRAM_COMPANY,IDC_STATIC_ABOUT_COMPANY,7,36,137,8
+    LTEXT           PROGRAM_VERSION_TEXT,IDC_STATIC_ABOUT_APPNAME,7,9,120,8
+    CONTROL         135,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,153,7,62,19
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION PROGRAM_VERSION_NUMBER
+ PRODUCTVERSION PROGRAM_VERSION_NUMBER
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "Small sample programm showing how to use the timstamp"
+            VALUE "CompanyName", PROGRAM_COMPANY
+            VALUE "FileDescription", PROGRAM_NAME
+            VALUE "FileVersion", PROGRAM_VERSION_TEXT
+            VALUE "InternalName", PROGRAM_NAME
+            VALUE "LegalCopyright", "Copyright © 2004 - " CURRENT_YEAR
+            VALUE "LegalTrademarks", "uEye"
+            VALUE "OriginalFilename", "uEyeTimestamp.exe"
+            VALUE "ProductName", PROGRAM_NAME
+            VALUE "ProductVersion", PROGRAM_VERSION_TEXT
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_UEYETIMESTAMP_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 436
+        VERTGUIDE, 327
+        VERTGUIDE, 334
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 271
+    END
+
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 215
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 47
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About uEyeTimestamp..."
+END
+
+#endif    // Englisch (USA) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\uEyeTimestamp.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

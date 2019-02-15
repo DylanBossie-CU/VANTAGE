@@ -1,0 +1,42 @@
+// uEyePixelPeek.odl : type library source for uEyePixelPeek.exe
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (uEyePixelPeek.tlb).
+
+[ uuid(7FB646F1-6B5A-43DD-9EBE-EBF3E24E4154), version(1.0) ]
+library UEyePixelPeek
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+	//  Primary dispatch interface for CUEyePixelPeekDoc
+	
+	[ uuid(AE872FB9-0D15-430E-892C-A61849D31633) ]
+	dispinterface IUEyePixelPeek
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CUEyePixelPeekDlgAutoProxy)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CUEyePixelPeekDlgAutoProxy)
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CUEyePixelPeekDoc
+	
+	[ uuid(B2061A39-5F07-411C-96EE-EAAFF303FC69) ]
+	coclass UEyePixelPeek
+	{
+		[default] dispinterface IUEyePixelPeek;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

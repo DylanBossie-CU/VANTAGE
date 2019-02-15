@@ -1,0 +1,265 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+#include "version.h"
+
+#define PROGRAM_NAME	"uEyeSequenceAoi"
+
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)\r\n"
+    "LANGUAGE 7, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\uEyeSequenceAoi.rc2""  // Nicht mit Microsoft Visual C++ bearbeitete Ressourcen\r\n"
+    "#include ""afxres.rc""     // Standardkomponenten\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\uEyeSequenceAoi.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 227, 66
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Info über uEyeSequenceAoi"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    LTEXT           PROGRAM_VERSION_TEXT,IDC_STATIC,7,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright © 2011 - ",IDC_STATIC_COPYRIGHT,7,25,119,8
+    LTEXT           CURRENT_YEAR,IDC_STATIC,73,25,26,8
+    DEFPUSHBUTTON   "OK",IDOK,170,7,50,16,WS_GROUP
+    LTEXT           PROGRAM_COMPANY,IDC_STATIC,7,40,133,8
+    CONTROL         130,IDC_STATIC,"Static",SS_BITMAP,158,34,62,25
+END
+
+IDD_UEYESEQUENCEAOI_DIALOG DIALOGEX 0, 0, 676, 408
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "uEyeSequenceAoi"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT_AOI_POS_X,528,30,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN_AOI_POS_X,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,558,30,11,14
+    EDITTEXT        IDC_EDIT_AOI_WIDTH,606,30,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN_AOI_WIDTH,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,636,30,11,14
+    EDITTEXT        IDC_EDIT_AOI_POS_Y,528,48,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN_AOI_POS_Y,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,558,49,11,14
+    EDITTEXT        IDC_EDIT_AOI_HEIGHT,606,49,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN_AOI_HEIGHT,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,636,49,11,14
+    PUSHBUTTON      "Set",IDC_BUTTON_AOI_SET,600,72,50,14
+    CONTROL         "",IDC_SLIDER_FPS,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,498,114,102,15
+    EDITTEXT        IDC_EDIT_FPS,602,114,40,14,ES_AUTOHSCROLL | ES_WANTRETURN
+    CONTROL         "",IDC_SPIN_FPS,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,636,114,11,14
+    COMBOBOX        IDC_COMBO_CUR_SEQUENCE,528,192,54,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_AOI_CYCLE,612,192,42,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPIN_AOI_CYCLE,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,642,192,11,14
+    CONTROL         "",IDC_SLIDER_AOI_X,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,498,222,114,15
+    EDITTEXT        IDC_EDIT_AOI_X,612,222,42,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN_AOI_X,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,642,222,11,14
+    CONTROL         "",IDC_SLIDER_AOI_Y,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,498,264,114,15
+    EDITTEXT        IDC_EDIT_AOI_Y,612,265,42,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN_AOI_Y,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,642,264,11,14
+    CONTROL         "",IDC_SLIDER_AOI_EXP,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,498,306,114,15
+    EDITTEXT        IDC_EDIT_AOI_EXP,612,306,42,14,ES_AUTOHSCROLL | ES_WANTRETURN
+    CONTROL         "",IDC_SPIN_AOI_EXP,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,642,306,11,14
+    CONTROL         "",IDC_SLIDER_AOI_MASTERGAIN,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,498,354,114,15
+    EDITTEXT        IDC_EDIT_AOI_MASTERGAIN,612,353,42,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN_AOI_MASTERGAIN,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,642,354,11,14
+    LTEXT           "min",IDC_TXT_AOI_X_MIN,504,240,12,8
+    LTEXT           "max",IDC_TXT_AOI_X_MAX,576,240,30,8
+    CONTROL         "",IDC_DISPLAY_AOI_2,"Static",SS_BLACKFRAME,246,24,222,174
+    CONTROL         "",IDC_DISPLAY_AOI_1,"Static",SS_BLACKFRAME,18,24,222,174
+    CONTROL         "",IDC_DISPLAY_AOI_3,"Static",SS_BLACKFRAME,18,210,222,174
+    CONTROL         "",IDC_DISPLAY_AOI_4,"Static",SS_BLACKFRAME,246,210,222,174
+    GROUPBOX        "Sequence",IDC_GRP_SEQUENCE,6,6,474,384
+    GROUPBOX        "Properties",IDC_GRP_PROPERTIES,486,6,180,384
+    LTEXT           "X position",IDC_STATIC_X_POSITION,498,210,32,8
+    LTEXT           "max",IDC_TXT_AOI_Y_MAX,576,282,36,8
+    LTEXT           "min",IDC_TXT_AOI_Y_MIN,504,282,18,8
+    LTEXT           "Y position",IDC_STATIC_Y_POSITION,498,252,32,8
+    LTEXT           "max",IDC_TXT_AOI_EXP_MAX,576,324,36,8
+    LTEXT           "min",IDC_TXT_AOI_EXP_MIN,504,324,30,8
+    LTEXT           "Exposure time",IDC_STATIC_EXPOSURE_TIME,498,294,46,8
+    LTEXT           "max",IDC_TXT_AOI_GAIN_MAX,576,372,30,8
+    LTEXT           "min",IDC_TXT_AOI_GAIN_MIN,504,372,18,8
+    LTEXT           "Master gain",IDC_STATIC_MASTERGAIN,498,342,38,8
+    LTEXT           "Current",IDC_STATIC_CUR_SEQUENCE,498,192,26,8
+    GROUPBOX        "AOI",IDC_GRP_AOI,492,18,168,72
+    LTEXT           "X Pos.",IDC_STATIC_POS_X,498,36,21,8
+    LTEXT           "Y Pos.",IDC_STATIC_POS_Y,498,54,21,8
+    LTEXT           "Width",IDC_STATIC_AOI_WIDTH,582,36,20,8
+    LTEXT           "Height",IDC_STATIC_AOI_HEIGHT,582,54,22,8
+    GROUPBOX        "Sequence",IDC_STATIC,492,180,168,204
+    GROUPBOX        "Preference",IDC_STATIC,492,90,168,84
+    LTEXT           "min",IDC_TXT_FPS_MIN,504,132,24,8
+    LTEXT           "max",IDC_TXT_FPS_MAX,576,132,30,8
+    LTEXT           "Framerate",IDC_STATIC_FPS,498,102,34,8
+    LTEXT           "Cycle",IDC_STATIC,588,192,18,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION PROGRAM_VERSION_NUMBER
+ PRODUCTVERSION PROGRAM_VERSION_NUMBER
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040704e4"
+        BEGIN
+            VALUE "CompanyName", PROGRAM_COMPANY
+            VALUE "FileDescription", PROGRAM_NAME
+            VALUE "FileVersion", PROGRAM_VERSION_TEXT
+            VALUE "InternalName", PROGRAM_NAME
+            VALUE "LegalCopyright", "Copyright © 2011 - " CURRENT_YEAR
+            VALUE "LegalTrademarks", "uEye"
+            VALUE "OriginalFilename", PROGRAM_NAME ".exe"
+            VALUE "ProductName", PROGRAM_NAME
+            VALUE "ProductVersion", PROGRAM_VERSION_TEXT
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x407, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 220
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 59
+    END
+
+    IDD_UEYESEQUENCEAOI_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 669
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 401
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_IDS_LOGO            BITMAP                  "res\\IDS_LOGO_GREY_93_40.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&Info über uEyeSequenceAoi..."
+END
+
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+LANGUAGE 7, 1
+#pragma code_page(1252)
+#include "res\uEyeSequenceAoi.rc2"  // Nicht mit Microsoft Visual C++ bearbeitete Ressourcen
+#include "afxres.rc"     // Standardkomponenten
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

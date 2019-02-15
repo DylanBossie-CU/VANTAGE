@@ -1,0 +1,248 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+#include "version.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// German (Germany) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\uEyeDirectRenderer.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\uEyeDirectRenderer.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_UEYE_LOGO           BITMAP                  "res\\uEye_Logo1.bmp"
+IDB_MOVING_LOGO         BITMAP                  "res\\uEye_Logo2.bmp"
+#endif    // German (Germany) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 63
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About uEyeDirectRenderer"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           PROGRAM_VERSION_TEXT,IDC_STATIC,40,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright © 2009 - ",IDC_STATIC_COPYRIGHT,40,25,179,8
+    LTEXT           CURRENT_YEAR,IDC_STATIC,101,25,26,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
+    LTEXT           PROGRAM_COMPANY,IDC_STATIC_ABOUT_COMPANY,40,42,153,8
+END
+
+IDD_UEYEDIRECTRENDERER_DIALOG DIALOGEX 0, 0, 493, 447
+STYLE DS_SETFONT | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "uEyeDirectRenderer"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         129,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE | SS_SUNKEN,6,341,80,36
+    LTEXT           "Image width:",IDC_IMAGE_WIDTH,90,360,79,8
+    LTEXT           "Image height:",IDC_IMAGE_HEIGHT,90,378,81,8
+    LTEXT           "Overlay width: ",IDC_OVERLAY_WIDTH,172,360,82,8
+    LTEXT           "Overlay height:",IDC_OVERLAY_HEIGHT,172,378,82,8
+    CONTROL         "Mono",IDC_CHECK_MONO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,261,341,35,10
+    CONTROL         "Show overlay",IDC_CHECK_SHOW_OVERLAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,261,358,59,10
+    CONTROL         "Scale image and overlay",IDC_CHECK_ALLOW_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,324,340,93,10
+    CONTROL         "Show moving overlay",IDC_CHECK_SHOW_MOVING_OVERLAY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,324,358,81,10
+    CONTROL         "Semi transparent",IDC_CHECK_SEMI_TRANSPARENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,418,376,69,10
+    CONTROL         "Overlay from file",IDC_CHECK_OVERLAY_FROM_FILE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,418,358,66,10
+    CONTROL         "Vsync off",IDC_RADIO_VSYNC_OFF,"Button",BS_AUTORADIOBUTTON | WS_GROUP,306,396,45,10
+    CONTROL         "Vsync auto",IDC_RADIO_VSYNC_AUTO,"Button",BS_AUTORADIOBUTTON,358,398,51,8
+    CONTROL         "Vsync user",IDC_RADIO_VSYNC_USER,"Button",BS_AUTORADIOBUTTON,416,398,51,8
+    LTEXT           "Sync pos:",IDC_STATIC_SYNC_POS,261,377,32,10,WS_DISABLED
+    EDITTEXT        IDC_EDIT_SYNC_POS,297,375,31,13,ES_AUTOHSCROLL | WS_DISABLED
+    CONTROL         "",IDC_SPIN_SYNC_POSITION,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | WS_DISABLED,328,373,11,16
+    CONTROL         "",IDC_KEY_COLOR,"Button",BS_OWNERDRAW | WS_TABSTOP,355,375,20,13,WS_EX_CLIENTEDGE
+    LTEXT           "Key Color",IDC_KC_TEXT,379,377,30,8,SS_CENTERIMAGE
+    PUSHBUTTON      "Start &Live",IDC_BUTTON_LIVE,6,426,115,16
+    PUSHBUTTON      "&Stop Live",IDC_BUTTON_STOP_LIVE,126,426,115,16
+    PUSHBUTTON      "&Load Parameter",IDC_BUTTON_LOAD_PARAMETER,247,426,116,16
+    PUSHBUTTON      "&Exit",IDC_BUTTON_EXIT,368,426,116,16
+    CONTROL         "",IDC_DISPLAY,"Static",SS_BLACKFRAME | SS_CENTERIMAGE | SS_REALSIZEIMAGE | SS_SUNKEN,5,5,480,330
+    CONTROL         "Scale image",IDC_CHECK_ALLOW_IMAGE_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,418,340,55,10
+    CONTROL         "Direct3D",IDC_RADIO_DIRECT3D,"Button",BS_AUTORADIOBUTTON | WS_GROUP,90,342,44,10
+    CONTROL         "OpenGL",IDC_RADIO_OPENGL,"Button",BS_AUTORADIOBUTTON,168,342,43,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION PROGRAM_VERSION_NUMBER
+ PRODUCTVERSION PROGRAM_VERSION_NUMBER
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", PROGRAM_COMPANY
+            VALUE "FileDescription", "uEyeDirectRenderer"
+            VALUE "FileVersion", PROGRAM_VERSION_TEXT
+            VALUE "InternalName", "uEyeDirectRenderer"
+            VALUE "LegalCopyright", "Copyright © 2009 - " CURRENT_YEAR
+            VALUE "LegalTrademarks", "uEye"
+            VALUE "OriginalFilename", "uEyeDirectRenderer.exe"
+            VALUE "ProductName", "uEyeDirectRenderer"
+            VALUE "ProductVersion", PROGRAM_VERSION_TEXT
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 56
+    END
+
+    IDD_UEYEDIRECTRENDERER_DIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 490
+        BOTTOMMARGIN, 411
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About uEyeDirectRenderer..."
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\uEyeDirectRenderer.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

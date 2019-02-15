@@ -1,0 +1,328 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+#include "version.h"
+
+#define PROGRAM_NAME	"uEyeSequence"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\uEyeSequence.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\uEyeSequence.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_TRANSFER_FAILED     BITMAP                  "res\\bitmap_t.bmp"
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Englisch (USA) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_IDS_LOGO            BITMAP                  "res\\IDS_UEYE_LOGO_WHITE_118_57.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About uEyeSequence"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           PROGRAM_VERSION_TEXT,IDC_STATIC,40,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright © 2005 - ",IDC_STATIC_COPYRIGHT,40,25,119,8
+    LTEXT           CURRENT_YEAR,IDC_STATIC,101,25,26,8
+    LTEXT           PROGRAM_COMPANY,IDC_STATIC,40,40,140,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
+END
+
+IDD_UEYESEQUENCE_DIALOG DIALOGEX 0, 0, 716, 390
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "uEyeSequence"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_DISPLAY,"Static",SS_BLACKFRAME | SS_SUNKEN,7,7,428,296
+    CONTROL         129,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_REALSIZEIMAGE | SS_SUNKEN | WS_BORDER,611,310,98,40
+    CONTROL         "",IDC_BUF_0,"Static",SS_BLACKFRAME | SS_SUNKEN,7,310,80,56
+    CONTROL         "",IDC_BUF_1,"Static",SS_BLACKFRAME | SS_SUNKEN,94,310,80,56
+    CONTROL         "",IDC_BUF_2,"Static",SS_BLACKFRAME | SS_SUNKEN,181,310,80,56
+    CONTROL         "",IDC_BUF_3,"Static",SS_BLACKFRAME | SS_SUNKEN,268,310,80,56
+    CONTROL         "",IDC_BUF_4,"Static",SS_BLACKFRAME | SS_SUNKEN,355,310,80,56
+    LTEXT           "Buffer:",IDC_STATIC,7,370,22,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_BUF_0,37,370,50,12,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    LTEXT           "Buffer:",IDC_STATIC,94,370,22,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_BUF_1,124,370,50,12,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    LTEXT           "Buffer:",IDC_STATIC,181,370,22,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_BUF_2,211,370,50,12,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    LTEXT           "Buffer:",IDC_STATIC,268,370,22,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_BUF_3,298,370,50,12,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    LTEXT           "Buffer:",IDC_STATIC,355,370,22,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_BUF_4,385,370,50,12,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    GROUPBOX        "Capture",IDC_STATIC,442,7,162,136
+    GROUPBOX        "Sequence Buffer Memory",IDC_STATIC,442,147,162,128
+    GROUPBOX        "Application",IDC_STATIC,611,269,98,34
+    GROUPBOX        "Replay",IDC_STATIC,442,310,162,73
+    EDITTEXT        IDC_EDIT_IDS_WEB,611,370,98,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    PUSHBUTTON      "&Exit",IDC_BUTTON_EXIT,617,282,86,14
+    PUSHBUTTON      "&Capture!",IDC_BUTTON_CAPTURE,448,20,60,14,WS_DISABLED
+    PUSHBUTTON      "&Stop Capture",IDC_BUTTON_CAPTURE_STOP,448,38,60,14,WS_DISABLED
+    CONTROL         "Ring Buffer (overwrite)",IDC_RADIO_BUFFER_RING,"Button",BS_AUTORADIOBUTTON,516,20,82,10
+    CONTROL         "Linear Buffer ",IDC_RADIO_BUFFER_LIN,"Button",BS_AUTORADIOBUTTON,516,32,84,11
+    LTEXT           "Buffer Count:",IDC_STATIC,448,76,60,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_CNT_BUF,524,76,50,12,ES_RIGHT | ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    LTEXT           "Sequence Count:",IDC_STATIC,448,108,60,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_CNT_SEQ,524,108,50,12,ES_RIGHT | ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    LTEXT           "Buffer Index:",IDC_STATIC,448,92,60,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_BUF_INDEX,524,92,50,12,ES_RIGHT | ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    LTEXT           "Transfer Errors:",IDC_STATIC,448,124,60,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_CNT_TRANS_ERR,524,124,50,12,ES_RIGHT | ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    PUSHBUTTON      "&Replay",IDC_BUTTON_REPLAY,448,322,46,14,WS_DISABLED
+    CONTROL         "Spin1",IDC_SPIN_REPLAY,"msctls_updown32",UDS_ARROWKEYS | UDS_HORZ | WS_DISABLED,498,322,60,14
+    LTEXT           "Number of Buffers:",IDC_STATIC,448,224,59,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_BUFFERS_IN_USE,524,224,50,12,ES_RIGHT | ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    PUSHBUTTON      "Re&alloc Buffers",IDC_BUTTON_REALLOCTE_BUFFERS,448,240,60,12
+    EDITTEXT        IDC_EDIT_CNT_BUFFERS_NEW,524,240,50,12,ES_RIGHT | ES_NUMBER | WS_GROUP
+    EDITTEXT        IDC_EDIT_BUFFER_REPLAY,518,340,20,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    EDITTEXT        IDC_EDIT_BUFFER_START,498,340,20,12,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    EDITTEXT        IDC_EDIT_BUFFER_STOP,538,340,20,12,ES_RIGHT | ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    CONTROL         "Progress1",IDC_PROGRESS_MEM_ALLOC,"msctls_progress32",PBS_SMOOTH | PBS_VERTICAL,586,160,12,108
+    CONTROL         "Progress1",IDC_PROGRESS_REPLAY,"msctls_progress32",PBS_SMOOTH | PBS_VERTICAL,586,322,12,54
+    CONTROL         "Progress1",IDC_PROGRESS_RECORD,"msctls_progress32",PBS_SMOOTH | PBS_VERTICAL,586,60,12,76
+    LTEXT           "Single Buffer Size:",IDC_STATIC,448,192,60,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_BUFFER_SIZE_SINGLE,524,192,50,12,ES_RIGHT | ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    LTEXT           "Total Buffer Size:",IDC_STATIC,448,208,60,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_BUFFER_SIZE_TOTAL,524,208,50,12,ES_RIGHT | ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    GROUPBOX        "Camera Parameters",IDC_STATIC,611,191,98,73
+    CONTROL         "Y8 monochrome",IDC_RADIO_CM_Y8,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,617,204,67,10
+    CONTROL         "RGB24 color",IDC_RADIO_CM_RGB24,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,617,217,57,10
+    LTEXT           "Total System Memory:",IDC_STATIC,448,160,70,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_BUFFER_SIZE_SYSMEM_TOTAL,524,160,50,12,ES_RIGHT | ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    LTEXT           "Free System Memory:",IDC_STATIC,448,176,70,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_BUFFER_SIZE_SYSMEM_FREE,524,176,50,12,ES_RIGHT | ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    EDITTEXT        IDC_EDIT_BUFFERS_STATUS,448,256,126,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    GROUPBOX        "Camera Info",IDC_STATIC,611,7,98,180
+    LTEXT           "Type:",IDC_STATIC,617,20,30,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_CAM_TYPE,653,20,50,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP,WS_EX_RIGHT
+    LTEXT           "ID:",IDC_STATIC,617,36,30,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_CAM_ID,653,36,50,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP,WS_EX_RIGHT
+    LTEXT           "Revision:",IDC_STATIC,617,52,30,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_CAM_REV,653,52,50,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP,WS_EX_RIGHT
+    LTEXT           "S/N:",IDC_STATIC,617,68,20,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_CAM_SN,653,68,50,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP,WS_EX_RIGHT
+    LTEXT           "Driver:",IDC_STATIC,617,86,30,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_CAM_DRV,653,86,50,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP,WS_EX_RIGHT
+    LTEXT           "Width:",IDC_STATIC,617,104,25,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_CAM_X,653,104,50,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP,WS_EX_RIGHT
+    LTEXT           "Height:",IDC_STATIC,617,120,30,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_CAM_Y,653,120,50,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP,WS_EX_RIGHT
+    LTEXT           "Color:",IDC_STATIC,617,136,30,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_CAM_COL,653,136,50,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP,WS_EX_RIGHT
+    PUSHBUTTON      "Load Parameters",IDC_BUTTON_LOAD_PARAMETERS,617,247,86,14,WS_DISABLED
+    LTEXT           "Frame Rate:",IDC_STATIC,448,60,60,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_CURRENT_FPS,524,60,50,12,ES_RIGHT | ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP
+    LTEXT           "FPS:",IDC_STATIC,617,152,30,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_CAM_FPS,653,152,50,12,ES_CENTER | ES_MULTILINE | ES_READONLY | ES_NUMBER | NOT WS_TABSTOP,WS_EX_RIGHT
+    LTEXT           "Pixel CLK:",IDC_STATIC,617,168,35,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_CAM_PCLK,653,168,50,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP,WS_EX_RIGHT
+    CONTROL         "Slider1",IDC_SLIDER_REPLAY,"msctls_trackbar32",TBS_VERT | TBS_BOTH | WS_DISABLED | WS_TABSTOP,562,321,18,56
+    PUSHBUTTON      "Stop Replay",IDC_BUTTON_REPLAY_STOP,448,340,46,14,WS_DISABLED
+    CONTROL         "Loop Replay",IDC_CHECK_REPLAY_LOOP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,448,366,55,10
+    RADIOBUTTON     "",IDC_RADIO_CM_OTHER,617,231,92,8,BS_NOTIFY | NOT WS_VISIBLE | WS_DISABLED
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION PROGRAM_VERSION_NUMBER
+ PRODUCTVERSION PROGRAM_VERSION_NUMBER
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", PROGRAM_COMPANY
+            VALUE "FileDescription", PROGRAM_NAME
+            VALUE "FileVersion", PROGRAM_VERSION_TEXT
+            VALUE "InternalName", PROGRAM_NAME
+            VALUE "LegalCopyright", "Copyright © 2005 - " CURRENT_YEAR
+            VALUE "OriginalFilename", PROGRAM_NAME ".exe"
+            VALUE "ProductName", PROGRAM_NAME
+            VALUE "ProductVersion", PROGRAM_VERSION_TEXT
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_UEYESEQUENCE_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 709
+        VERTGUIDE, 87
+        VERTGUIDE, 174
+        VERTGUIDE, 261
+        VERTGUIDE, 348
+        VERTGUIDE, 435
+        VERTGUIDE, 442
+        VERTGUIDE, 448
+        VERTGUIDE, 604
+        VERTGUIDE, 611
+        VERTGUIDE, 617
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 383
+        HORZGUIDE, 303
+        HORZGUIDE, 310
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About uEyeSequence..."
+END
+
+#endif    // Englisch (USA) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\uEyeSequence.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

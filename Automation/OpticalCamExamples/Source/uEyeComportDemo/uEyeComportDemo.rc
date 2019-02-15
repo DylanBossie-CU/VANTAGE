@@ -1,0 +1,271 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+#include "version.h"
+
+#define PROGRAM_NAME			"uEyeComport"
+
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)\r\n"
+    "LANGUAGE 7, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\uEyeComportDemo.rc2""  // Nicht mit Microsoft Visual C++ bearbeitete Ressourcen\r\n"
+    "#include ""afxres.rc""         // Standardkomponenten\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\uEyeComportDemo.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Info über uEyeComportDemo"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           PROGRAM_VERSION_TEXT, IDC_STATIC,40,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright © 2008 - ", IDC_STATIC_COPYRIGHT,40,25,68,8
+    LTEXT           CURRENT_YEAR,IDC_STATIC,104,25,26,8
+    LTEXT           PROGRAM_COMPANY,IDC_STATIC,40,40,150,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,16,WS_GROUP
+END
+
+IDD_UEYECOMPORTDEMO_DIALOG DIALOGEX 0, 0, 364, 361
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "uEyeComportDemo"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Virtual COM port",IDC_GRP_COMPORT_VIRT,7,7,349,114
+    PUSHBUTTON      "Configure",IDC_BTN_CONFIGURE,18,23,63,14,WS_DISABLED
+    CONTROL         "GPIO1 = TX, GPIO2 = RX",IDC_RADIO_GPIO1_TX,"Button",BS_AUTORADIOBUTTON | WS_GROUP,93,25,103,10
+    CONTROL         "GPIO1 = RX, GPIO2 = TX",IDC_RADIO_GPIO1_RX,"Button",BS_AUTORADIOBUTTON,219,25,97,10
+    PUSHBUTTON      "Connect",IDC_BTN_CONNECT_VIRT,18,45,63,13,WS_DISABLED
+    LTEXT           "Baud",IDC_BAUD_VIRT,93,48,19,8
+    COMBOBOX        IDC_COMBO_BAUD_VIRT,113,45,64,145,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Append",IDC_APPEND_VIRT,189,48,26,9
+    COMBOBOX        IDC_COMBO_CHAR_VIRT,218,45,39,41,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Broadcast COM port",IDC_CHECK_BROADCAST,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,268,46,79,12
+    PUSHBUTTON      "Send",IDC_BTN_SEND_VIRT,18,66,63,13
+    EDITTEXT        IDC_EDIT_SEND_VIRT,91,66,255,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "Clear",IDC_BTN_CLEAR_VIRT,18,88,63,13
+    EDITTEXT        IDC_EDIT_RECEIVE_VIRT,91,88,256,26,ES_MULTILINE | ES_READONLY | WS_VSCROLL
+    GROUPBOX        "Serial port (COM1)",IDC_GRP_SERIAL,8,122,349,95
+    PUSHBUTTON      "Connect",IDC_BTN_CONNECT_COM1,18,138,63,13
+    LTEXT           "Baud",IDC_BAUD_COM1,94,141,19,8
+    COMBOBOX        IDC_COMBO_BAUD_COM1,114,138,64,126,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Append",IDC_APPEND_COM1,189,141,26,9
+    COMBOBOX        IDC_COMBO_CHAR_COM1,218,138,39,41,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Send",IDC_BTN_SEND_COM1,18,160,63,13
+    EDITTEXT        IDC_EDIT_SEND_COM1,92,160,255,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "Clear",IDC_BTN_CLEAR_COM1,18,182,63,13
+    EDITTEXT        IDC_EDIT_RECEIVE_COM1,92,182,256,27,ES_MULTILINE | ES_READONLY | WS_VSCROLL
+    GROUPBOX        "Send file",IDC_GRP_SEND_FILE,7,218,350,114
+    LTEXT           "Source",IDC_SOURCE,19,234,24,9
+    EDITTEXT        IDC_EDIT_SOURCE_FILE,62,231,231,13,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Browse",IDC_BTN_SOURCE_FILE,300,231,47,13
+    LTEXT           "Destination",IDC_DEST,19,254,38,9
+    EDITTEXT        IDC_EDIT_DEST_FILE,62,252,231,13,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Browse",IDC_BTN_DEST_FILE,300,252,47,13
+    LTEXT           "Direction",IDC_DIRECTION,19,276,33,9
+    COMBOBOX        IDC_COMBO_DIRECTION,62,274,232,43,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Send file",IDC_BTN_SEND_FILE,300,274,47,13
+    LTEXT           "Source:",IDC_SOURCE_SIZE,19,297,28,9
+    LTEXT           "0 bytes",IDC_SIZE_SOURCE2,63,297,67,11
+    LTEXT           "Destination:",IDC_DEST_SIZE,19,316,40,9
+    LTEXT           "0 bytes",IDC_SIZE_DEST2,63,316,67,11
+    LTEXT           "Progress",IDC_PROGRESS,136,307,31,9
+    CONTROL         "",IDC_PROGRESSBAR,"msctls_progress32",0x1,169,304,178,13
+    DEFPUSHBUTTON   "Close",IDOK,147,339,67,15
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION PROGRAM_VERSION_NUMBER
+ PRODUCTVERSION PROGRAM_VERSION_NUMBER
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040704e4"
+        BEGIN
+            VALUE "Comments", "Application to show the uEye DirectRenderer mode"
+			VALUE "CompanyName", PROGRAM_COMPANY
+            VALUE "FileDescription", PROGRAM_NAME
+            VALUE "FileVersion", PROGRAM_VERSION_TEXT
+            VALUE "InternalName", PROGRAM_NAME
+            VALUE "LegalCopyright", "Copyright © 2008 - " CURRENT_YEAR
+			VALUE "LegalTrademarks", "uEye"
+            VALUE "OriginalFilename", "uEyeComportDemo.exe"
+            VALUE "ProductName", PROGRAM_NAME
+            VALUE "ProductVersion", PROGRAM_VERSION_TEXT
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x407, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_UEYECOMPORTDEMO_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 357
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 354
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&Info über uEyeComportDemo..."
+    IDS_CONNECT             "Connect"
+    IDS_DISCONNECT          "Disconnect"
+    IDS_COMPORT_NOT_CLOSED  "The COM port can not be closed"
+    IDS_COMPORT_NOT_OPENED  "The COM port can not be opened"
+    IDS_BYTES               "bytes"
+    IDS_COMPORT_SEND_ERROR  "The buffer could not be sent!"
+    IDS_COMPORT_CONNECT_FIRST "Please connect the COM port first"
+    IDS_COMPORT_RECEIVE_ERROR "The buffer could not be received!"
+    IDS_CR                  "CR"
+    IDS_CR_LF               "CR-LF"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_LF                  "LF"
+    IDS_NO_CHAR             "none"
+    IDS_DESTINATION_FILE    "Destination file"
+    IDS_SOURCE_FILE         "Source file"
+    IDS_FILE_TRANSFER_COMPLETE "File transfer complete"
+    IDS_FILE_TRANSFER_INCOMPLETE "File transfer incomplete"
+    IDS_SEND_FILE           "Send file"
+    IDS_SELECT_FILES_FIRST  "Please select source and destination file first"
+    IDS_STOP                "Stop"
+    IDS_NO_CAMERA_OPENED    "No supported uEye camera could be opened !"
+    IDS_NO_CAMERA           "The COM port functionality is only available for Gigabit Ethernet uEye HE and uEye USB3 cameras!"
+    IDS_ERROR               "Unknown error!"
+    IDS_BAUDRATES_DIFFERENT "The baud rates of the virtual COM port and COM1 are different!"
+    IDS_COMPORT_ERROR       "The comport number can not be read!"
+END
+
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+LANGUAGE 7, 1
+#pragma code_page(1252)
+#include "res\uEyeComportDemo.rc2"  // Nicht mit Microsoft Visual C++ bearbeitete Ressourcen
+#include "afxres.rc"         // Standardkomponenten
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

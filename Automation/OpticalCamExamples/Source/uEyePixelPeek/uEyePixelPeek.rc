@@ -1,0 +1,258 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+#include "version.h"
+
+#define PROGRAM_NAME	"uEyePixelPeek"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\uEyePixelPeek.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\uEyePixelPeek.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAP_UEYE_LOGO    BITMAP                  "res\\IDS_UEYE_LOGO_WHITE_118_57.bmp"
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Englisch (USA) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About uEyePixelPeek"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           PROGRAM_VERSION_TEXT,IDC_STATIC,40,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright © 2007 - ",IDC_STATIC_COPYRIGHT,40,25,119,8
+    LTEXT           CURRENT_YEAR,IDC_STATIC,102,25,26,8
+    LTEXT           PROGRAM_COMPANY,IDC_STATIC,40,40,150,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
+END
+
+IDD_UEYEPIXELPEEK_DIALOG DIALOGEX 0, 0, 712, 396
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "uEyePixelPeek"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_DISPLAY,"Static",SS_BLACKFRAME,10,10,500,375
+    CONTROL         129,IDC_STATIC_LOGO,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_SUNKEN | WS_BORDER,525,335,175,45
+    CONTROL         "",IDC_DISPLAY_PIXEL_PEEK,"Static",SS_BLACKFRAME,595,235,90,85
+    PUSHBUTTON      "&Acquire",IDC_BUTTON_ACQUIRE,535,20,65,14
+    PUSHBUTTON      "&Load Parameters",IDC_BUTTON_LOAD_PARAM,535,40,65,14
+    PUSHBUTTON      "&Exit",IDC_BUTTON_EXIT,625,20,65,14
+    LTEXT           "Mouse position:",IDC_STATIC,535,180,55,10,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_MOUSE_X,595,180,30,12,ES_AUTOHSCROLL | ES_READONLY,WS_EX_RIGHT
+    EDITTEXT        IDC_EDIT_MOUSE_Y,625,180,30,12,ES_AUTOHSCROLL | ES_READONLY,WS_EX_RIGHT
+    LTEXT           "Pixel value:",IDC_STATIC,535,195,55,10,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_VALUE_1,595,195,30,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_VISIBLE,WS_EX_RIGHT
+    EDITTEXT        IDC_EDIT_VALUE_2,625,195,30,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_VISIBLE,WS_EX_RIGHT
+    EDITTEXT        IDC_EDIT_VALUE_3,655,195,30,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_VISIBLE,WS_EX_RIGHT
+    GROUPBOX        "Pixel Peek",IDC_STATIC,525,165,175,160
+    GROUPBOX        "Image Properties",IDC_STATIC,525,70,175,90
+    GROUPBOX        "Camera Control",IDC_STATIC,525,5,175,60
+    CONTROL         "Y8 monochrome",IDC_RADIO_COLOR_Y8,"Button",BS_AUTORADIOBUTTON,535,85,65,10
+    CONTROL         "RGB24 color",IDC_RADIO_COLOR_RGB24,"Button",BS_AUTORADIOBUTTON,535,95,65,10
+    CONTROL         "",IDC_RADIO_COLOR_X,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE | WS_DISABLED,535,105,60,8
+    LTEXT           "Width:",IDC_STATIC,620,80,22,15,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_IMG_X,665,80,25,12,ES_AUTOHSCROLL | WS_DISABLED | NOT WS_TABSTOP,WS_EX_RIGHT
+    LTEXT           "Height:",IDC_STATIC,620,94,22,15,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_IMG_Y,665,94,25,12,ES_AUTOHSCROLL | WS_DISABLED | NOT WS_TABSTOP,WS_EX_RIGHT
+    LTEXT           "Pitch:",IDC_STATIC,620,108,22,15,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_IMG_PITCH,665,108,25,12,ES_AUTOHSCROLL | WS_DISABLED | NOT WS_TABSTOP,WS_EX_RIGHT
+    LTEXT           "Size [kByte]:",IDC_STATIC,620,123,40,15,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_IMG_SIZE,665,122,25,12,ES_AUTOHSCROLL | WS_DISABLED | NOT WS_TABSTOP,WS_EX_RIGHT
+    LTEXT           "Bits/Pixel:",IDC_STATIC,620,137,35,15,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_IMG_BPP,665,137,25,12,ES_AUTOHSCROLL | WS_DISABLED | NOT WS_TABSTOP,WS_EX_RIGHT
+    LTEXT           "Pointer to buffer:",IDC_STATIC,535,210,55,10,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_POINTER_BUF,595,210,90,12,ES_AUTOHSCROLL | ES_READONLY,WS_EX_RIGHT
+    LTEXT           "Pointer to pixel:",IDC_STATIC,535,220,55,10,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_POINTER_PIX,595,220,90,12,ES_AUTOHSCROLL | ES_READONLY,WS_EX_RIGHT
+    LTEXT           "Pixel Peek:",IDC_STATIC,535,240,55,10,SS_CENTERIMAGE
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION PROGRAM_VERSION_NUMBER
+ PRODUCTVERSION PROGRAM_VERSION_NUMBER
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+		    VALUE "CompanyName", PROGRAM_COMPANY
+            VALUE "FileDescription", PROGRAM_NAME
+            VALUE "FileVersion", PROGRAM_VERSION_TEXT
+            VALUE "InternalName", PROGRAM_NAME
+            VALUE "LegalCopyright", "Copyright © 2007 - " CURRENT_YEAR
+			VALUE "LegalTrademarks", "uEye"
+            VALUE "OriginalFilename", "uEyePixelPeek.exe"
+            VALUE "ProductName", PROGRAM_NAME
+            VALUE "ProductVersion", PROGRAM_VERSION_TEXT
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_UEYEPIXELPEEK_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 705
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 389
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDP_OLE_INIT_FAILED     "OLE initialization failed.  Make sure that the OLE libraries are the correct version."
+    IDS_ABOUTBOX            "&About uEyePixelPeek..."
+END
+
+#endif    // Englisch (USA) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\uEyePixelPeek.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
