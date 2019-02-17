@@ -1,26 +1,14 @@
 {
-	"DeploymentTube": 3,
-	"VantageTube": 1,
-	"expectedRelease": [2019,2,12,13,46,20,536],
-	"CubesatArray": 
-		[
-			{
-				"name": "NOAA 1",
-				"rangeOrder": 1,
-				"expectedU": 1,
-				"actualDims": [0.115,0.115,0.115]
-			},
-			{
-				"name": "NOAA 2", 
-				"rangeOrder": 2,
-				"expectedU": 1,
-				"actualDims": [0.115,0.115,0.115]
-			},
-			{
-				"name": "NOAA 3",
-				"rangeOrder": 3,
-				"expectedU": 1,
-				"actualDims": [0.115,0.115,0.115]
-			}
-		]
+    "V_TCF2VCF": [0.049758000,-0.022000000,-0.01190000],
+    "VT_DCM": [
+            [-1,0,0],
+            [0,-1,0],
+            [0,0,1]
+        ],
+	"V_CCF2VCF": [0,0,0],
+    "VC_DCM": [
+            [1,0,0],
+            [0,1,0],
+            [0,0,1]
+        ]
 }
