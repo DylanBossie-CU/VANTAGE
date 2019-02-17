@@ -31,8 +31,11 @@ SensorData = jsondecode(fileread('config/Sensors.json'));
 
 % TOF Post-Processing
 TOFData = dir(strcat(SensorData.TOFData,'*.pcd'));
-TOF.naiveFindCentroids(TOFData,Deployer,SensorData);
-disp('yes')
+try
+    TOF.naiveFindCentroids(TOFData,Deployer,SensorData);
+catch
+    disp('TOF not fully implemented yet. Continuing...')
+end
 
 %% Compare Results against Deployment Predictions
 
