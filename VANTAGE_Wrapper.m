@@ -33,10 +33,13 @@ SensorData = jsondecode(fileread('config/Sensors.json'));
 TOFData = dir(strcat(SensorData.TOFData,'*.pcd'));
 try
     TOF.naiveFindCentroids(TOFData,Deployer,SensorData);
+    %CubeSats_TOF = TOF.Processing(TOFData,Deployer,SensorData);
 catch
     disp('TOF not fully implemented yet. Continuing...')
 end
 
+% At this point, TOF data has been processed up to its predefined desired
+% range 
 %% Compare Results against Deployment Predictions
 
 
