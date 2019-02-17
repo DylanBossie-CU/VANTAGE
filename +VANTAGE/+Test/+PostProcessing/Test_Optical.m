@@ -14,7 +14,6 @@ classdef Test_Optical < matlab.unittest.TestCase
         % correctly, based on a provided FPS to be examined
         
         function testReadInputFrame(testCase)
-            return
             import VANTAGE.PostProcessing.Optical
             
             %Define test video path
