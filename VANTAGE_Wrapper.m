@@ -6,7 +6,7 @@
 % @date     17-Feb-2019
 
 %% Process Deployment Manifest
-
+jsondecode();
 
 %% Send Sensor Ready Signal to RBP
 
