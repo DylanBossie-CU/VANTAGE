@@ -39,16 +39,20 @@ classdef TOF
         % point cloud
         %
         % @param    filename    filename, string
+        % @param    SensorData  struct of information about sensors
         %
         % @return	3xn matrix of n CubeSat centroids in the TOF
         %        	Cartestian frame, m
-        function [Deployer] = naiveFindCentroids(filename,Deployer)
+        function [Deployer] = naiveFindCentroids(obj,filename,Deployer,...
+                SensorData)
+            % Extract point cloud locations
+            filename = strcat(SensorData.TOFData,filename.name);
             % Extract CubeSats from Deployer
             CubeSats = Deployer.CubesatArray;
             
             % Load point cloud from file
             warning('Load script is currently only designed to work with simulated .pcd files')
-            pc = loadSimFile(filename);
+            pc = obj.loadSimFile(filename);
             
             % Separate point cloud into identified cubesats
             CubeSats = cubesatPointsFromPC(pc);
@@ -81,7 +85,6 @@ classdef TOF
         % @author       Joshua Kirby
         % @date         24-Jan-2019
         function pc = loadSimFile(obj,filename)
-           
             ptCloud = pcread(filename);
             
             if sum(sum(sum(~isnan(ptCloud.Location))))==0

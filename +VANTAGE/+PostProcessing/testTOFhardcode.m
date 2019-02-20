@@ -1,6 +1,6 @@
 clearvars;close all;clc
 
-Deployer = VANTAGE.PostProcessing.Deployer('manifestTest.json');
+Deployer = VANTAGE.PostProcessing.Deployer('config/Manifest.json');
 CubeSats = Deployer.CubesatArray;
 TOF = VANTAGE.PostProcessing.TOF;
 pc = TOF.loadSimFile(['Data/Prototyping Data/Simulation Data/Tube 2/',...
