@@ -38,7 +38,7 @@ classdef TOF
         % Produces centroids of all CubeSats naively identified in a single
         % point cloud
         %
-        % @param    filename    filename, string
+        % @param    filename    filename, char
         % @param    SensorData  struct of information about sensors
         %
         % @return	3xn matrix of n CubeSat centroids in the TOF
@@ -47,6 +47,7 @@ classdef TOF
                 SensorData)
             % Extract point cloud locations
             filename = strcat(SensorData.TOFData,filename.name);
+            
             % Extract CubeSats from Deployer
             CubeSats = Deployer.CubesatArray;
             
