@@ -271,6 +271,200 @@ classdef Optical
         obj.VideoType = VideoType;
         obj.FrameIntervals = FrameIntervals;
     end
+
+    % obfuscation identification for cubesat boundaries
+    %
+    % This function takes boundary points found after binarization and separates
+    % it into multiple cubesats that are obfuscated
+    %
+    % @param      x            x coordinates of boundary
+    % @param      y            y coordinates of boundary
+    % @param      posCase      The position case 'd' is diagonal, 'h' is
+    %                          horizontal, 'v' is vertical
+    % @param      numCubesats  The number cubesats
+    %
+    % @return     cell array of identified polyshapes
+    %
+    % @author     Justin Fay
+    % @date       21-Feb-2019
+    %
+    function cutPoly = occlusionCut(x,y,posCase,numCubesats)
+
+        %% concavity finding stuff
+        % find convex hull
+        k = convhull(x,y);
+        convHull_poly = polyshape(x(k),y(k));
+
+        % calculate distance from boundary to convex hull
+        [xMesh,yMesh] = meshgrid(1:max(x),1:max(y));
+        convHullOuterBin = ~isinterior(convHull_poly,xMesh(:),yMesh(:));
+        convHullOuterBin = reshape(convHullOuterBin,[max(y),max(x)]);
+        D = bwdist(convHullOuterBin);
+        r = zeros(numel(x),1);
+        for i = 1:numel(x)
+            r(i) = D(y(i),x(i));
+        end
+
+        % estimate number of concavity points
+        windowSize = ceil(numel(r)*0.001);
+        b = (1/windowSize)*ones(1,windowSize);
+        a = 1;
+        r_filter = filter(b,a,r);
+        minProm = 0.01;
+        [tmpPks,~,~,tmpProm] = findpeaks(r_filter,'SortStr','descend','MinPeakProminence',minProm);
+        maxPks = numCubesats*2-2;
+        if numel(tmpPks)>maxPks
+            [~,diffI] = max(diff(sort(tmpProm)));
+            expectedPks = numel(tmpProm)-diffI;
+            if expectedPks > maxPks
+                expectedPks = maxPks;
+            end
+        else
+            expectedPks = numel(tmpPks);
+        end
+        expectedPks = expectedPks - mod(expectedPks,2);
+
+        if expectedPks==0
+            cutPoly{1} = polyshape(x,y);
+            return;
+        end
+
+        % filter method for finding concavity
+        numFiltTrials = 20;
+        windowPercent = linspace(1,10,numFiltTrials)'./100;
+        pks = zeros(numFiltTrials,expectedPks);
+        locs = zeros(numFiltTrials,expectedPks);
+        numGoodTrials = numFiltTrials;
+        for i = 1:numFiltTrials
+            windowSize = ceil(numel(r)*windowPercent(i));
+            b = (1/windowSize)*ones(1,windowSize);
+            a = 1;
+
+            r_filter = filter(b,a,r);
+            [tmpPks,tmpLocs,tmpWidth,tmpProm] = findpeaks(r_filter,'SortStr','descend','NPeaks',expectedPks);
+            if numel(tmpPks)<expectedPks
+                numGoodTrials = i-1;
+                break;
+            end
+            pks(i,1:numel(tmpPks)) = tmpPks;
+            locs(i,1:numel(tmpLocs)) = tmpLocs;
+            [locs(i,:),I] = sort(locs(i,:));
+            pks(i,:) = pks(i,I);
+        end
+        locs = locs(1:numGoodTrials,:);
+        windowPercent = windowPercent(1:numGoodTrials,:);
+
+        % fit lines to filtered results to find concavity indices
+        fitPks = zeros(expectedPks,1);
+        for i = 1:expectedPks
+            p = ransacLine(windowPercent,locs(:,i),10);
+            fitPks(i,1) = round(polyval(p,windowPercent(1)));
+        end
+
+        %% Associating Concavity Points
+        posCase = lower(posCase);
+        numSets = size(fitPks,1)/2;
+
+        if numSets > 1
+            ptSets = zeros(numSets,2);
+            switch posCase
+                case 'v' % vertical tube
+                    % order x positions
+                    [~,iOrder] = sort(x(fitPks));
+                    fitPksOrder = fitPks(iOrder);
+
+                    % find midline
+                    midLine = mean(y(fitPks));
+
+                    % find points greater than midline
+                    gtMid = y(fitPksOrder) > midLine;
+
+                    % store ordered connection points
+                    ptSets(:,1) = fitPksOrder(~gtMid);
+                    ptSets(:,2) = fitPksOrder(gtMid);    
+                case 'h' % horizontal tube
+                    % order x positions
+                    [~,iOrder] = sort(y(fitPks));
+                    fitPksOrder = fitPks(iOrder);
+
+                    % find midline
+                    midLine = mean(x(fitPks));
+
+                    % find points greater than midline
+                    gtMid = x(fitPksOrder) > midLine;
+
+                    % store ordered connection points
+                    ptSets(:,1) = fitPksOrder(~gtMid);
+                    ptSets(:,2) = fitPksOrder(gtMid);
+                case 'd' % diagonal tube
+
+                    % extract coordinate points
+                    xPks = x(fitPks);
+                    yPks = y(fitPks);
+
+                    % order points by x position
+                    [xPks,iOrder] = sort(xPks);
+                    yPks = yPks(iOrder);
+                    fitPksOrder = fitPks(iOrder);
+
+                    % fit line to points
+                    midLine = polyfit(xPks,yPks,1);
+                    midY = polyval(midLine,xPks);
+                    gtMid = yPks > midY;
+
+                    % store ordered connection points
+                    ptSets(:,1) = fitPksOrder(~gtMid);
+                    ptSets(:,2) = fitPksOrder(gtMid);
+            end
+        else
+            ptSets = fitPks';
+        end
+        %{
+        figure
+        plot(frame_poly)
+        hold on
+        plot(x(fitPks),y(fitPks),'ro')
+        for i = 1:numSets
+            plot( [x(ptSets(i,1)), x(ptSets(i,2))] , [y(ptSets(i,1)), y(ptSets(i,2))], 'k-+')
+        end
+        %}
+        
+        %% Cutting into multiple polyshapes
+        numShapes = numSets+1;
+        numPts = numel(x);
+        cutPoly = cell(numShapes,1);
+
+        % sort concavity point sets
+        tmp = min(ptSets,[],2);
+        [~,ptSort] = sort(tmp);
+        ptSets = ptSets(ptSort,:);
+        ptSets = [1,numPts;ptSets];
+
+        % re-organize point sets for ease of use
+        for i = 1:numShapes
+            [~,tmpI] = min(ptSets(i,:));
+            if tmpI == 2
+                ptSets(i,:) = fliplr(ptSets(i,:));
+            end  
+        end
+
+        % identify shape boundary indices and create cut poyshapes
+        for i = 1:numSets
+            tmpPolyI = [ptSets(i,1):ptSets(i+1,1),ptSets(i+1,2):ptSets(i,2)];
+            cutPoly{i} = polyshape(x(tmpPolyI),y(tmpPolyI));
+        end
+        tmpPolyI = ptSets(numShapes,1):ptSets(numShapes,2);
+        cutPoly{numShapes} = polyshape(x(tmpPolyI),y(tmpPolyI));
+
+        % plotting if you want it
+        %{
+        figure
+        for i = 1:numShapes
+            plot(cutPoly{i})
+            hold on
+        end
+        %}
+    end
 end
     
     
@@ -292,7 +486,33 @@ end
     % @date         24-Jan-2019
     function [row] = findNomen(obj,str)
 
-    end    
+    end
+
+    %% ransac line fitting for obfuscation
+    %
+    % This function uses the ransac algorithm to fit a line to noisy data
+    %
+    % @param      x            x coordinates to fit
+    % @param      y            y coordinates to fit
+    % @param      maxDistance  The maximum distance from the line
+    %
+    % @return     polyfit line
+    %
+    % @author       Justin Fay
+    % @date         21-Feb-2019
+    function p = ransacLine(x,y,maxDistance)
+        points = [x,y];
+        sampleSize = 2; % number of points to sample per trial
+
+        fitLineFcn = @(points) polyfit(points(:,1),points(:,2),1); % fit function using polyfit
+        evalLineFcn = ...   % distance evaluation function
+          @(model, points) sum((points(:, 2) - polyval(model, points(:,1))).^2,2);
+
+        [~, inlierIdx] = ransac(points,fitLineFcn,evalLineFcn, ...
+          sampleSize,maxDistance);
+      
+        p = polyfit(points(inlierIdx,1),points(inlierIdx,2),1);
+    end  
   end
   
   
