@@ -14,28 +14,17 @@ classdef Test_Optical < matlab.unittest.TestCase
         % correctly, based on a provided FPS to be examined
         
         function testReadInputFrame(testCase)
-            import VANTAGE.PostProcessing.Optical
-            
-            %Define test video path
-            VideoPath = 'Data/';
-            VideoFile = strcat(VideoPath,'Test_StraightTraj.mp4');
-            Video = VideoReader(VideoFile);
+            return
+            close all
+            import VANTAGE.PostProcessing.*
+            %Initialize Deployer
+            DeployerTest = Deployer('config/Manifest.json');
+            %Create optical class to be tested
+            OpticalTest = Optical(DeployerTest);
             
             %Load test frame to be compared
             testFrame = load('Data/Test_Optical/FirstFrame_Test.mat');
             
-            %Create optical class to be tested
-            OpticalTest = Optical;
-            OpticalTest.Video = Video;
-            
-            %Set P.P. to only process video at 1FPS (skip frames in between)
-            DesiredFPS = 1;
-            FrameIntervals = linspace(0,1,DesiredFPS+1);
-            PlotBinarizedImages = false;
-            PlotCentroids = false;
-            VideoType = 'StraightOn';
-            OpticalTest = OpticalTest.setOpticalData(DesiredFPS,PlotBinarizedImages,...
-                PlotCentroids,VideoType,FrameIntervals);
             
             %%% Process input video frames through Optical class
             OpticalTest.CurrentFrameCount = 1;
@@ -61,26 +50,11 @@ classdef Test_Optical < matlab.unittest.TestCase
         function testMultiObjectDetection(testCase)
             return
             close all
-            import VANTAGE.PostProcessing.Optical
-            
-            %Define test video path
-            VideoPath = 'Data/';
-            VideoFile = strcat(VideoPath,'TwoObjectsRender.mp4');
-            Video = VideoReader(VideoFile);
-            
+            import VANTAGE.PostProcessing.*
+            %Initialize Deployer
+            DeployerTest = Deployer('config/Manifest.json');
             %Create optical class to be tested
-            OpticalTest = Optical;
-            OpticalTest.Video = Video;
-            
-            %Set P.P. to only process video at desired FPS, skipping frames
-            %Cannot set higher than actual camera FPS
-            DesiredFPS = 10;
-            FrameIntervals = linspace(0,1,DesiredFPS+1);
-            PlotBinarizedImages = true;
-            PlotCentroids = true;
-            VideoType = 'TwoObjectsRender';
-            OpticalTest = OpticalTest.setOpticalData(DesiredFPS,PlotBinarizedImages,...
-                PlotCentroids,VideoType,FrameIntervals);
+            OpticalTest = Optical(DeployerTest);
             
             %%% Process input video frames through Optical class
             OpticalTest.CurrentFrameCount = 1;
@@ -94,26 +68,11 @@ classdef Test_Optical < matlab.unittest.TestCase
         function testAlignedCubeSats(testCase)
             return
             close all
-            import VANTAGE.PostProcessing.Optical
-            
-            %Define test video path
-            VideoPath = 'Data/';
-            VideoFile = strcat(VideoPath,'AlignedCubeSats.mp4');
-            Video = VideoReader(VideoFile);
-            
+            import VANTAGE.PostProcessing.*
+            %Initialize Deployer
+            DeployerTest = Deployer('config/Manifest.json');
             %Create optical class to be tested
-            OpticalTest = Optical;
-            OpticalTest.Video = Video;
-            
-            %Set P.P. to only process video at desired FPS, skipping frames
-            %Cannot set higher than actual camera FPS
-            DesiredFPS = 1;
-            FrameIntervals = linspace(0,1,DesiredFPS+1);
-            PlotBinarizedImages = true;
-            PlotCentroids = true;
-            VideoType = 'AlignedCubeSats';
-            OpticalTest = OpticalTest.setOpticalData(DesiredFPS,PlotBinarizedImages,...
-                PlotCentroids,VideoType,FrameIntervals);
+            OpticalTest = Optical(DeployerTest);
             
             %%% Process input video frames through Optical class
             OpticalTest.CurrentFrameCount = 1;
@@ -124,33 +83,13 @@ classdef Test_Optical < matlab.unittest.TestCase
         end
         
         function testObjectAssociation(testCase)
+            return
             close all
-            import VANTAGE.PostProcessing.Optical
-            import VANTAGE.PostProcessing.CubeSat_Optical
-            
-            %Define test video path
-            VideoPath = 'Data/';
-            VideoType = 'TwoObjectsRender.mp4';
-            VideoFile = strcat(VideoPath,VideoType);
-            Video = VideoReader(VideoFile);
-            
+            import VANTAGE.PostProcessing.*
+            %Initialize Deployer
+            DeployerTest = Deployer('config/Manifest.json');
             %Create optical class to be tested
-            OpticalTest = Optical;
-            OpticalTest.Video = Video;
-            
-            %Set P.P. to only process video at desired FPS, skipping frames
-            %Cannot set higher than actual camera FPS
-            DesiredFPS = 1;
-            FrameIntervals = linspace(0,1,DesiredFPS+1);
-            
-            %%%%% Deployment manifest dummy for CubeSat number
-            fakeDeploymentManifest = 6;
-            %%%%%
-            
-            PlotBinarizedImages = true;
-            PlotCentroids = true;
-            OpticalTest = OpticalTest.setOpticalData(DesiredFPS,PlotBinarizedImages,...
-                PlotCentroids,VideoType,FrameIntervals,fakeDeploymentManifest);
+            OpticalTest = Optical(DeployerTest);
             
             %%% Process input video frames through Optical class
             OpticalTest.CurrentFrameCount = 1;
@@ -158,6 +97,15 @@ classdef Test_Optical < matlab.unittest.TestCase
                 [OpticalTest,~] = OpticalTest.readInputFrame();
                 OpticalTest.CurrentFrameCount = OpticalTest.CurrentFrameCount + 1;
             end
+        end
+        
+        function testOpticalConstruction(testCase)
+            close all
+            import VANTAGE.PostProcessing.*
+            %Initialize Deployer
+            DeployerTest = Deployer('config/Manifest.json');
+            %Create optical class to be tested
+            OpticalTest = Optical(DeployerTest);
         end
     end
     

@@ -1,26 +1,8 @@
 {
-	"DeploymentTube": 3,
-	"VantageTube": 1,
-	"expectedRelease": [2019,2,12,13,46,20,536],
-	"CubesatArray": 
-		[
-			{
-				"name": "NOAA 1",
-				"rangeOrder": 1,
-				"expectedU": 1,
-				"actualDims": [0.115,0.115,0.115]
-			},
-			{
-				"name": "NOAA 2", 
-				"rangeOrder": 2,
-				"expectedU": 1,
-				"actualDims": [0.115,0.115,0.115]
-			},
-			{
-				"name": "NOAA 3",
-				"rangeOrder": 3,
-				"expectedU": 1,
-				"actualDims": [0.115,0.115,0.115]
-			}
-		]
+	"OpticalData": "Data/OpticalData/",
+	"OpticalVideoInput": "TwoObjectsRender.mp4",
+	"DesiredFPS": 1,
+	"PlotBinarizedImages": false,
+	"PlotCentroids": false
+	
 }
