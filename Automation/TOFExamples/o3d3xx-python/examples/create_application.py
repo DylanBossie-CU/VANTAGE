@@ -19,7 +19,7 @@ application = session.edit.editApplication(applicationIndex)
 # configure the application to
 # - double exposure
 application.imagerConfig.changeType("under5m_moderate")
-# - free-run at 10 Hz
+# - free-run at given fps
 application.setParameter("TriggerMode", "1")
 application.imagerConfig.setParameter("FrameRate", "10")
 application.imagerConfig.setParameter("Resolution","1") #mode 1 uses the full resolution of our camera, muy neccessary

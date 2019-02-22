@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 from builtins import *
 import struct
 import array
+import pdb
 
 from .client import PCICV3Client
 
@@ -20,7 +21,6 @@ class ImageClient(PCICV3Client):
 
 	def readNextFrame(self):
 		result = {}
-
 		# look for asynchronous output
 		ticket, answer = self.readNextAnswer()
 		if ticket == b"0000":
@@ -143,12 +143,14 @@ class ImageClient(PCICV3Client):
 
 				# diagnostic data
 				elif chunkType == 302:
+					pdb.set_trace()
 					diagnosticData = {}
 					payloadSize = chunkSize - headerSize
 					# the diagnostic data blob contains at least four temperatures plus the evaluation time
+					pdb.set_trace()
 					if payloadSize >= 20:
 						illuTemp, frontendTemp1, frontendTemp2, imx6Temp, evalTime = struct.unpack('=iiiiI', bytes(data[0:20]))
-						diagnosticData = dict([('illuTemp', illuTemp/10.0), ('frontendTemp1', frontendTemp1/10.0), ('frontendTemp2', frontendTemp2/10.0), ('imx6Temp', imx6Temp/10.0), ('evalTime', evalTime)])
+						diagnosticData = dict([('illuTemp', illuTemp/10.0), ('frontendTemp1', frontendTemp1/10.0), ('frontendTemp2', frontendTemp2/10.0), ('imx6Temp', imx6Temp/10.0), ('evalTime', evalTime), ('timeStamp', timeStamp)])
 					# check whether framerate is also provided
 					if payloadSize == 24:
 						diagnosticData['frameRate'] = struct.unpack('=I', bytes(data[20:24]))[0]
