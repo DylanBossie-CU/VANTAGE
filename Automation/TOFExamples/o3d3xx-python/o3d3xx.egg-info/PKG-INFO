@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: o3d3xx
+Version: 0.1
+Summary: A Python library for ifm O3D3xx devices
+Home-page: https://github.com/cfreundl/o3d3xx-python
+Author: Christoph Freundl
+Author-email: Christoph.Freundl@ifm.com
+License: MIT
+Description: UNKNOWN
+Platform: UNKNOWN
