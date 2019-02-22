@@ -95,7 +95,7 @@ else:
 
 
 
-a=ueye.DOUBLE(20)
+a=ueye.DOUBLE(10)
 c=ueye.DOUBLE()
 b=ueye.UINT(8)
 thing=ueye.is_Exposure(hCam,ueye.IS_EXPOSURE_CMD_SET_EXPOSURE, a,b )
@@ -118,14 +118,14 @@ while(nRet == ueye.IS_SUCCESS):
 	array = ueye.get_data(pcImageMemory, width, height, nBitsPerPixel, pitch, copy=False)
 	nRet1= ueye.is_GetImageInfo(hCam,MemID, Iinfo, ueye.sizeof(Iinfo) )
 	frame = np.reshape(array,(height.value, width.value, bytes_per_pixel))
-
-	TitleString="VANTAGEOp"+str(Iinfo.TimestampSystem.wMonth.value)+"_"+str(Iinfo.TimestampSystem.wDay.value)+"_"+str(Iinfo.TimestampSystem.wHour.value)+"_"+str(Iinfo.TimestampSystem.wMinute.value)+"_"+str(Iinfo.TimestampSystem.wSecond.value)+".jpg"
+	#print(Iinfo.TimestampSystem)
+	TitleString="VANTAGEOp"+str(Iinfo.TimestampSystem.wMonth.value)+"_"+str(Iinfo.TimestampSystem.wDay.value)+"_"+str(Iinfo.TimestampSystem.wHour.value)+"_"+str(Iinfo.TimestampSystem.wMinute.value)+"_"+str(Iinfo.TimestampSystem.wSecond.value)+"_"+str(Iinfo.TimestampSystem.wMilliseconds.value)+".jpg"
 	
 	cv2.imwrite(TitleString, frame)
 	print("Wrote Image")
 	count+=1
-	time.sleep(1)
-	if count>100:
+	time.sleep(0.25)
+	if count>80:
 		break
 
 
