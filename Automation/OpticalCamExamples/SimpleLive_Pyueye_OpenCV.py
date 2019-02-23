@@ -166,7 +166,7 @@ a=20
 
 
 
-a=ueye.DOUBLE(10)
+a=ueye.DOUBLE(40)
 c=ueye.DOUBLE()
 b=ueye.UINT(8)
 thing=ueye.is_Exposure(hCam,ueye.IS_EXPOSURE_CMD_SET_EXPOSURE, a,b )

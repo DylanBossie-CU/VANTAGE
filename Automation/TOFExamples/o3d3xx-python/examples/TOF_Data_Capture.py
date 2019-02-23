@@ -35,15 +35,19 @@ class GrabO3D300():
         self.Distance = np.frombuffer(result['distance'],dtype='uint16')
         self.Distance = self.Distance.reshape(imageHeight,imageWidth)
         self.illuTemp = 20.0
-        self.X = np.frombuffer(result['x'],dtype='uint16') #Gives a Key to a library to pull the appropriate data
-        #self.X = self.X.reshape(imageHeight,imageWidth)
-        self.Y = np.frombuffer(result['y'],dtype='uint16')
-        self.Z = np.frombuffer(result['z'],dtype='uint16')
+        
+        # page 23 of manual, 
+        # xyz data is 16-bit signed ints
+        # [mm]
+        self.X = np.frombuffer(result['x'], dtype='int16') #Gives a Key to a library to pull the appropriate data
+        self.Y = np.frombuffer(result['y'], dtype='int16')
+        self.Z = np.frombuffer(result['z'], dtype='int16')
         #self.L=np.concatenate([self.X,self.Y,self.Z])
         #for i in range(len(self.X)):
         #	self.L[i] = (self.X[i],self.Y[i],self.Z[i])
         self.L = [self.X,self.Y,self.Z]
         self.L = np.transpose(self.L)
+
         #self.L = self.L.astype(np.float32)
     	#self.pc_data = self.L.view(np.dtype([('x', np.int16), ('y', np.int16),('z', np.int16)]))
     	# print(self.pc_data)
@@ -52,7 +56,13 @@ class GrabO3D300():
        #print(self.pc.pc_data[:,:]) #This indicates that somewhere something is only taking the first column of a thing
         currentDT = datetime.datetime.now()
         timestamp = str(currentDT.hour) + "_" + str(currentDT.minute) + "_" + str(currentDT.second) + "_" + str(currentDT.microsecond)
-        pypcd.save_point_cloud(self.pc, "/home/vantage/Documents/githere/VANTAGE/Automation/TOFExamples/o3d3xx-python/examples/TOF_PointClouds/testframe_" + timestamp + ".pcd")
+        #Convert micro_sec to sec
+        timestampTOF = result['diagnostic']['timeStamp']/1e6
+
+        ### Storing in memory instead
+        #pypcd.save_point_cloud(self.pc, "../examples/TOF_PointClouds/testframe_" + timestamp + ".pcd")
+
+        return self.pc, timestampTOF
         # print(len(self.pc.pc_data[:,:]))
         # print(num)
         # self.pc.save("apcd.pcd")
@@ -73,13 +83,23 @@ def updatefig(*args):
        
 
 def main():
-    address = sys.argv[1]
-    camData = o3d3xx.ImageClient(address, 50010)
+    address = '169.254.145.24'
 
+    camData = o3d3xx.ImageClient(address, 50010)
     
     grabber = GrabO3D300(camData)
-    #for x in range(1):
-    grabber.readNextFrame()
+    
+    # grabber.readNextFrame()
+
+
+    frameCount = 5
+    pointCloudStorage = []
+    timeStamps = []
+    for x in range(0, frameCount):
+        (pc, timeStamp) = grabber.readNextFrame()
+    	pointCloudStorage.append(pc)
+        timeStamps.append(timeStamp)
+        print(timeStamp)
 		#fig = plt.figure()
 		#ax1 = fig.add_subplot(1, 2, 1)
 		#ax2 = fig.add_subplot(1, 2, 2)
@@ -88,7 +108,10 @@ def main():
 		#ani = animation.FuncAnimation(fig, updatefig, blit=True, fargs = [grabber,imAmplitude,imDistance,x])
 		#plt.show()
 		#plt.close()
-
+    #This format of directory is necessary to communicate with MATLAB
+    fileDirectory = '/home/vantage/Documents/githere/VANTAGE/Automation/TOFExamples/o3d3xx-python/examples/TOF_PointClouds/pointcloud_'
+    for pc, timeStamp in zip(pointCloudStorage, timeStamps):
+        pypcd.save_point_cloud(pc, fileDirectory + str(timeStamp) + ".pcd")
 if __name__ == '__main__':
     main()
 

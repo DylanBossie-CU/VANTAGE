@@ -1,0 +1,16 @@
+169.254.145.24
+
+How to find IP:
+turn off ToF
+sudo wireshark
+click on the alias for the ehternet NIC (enp0s31f6)
+Statistics->Conversations
+CLick IPv4
+plug the ToF camera into the NUC
+turn it on and wait a while it starts up
+wait for a few mintueds
+try all of the addresses in Address A and one of them should be it
+
+GG - if not, start the 255*255 search proccess over the entire 169.254.*.* 
+O(18hr) search
+

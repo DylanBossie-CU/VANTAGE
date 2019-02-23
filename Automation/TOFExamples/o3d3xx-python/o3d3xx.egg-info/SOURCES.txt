@@ -1,6 +1,5 @@
 LICENSE.txt
 MANIFEST.in
-README.md
 setup.py
 o3d3xx/__init__.py
 o3d3xx.egg-info/PKG-INFO
