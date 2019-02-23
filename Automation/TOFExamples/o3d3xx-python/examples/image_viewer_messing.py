@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import pypcd
 import pdb
+import datetime
 #ourstanding issue: being able to set image dimensions to that of the O3D313
 #How to format this data
 #This is not quite working yet.
@@ -27,7 +28,7 @@ class GrabO3D300():
         self.Distance = np.zeros((imageHeight,imageWidth))
         print(len(self.Z))
 
-    def readNextFrame(self,frame):
+    def readNextFrame(self):
         result = self.data.readNextFrame()
         self.Amplitude = np.frombuffer(result['amplitude'],dtype='uint16')
         self.Amplitude = self.Amplitude.reshape(imageHeight,imageWidth)
@@ -49,7 +50,9 @@ class GrabO3D300():
     	# print(len(self.pc_data))
         self.pc=pypcd.make_xyz_point_cloud(self.L)
        #print(self.pc.pc_data[:,:]) #This indicates that somewhere something is only taking the first column of a thing
-        pypcd.save_point_cloud(self.pc, "TOF_PointClouds/testframe_" + str(frame) + ".pcd")
+        currentDT = datetime.datetime.now()
+        timestamp = str(currentDT.hour) + "_" + str(currentDT.minute) + "_" + str(currentDT.second) + "_" + str(currentDT.microsecond)
+        pypcd.save_point_cloud(self.pc, "/home/vantage/Documents/githere/VANTAGE/Automation/TOFExamples/o3d3xx-python/examples/TOF_PointClouds/testframe_" + timestamp + ".pcd")
         # print(len(self.pc.pc_data[:,:]))
         # print(num)
         # self.pc.save("apcd.pcd")
@@ -75,8 +78,8 @@ def main():
 
     
     grabber = GrabO3D300(camData)
-    for x in range(0,5):
-		grabber.readNextFrame(x)
+    #for x in range(1):
+    grabber.readNextFrame()
 		#fig = plt.figure()
 		#ax1 = fig.add_subplot(1, 2, 1)
 		#ax2 = fig.add_subplot(1, 2, 2)
