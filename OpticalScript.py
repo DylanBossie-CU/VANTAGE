@@ -18,6 +18,18 @@ nBitsPerPixel = ueye.INT(8)    #24: bits per pixel for color mode; take 8 bits p
 channels = 1                    #3: channels for color mode(RGB); take 1 channel for monochrome
 m_nColorMode = ueye.INT()		# Y8/RGB16/RGB24/REG32
 bytes_per_pixel = int(nBitsPerPixel / 8)
+
+
+
+#Added by Sean
+exposureTime=ueye.DOUBLE(20)
+#Number of images to take
+numPics=100
+#sleeptime: amount of time spent waiting between pic (to set fps) (time is in seconds), so it's approximately the interval between shots
+sleepy=1
+
+#Set this to specify file prefixes: including directory that you would like the files to be saved
+FilePrefix="VANTAGEOp" #currently it saves to the working directory
 #---------------------------------------------------------------------------------------------------------------------------------------
 print("START")
 print()
@@ -95,12 +107,12 @@ else:
 
 
 
-a=ueye.DOUBLE(20)
-c=ueye.DOUBLE()
+
+exposureGetter=ueye.DOUBLE()
 b=ueye.UINT(8)
-thing=ueye.is_Exposure(hCam,ueye.IS_EXPOSURE_CMD_SET_EXPOSURE, a,b )
-thing=ueye.is_Exposure(hCam,ueye.IS_EXPOSURE_CMD_GET_EXPOSURE, c,b )
-print(c)
+thing=ueye.is_Exposure(hCam,ueye.IS_EXPOSURE_CMD_SET_EXPOSURE, exposureTime,b )
+thing=ueye.is_Exposure(hCam,ueye.IS_EXPOSURE_CMD_GET_EXPOSURE, exposureGetter,b )
+print(exposureGetter)
 #---------------------------------------------------------------------------------------------------------------------------------------
 nRet = ueye.is_FreezeVideo(hCam, ueye.IS_WAIT)
 Iinfo=ueye.UEYEIMAGEINFO()
@@ -118,14 +130,16 @@ while(nRet == ueye.IS_SUCCESS):
 	array = ueye.get_data(pcImageMemory, width, height, nBitsPerPixel, pitch, copy=False)
 	nRet1= ueye.is_GetImageInfo(hCam,MemID, Iinfo, ueye.sizeof(Iinfo) )
 	frame = np.reshape(array,(height.value, width.value, bytes_per_pixel))
-
-	TitleString="VANTAGEOp"+str(Iinfo.TimestampSystem.wMonth.value)+"_"+str(Iinfo.TimestampSystem.wDay.value)+"_"+str(Iinfo.TimestampSystem.wHour.value)+"_"+str(Iinfo.TimestampSystem.wMinute.value)+"_"+str(Iinfo.TimestampSystem.wSecond.value)+".jpg"
+    #file Writing
+	TitleString=FilePrefix+str(Iinfo.TimestampSystem.wMonth.value)+"_"+str(Iinfo.TimestampSystem.wDay.value)+"_"+str(Iinfo.TimestampSystem.wHour.value)+"_"+str(Iinfo.TimestampSystem.wMinute.value)+"_"+str(Iinfo.TimestampSystem.wSecond.value)+".jpg"
 	
 	cv2.imwrite(TitleString, frame)
 	print("Wrote Image")
 	count+=1
-	time.sleep(1)
-	if count>100:
+    #sleepy time
+	time.sleep(sleepy)
+    #When do I stop?
+	if count>numPics:
 		break
 
 
