@@ -92,7 +92,7 @@ def main():
     # grabber.readNextFrame()
 
 
-    frameCount = 5
+    frameCount = 50
     pointCloudStorage = []
     timeStamps = []
     for x in range(0, frameCount):

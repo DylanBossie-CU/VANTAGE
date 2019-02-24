@@ -1,7 +1,0 @@
-from pyueye import ueye
-
-a=ueye.Cam()     # Get the first available cam
-
-b=a.GrabImage()  # Grab an image
-
-imshow(b)
