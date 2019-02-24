@@ -119,13 +119,12 @@ while(nRet == ueye.IS_SUCCESS):
 	nRet1= ueye.is_GetImageInfo(hCam,MemID, Iinfo, ueye.sizeof(Iinfo) )
 	frame = np.reshape(array,(height.value, width.value, bytes_per_pixel))
 	#print(Iinfo.TimestampSystem)
-	TitleString="TestImages_Automated/VANTAGEOp"+str(Iinfo.TimestampSystem.wMonth.value)+"_"+str(Iinfo.TimestampSystem.wDay.value)+"_"+str(Iinfo.TimestampSystem.wHour.value)+"_"+str(Iinfo.TimestampSystem.wMinute.value)+"_"+str(Iinfo.TimestampSystem.wSecond.value)+"_"+str(Iinfo.TimestampSystem.wMilliseconds.value)+".jpg"
-	
+	TitleString="/home/vantage/Documents/githere/VANTAGE/Automation/OpticalCam_Automation/TestImages_Automated/VANTAGEOp"+str(Iinfo.TimestampSystem.wMonth.value)+"_"+str(Iinfo.TimestampSystem.wDay.value)+"_"+str(Iinfo.TimestampSystem.wHour.value)+"_"+str(Iinfo.TimestampSystem.wMinute.value)+"_"+str(Iinfo.TimestampSystem.wSecond.value)+"_"+str(Iinfo.TimestampSystem.wMilliseconds.value)+".jpg"
 	cv2.imwrite(TitleString, frame)
-	print("Wrote Image")
+	#print("Wrote Image")
 	count+=1
 	time.sleep(0.25)
-	if count>10:
+	if count>100:
 		break
 
 
