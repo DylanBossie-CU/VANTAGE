@@ -19,7 +19,7 @@ classdef Deployer
         ExpectedRelease
     end
     properties (SetAccess = private)
-        % List of deployer geometry
+        % Structure of deployer geometry
         DeployerGeometry
 
         % Cell array of tube geometry
@@ -30,10 +30,11 @@ classdef Deployer
         % Class Constructor:
         %
         % @param      manifestFilename  The manifest filename
+        % @param      configFilename    The configuration filename
         %
         % @return     A reference to an initialized Deployer object
         %
-        function obj = Deployer(manifestFilename)
+        function obj = Deployer(manifestFilename, configFilename)
             % This constructor will need to read the deployment manifest file
             % and initialize an instance of the Deployer class. This constructor
             % should also create instances of the CubeSat class for every
@@ -78,6 +79,9 @@ classdef Deployer
                     manifestData.CubesatArray(i).expectedU,...
                     manifestData.CubesatArray(i).actualDims);
             end
+
+            % Read data from deployer configuration file
+            obj.DeployerGeometry = jsondecode(fileread(configFilename));
             
         end
 

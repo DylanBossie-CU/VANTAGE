@@ -303,7 +303,9 @@ classdef Optical
             obj.VideoFilename = filename;
             obj.FrameIntervals = FrameIntervals;
             obj.VideoType = SensorData.OpticalVideoInput;
-            obj.Video = VideoReader(obj.VideoFilename);
+            if exist(obj.VideoFilename,'file')
+                obj.Video = VideoReader(obj.VideoFilename);
+            end
         end
 
     % obfuscation identification for cubesat boundaries

@@ -28,9 +28,17 @@ classdef Model
         % @return     A reference to an initialized Model object
         %
         function obj = Model()
-            %obj.Deployer = 
-            %obj.Transform = 
-            %obj.Optical = 
+
+        	% Import child classes
+        	import VANTAGE.PostProcessing.Deployer
+        	import VANTAGE.PostProcessing.Transform
+        	import VANTAGE.PostProcessing.Optical
+        	import VANTAGE.PostProcessing.TOF
+
+        	% Construct child classes
+            obj.Deployer = Deployer('./Config/Manifest.json', './Config/Deployer.json')
+            obj.Transform = Transform('./Config/Transform.json');
+            obj.Optical = Optical(obj.Deployer)
             %obj.TOF = 
         end
         
