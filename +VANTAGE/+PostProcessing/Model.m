@@ -38,8 +38,8 @@ classdef Model
         	% Construct child classes
             obj.Deployer = Deployer('./Config/Manifest.json', './Config/Deployer.json')
             obj.Transform = Transform('./Config/Transform.json');
-            obj.Optical = Optical(obj.Deployer)
-            %obj.TOF = 
+            obj.Optical = Optical(obj.Deployer);
+            obj.TOF = TOF('./Config/TOF.json');
         end
         
         % A method for synchronizing timestamps between the TOF and optical

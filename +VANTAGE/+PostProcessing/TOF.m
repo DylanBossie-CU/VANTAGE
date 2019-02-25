@@ -13,19 +13,35 @@ classdef TOF
     properties (Access = private)
         %
         % Maximum range within which TOF data is considered valid, m
-        maxAllowableRange = 8
+        maxAllowableRange
         
         % The transform class used for frame changes
         % @see Transform
         Transform
         
         % Maximum allowed distance from a plane to be considered part of the plane
-        ptMaxDistFromPlane = 0.001;
+        ptMaxDistFromPlane
         
     end
     
     %% Methods
     methods
+        %% Constructor
+        %
+        % @param      manifestFilename  The manifest filename
+        % @param      configFilename    The configuration filename
+        %
+        % @return     A reference to an initialized TOF object
+        %
+        function obj = TOF(configFileneame)
+            % Read data from configuration file
+            configData = jsondecode(fileread(configFileneame));
+
+            % Initialize confuiguration parameters
+            obj.maxAllowableRange = configData.maxAllowableRange;
+            obj.ptMaxDistFromPlane = configData.ptMaxDistFromPlane;
+        end
+
         %% Getters
         %
         % Returns the maxAllowableRange

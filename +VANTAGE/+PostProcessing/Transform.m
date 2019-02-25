@@ -27,16 +27,16 @@ classdef Transform
         %
         % Constructs class using Transform.json config file
         %
-        % @param    jsonConfigFilename  relative path to JSON config file
+        % @param    configFilename  relative path to JSON config file
         %
         % @return   Class instance
         % 
         % @author   Joshua Kirby
         % @date     17-Feb-2019
-        function obj = Transform(jsonConfigFilename)
+        function obj = Transform(configFilename)
             if nargin == 1
                 % Obtain data from json file
-                config = jsondecode(fileread(jsonConfigFilename));
+                config = jsondecode(fileread(configFilename));
 
                 % Set transforms between TCF and VCF
                 obj = obj.setTdata('VCF',config.VT_DCM,config.V_TCF2VCF,'TCF');
