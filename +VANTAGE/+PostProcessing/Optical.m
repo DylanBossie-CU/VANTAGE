@@ -275,38 +275,35 @@ classdef Optical
     end
     
     % Class Constructor:
-        %
-        % @param      Deployer    Deployer object containing launch info
-        % @param      SensorData  Contains optical camera parameters
-        % @param      CubeSats    Cell array to store CubeSat object data
-        % @param      DesiredFPS  Input FPS of camera or desired rate
-        %
-        % @return     A reference to an initialized CubeSat object
-        %
-        function obj = Optical(Deployer)
-            import VANTAGE.PostProcessing.CubeSat_Optical
-            SensorData = jsondecode(fileread('config/Optical.json'));
-            amount = length(Deployer.CubesatArray);
-            obj.CubeSats = cell(amount,1);
-            for i = 1:amount
-                obj.CubeSats{i} = CubeSat_Optical;
-                obj.CubeSats{i}.tag = i;
-                obj.CubeSats{i}.centroid = [0,0];
-            end
-            filename = strcat(SensorData.OpticalData,...
-                SensorData.OpticalVideoInput);
-            FrameIntervals = linspace(0,1,SensorData.DesiredFPS+1);
-            
-            obj.DesiredFPS = SensorData.DesiredFPS;
-            obj.PlotBinarizedImages = SensorData.PlotBinarizedImages;
-            obj.PlotCentroids = SensorData.PlotCentroids;
-            obj.VideoFilename = filename;
-            obj.FrameIntervals = FrameIntervals;
-            obj.VideoType = SensorData.OpticalVideoInput;
-            if exist(obj.VideoFilename,'file')
-                obj.Video = VideoReader(obj.VideoFilename);
-            end
+    %
+    % @param      configFilename  The configuration filename
+    % @param      numCubesats     Number of expected cubesats
+    %
+    % @return     A reference to an initialized CubeSat object
+    %
+    function obj = Optical(configFilename, numCubesats)
+        import VANTAGE.PostProcessing.CubeSat_Optical
+        SensorData = jsondecode(fileread(configFilename));
+        obj.CubeSats = cell(numCubesats,1);
+        for i = 1:numCubesats
+            obj.CubeSats{i} = CubeSat_Optical;
+            obj.CubeSats{i}.tag = i;
+            obj.CubeSats{i}.centroid = [0,0];
         end
+        filename = strcat(SensorData.OpticalData,...
+            SensorData.OpticalVideoInput);
+        FrameIntervals = linspace(0,1,SensorData.DesiredFPS+1);
+        
+        obj.DesiredFPS = SensorData.DesiredFPS;
+        obj.PlotBinarizedImages = SensorData.PlotBinarizedImages;
+        obj.PlotCentroids = SensorData.PlotCentroids;
+        obj.VideoFilename = filename;
+        obj.FrameIntervals = FrameIntervals;
+        obj.VideoType = SensorData.OpticalVideoInput;
+        if exist(obj.VideoFilename,'file')
+            obj.Video = VideoReader(obj.VideoFilename);
+        end
+    end
 
     % obfuscation identification for cubesat boundaries
     %

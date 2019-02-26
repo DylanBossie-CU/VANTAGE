@@ -36,9 +36,9 @@ classdef Model
         	import VANTAGE.PostProcessing.TOF
 
         	% Construct child classes
-            obj.Deployer = Deployer('./Config/Manifest.json', './Config/Deployer.json')
+            obj.Deployer = Deployer('./Config/Manifest.json', './Config/Deployer.json');
             obj.Transform = Transform('./Config/Transform.json');
-            obj.Optical = Optical(obj.Deployer);
+            obj.Optical = Optical('./Config/Optical.json', obj.Deployer.GetNumCubesats());
             obj.TOF = TOF('./Config/TOF.json');
         end
         

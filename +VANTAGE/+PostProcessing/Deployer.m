@@ -24,6 +24,9 @@ classdef Deployer
 
         % Cell array of tube geometry
         TubeGeometry
+
+        % Number of expected cubesats
+        numCubesats
     end
 
     methods
@@ -61,17 +64,17 @@ classdef Deployer
                 manifestData.expectedRelease(7));
 
             % Calculate cubesat initial positions
-            numCubesats = numel(manifestData.CubesatArray);
-            pos_init = zeros(numCubesats,3);
+            obj.numCubesats = numel(manifestData.CubesatArray);
+            pos_init = zeros(obj.numCubesats,3);
 
             % Initialize cubesat array
-            obj.CubesatArray(1,numCubesats) = CubeSat(...
-                manifestData.CubesatArray(numCubesats).name,...
-                manifestData.CubesatArray(numCubesats).rangeOrder,...
-                pos_init(numCubesats,:),...
-                manifestData.CubesatArray(numCubesats).expectedU,...
-                manifestData.CubesatArray(numCubesats).actualDims);
-            for i = 1:numCubesats-1
+            obj.CubesatArray(1,obj.numCubesats) = CubeSat(...
+                manifestData.CubesatArray(obj.numCubesats).name,...
+                manifestData.CubesatArray(obj.numCubesats).rangeOrder,...
+                pos_init(obj.numCubesats,:),...
+                manifestData.CubesatArray(obj.numCubesats).expectedU,...
+                manifestData.CubesatArray(obj.numCubesats).actualDims);
+            for i = 1:obj.numCubesats-1
                 obj.CubesatArray(1,i) = CubeSat(...
                     manifestData.CubesatArray(i).name,...
                     manifestData.CubesatArray(i).rangeOrder,...
@@ -96,6 +99,16 @@ classdef Deployer
             
 
 
+        end
+
+        % A method for getting the expected number of cubesats
+        % 
+        % @param      obj   The object
+        %
+        % @return     pThe expected number of cubesats
+        %
+        function [numCubesats] = GetNumCubesats(obj)
+            numCubesats = obj.numCubesats;
         end
     end
 end
