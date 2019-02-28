@@ -46,6 +46,16 @@ classdef Test_Optical < matlab.unittest.TestCase
             % Perform comparison
             testCase.verifyEqual(FirstFrame,testFrame.frame)
         end
+
+        function testOcclusionCut(testCase)
+            return
+            close all
+            import VANTAGE.PostProcessing.*
+            %Initialize Deployer
+            DeployerTest = Deployer('config/Manifest.json');
+            %Create optical class to be tested
+            OpticalTest = Optical('./Config/Optical.json', DeployerTest.GetNumCubesats());
+        end
         
         function testMultiObjectDetection(testCase)
             return
