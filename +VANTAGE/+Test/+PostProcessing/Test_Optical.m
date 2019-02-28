@@ -20,7 +20,7 @@ classdef Test_Optical < matlab.unittest.TestCase
             %Initialize Deployer
             DeployerTest = Deployer('config/Manifest.json');
             %Create optical class to be tested
-            OpticalTest = Optical(DeployerTest);
+            OpticalTest = Optical('./Config/Optical.json', DeployerTest.GetNumCubesats());
             
             %Load test frame to be compared
             testFrame = load('Data/Test_Optical/FirstFrame_Test.mat');
@@ -54,7 +54,7 @@ classdef Test_Optical < matlab.unittest.TestCase
             %Initialize Deployer
             DeployerTest = Deployer('config/Manifest.json');
             %Create optical class to be tested
-            OpticalTest = Optical(DeployerTest);
+            OpticalTest = Optical('./Config/Optical.json', DeployerTest.GetNumCubesats());
             
             %%% Process input video frames through Optical class
             OpticalTest.CurrentFrameCount = 1;
@@ -72,7 +72,7 @@ classdef Test_Optical < matlab.unittest.TestCase
             %Initialize Deployer
             DeployerTest = Deployer('config/Manifest.json');
             %Create optical class to be tested
-            OpticalTest = Optical(DeployerTest);
+            OpticalTest = Optical('./Config/Optical.json', DeployerTest.GetNumCubesats());
             
             %%% Process input video frames through Optical class
             OpticalTest.CurrentFrameCount = 1;
@@ -89,7 +89,7 @@ classdef Test_Optical < matlab.unittest.TestCase
             %Initialize Deployer
             DeployerTest = Deployer('config/Manifest.json');
             %Create optical class to be tested
-            OpticalTest = Optical(DeployerTest);
+            OpticalTest = Optical('./Config/Optical.json', DeployerTest.GetNumCubesats());
             
             %%% Process input video frames through Optical class
             OpticalTest.CurrentFrameCount = 1;
@@ -105,7 +105,7 @@ classdef Test_Optical < matlab.unittest.TestCase
             %Initialize Deployer
             DeployerTest = Deployer('config/Manifest.json');
             %Create optical class to be tested
-            OpticalTest = Optical(DeployerTest);
+            OpticalTest = Optical('./Config/Optical.json', DeployerTest.GetNumCubesats());
         end
     end
     
