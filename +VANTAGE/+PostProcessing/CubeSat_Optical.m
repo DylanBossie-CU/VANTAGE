@@ -1,7 +1,7 @@
 classdef CubeSat_Optical
     %% Classdef
-    % Class for containing data relative to CubeSat centroids processed in
-    % the optical camera class
+    % A class representing disposable CubeSats with data relevant to
+    % Optical processing
     % @author       Dylan Bossie
     % @date         14-Feb-2019
     %% Properties
