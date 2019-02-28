@@ -1,4 +1,5 @@
 classdef Test_TOF < matlab.unittest.TestCase
+    %% Setup
     properties
     end
     
@@ -7,16 +8,16 @@ classdef Test_TOF < matlab.unittest.TestCase
     
     methods (TestMethodTeardown)
     end
-    
+    %% Test methods
     methods (Test)
-        
+         
         function testNaiveFindCentroids(testCase)
             
         end
 
     end
     
-    
+    %% Private methods
     methods (Access = private)
         
         function checkStruct(testCase, oldStruct, newStruct)
