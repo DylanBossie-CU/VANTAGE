@@ -9,8 +9,7 @@ close all
 clear
 
 %% Process Deployment Manifest
-fileName = 'config/Manifest.json';
-Deployer = VANTAGE.PostProcessing.Deployer(fileName);
+Model = VANTAGE.PostProcessing.Model();
 
 %% Send Sensor Ready Signal to RBP
 % pleaseAvionicsTeamSaveMe(wat);
@@ -22,14 +21,10 @@ Deployer = VANTAGE.PostProcessing.Deployer(fileName);
 % SeanAutomationCodeHere(yeet);
 
 %% Data Post-Processing
-%Initialize VANTAGE Classes
-CubeSats = Deployer.CubesatArray;
-TOF = VANTAGE.PostProcessing.TOF;
-Optical = VANTAGE.PostProcessing.Optical;
 
-SensorData = jsondecode(fileread('config/Sensors.json'));
 
 % TOF Post-Processing
+%{
 TOFData = dir(strcat(SensorData.TOFData,'*.pcd'));
 try
     TOF.naiveFindCentroids(TOFData,Deployer,SensorData);
@@ -37,6 +32,7 @@ try
 catch
     disp('TOF not fully implemented yet. Continuing...')
 end
+%}
 
 % At this point, TOF data has been processed up to its predefined desired
 % range 
