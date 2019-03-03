@@ -49,6 +49,72 @@ classdef TOF
             maxAllowableRange = obj.maxAllowableRange;
         end
         
+        %% TOF Processing
+        %
+        % Performs all TOF processing for VANTAGE
+        %
+        % @param    SensorData  struct of information about sensors
+        % @param    Deployer    Deployer class instance, containing
+        %                       Cubesats and manifest data
+        %
+        % @return   Deployer    Deployer class instance, containing
+        %                       Cubesats populated with TOF centroid 
+        %                       results
+        %
+        % @author   Joshua Kirby
+        % @date     01-Mar-2019
+        function [Deployer] = TOFProcessing(obj,SensorData,Deployer,varargin)
+            % Extract relevant data from inputs
+            Cubesats = Deployer.CubesatArray;
+            
+            % Obtain filenames from SensorData TOFData dir
+            ls = dir(SensorData.TOFData);
+            ls = ls([ls.bytes]~=0);
+            fileLims = [1,length(ls)];
+            
+            % Process varargin
+            if ~isempty(varargin)
+                for i = 1:length(varargin)
+                    if strcmpi(varargin{i},'fileLims')
+                        if size(varargin{i+1},1) == 1 && size(varargin{i+1},2) == 2
+                            fileLims = varargin{i+1};
+                            if fileLims(1) < 1 || fileLims(2)>length(ls)
+                                error('fileLims arguments are out of range for the files in SensorData.TOFData')
+                            end
+                        else
+                            error('fileLims requires a following [minFileIndex maxFileIndex] argument')
+                        end
+                    end
+                end
+            end
+            
+            % Loop over files for as long as there are files or until the
+            % Cubesats leave the maxAllowableRange of the TOF camera
+            stopProcessing = 0;
+            outOfRange = 0;
+            ii = fileLims(1);
+            warning('TOFProcessing currenlty processes all files, set a stopping condition based on maxAllowableRange as well')
+            while ~stopProcessing
+                % Naively identify centroids in image
+                CubeSats_TOF = obj.naiveFindCentroids(ls(ii).name,SensorData);
+                % Associate with known cubesats within deployer
+                warning('unimplemented')
+                % Determine if cubesats have passed out of range (sets
+                % outOfRange)
+                warning('unimplemented')
+                % Iterate counter
+                ii = ii + 1;
+                % Stop processing?
+                if (ii > fileLims(2)) || outOfRange
+                    stopProcessing = 1;
+                end
+            end
+            
+            % Update Deployer CubesatArray
+            Deployer.CubesatArray = Cubesats;
+            
+        end
+        
         %% Calculate centroids from file
         %
         % Produces centroids of all CubeSats naively identified in a single
@@ -57,33 +123,31 @@ classdef TOF
         % @param    filename    filename, char
         % @param    SensorData  struct of information about sensors
         %
-        % @return	3xn matrix of n CubeSat centroids in the TOF
-        %        	Cartestian frame, m
-        function [Deployer] = naiveFindCentroids(obj,filename,Deployer,...
-                SensorData)
+        % @return	length-n array of Cubesat_TOF's containing identified
+        %           TCF centroids
+        function [CubeSats_TOF] = naiveFindCentroids(obj,filename,SensorData)
             % Extract point cloud locations
-            filename = strcat(SensorData.TOFData,filename.name);
-            
-            % Extract CubeSats from Deployer
-            CubeSats = Deployer.CubesatArray;
+            filename = strcat(SensorData.TOFData,filename);
             
             % Load point cloud from file
             warning('Load script is currently only designed to work with simulated .pcd files')
             pc = obj.loadSimFile(filename);
             
-            % Separate point cloud into identified cubesats
-            CubeSats = cubesatPointsFromPC(pc);
-            
-            for i = 1:length(CubeSats)
-                % Identify visible planes for each cubesat
-                CubeSats(i) = fitPlanesToCubesat(CubeSats(i));
+            % Only proceed if the point cloud is valid
+            if ~isempty(pc.XLimits)
+                % Separate point cloud into identified cubesats
+                [obj,CubeSats_TOF] = obj.cubesatPointsFromPC(pc);
 
-                % Calculate centroids by projecting from identified planes
-                CubeSats(i) = findCentroidFromFaces(CubeSats(i));
+                for i = 1:length(CubeSats_TOF)
+                    % Identify visible planes for each cubesat
+                    CubeSats_TOF(i) = obj.fitPlanesToCubesat(CubeSats_TOF(i));
+
+                    % Calculate centroids by projecting from identified planes
+                    CubeSats_TOF(i) = obj.findCentroidFromFaces(CubeSats_TOF(i));
+                end
+            else
+                CubeSats_TOF = VANTAGE.PostProcessing.CubeSat_TOF.empty;
             end
-            
-            % Repackage CubeSats into Deployer
-            Deployer.CubesatArray = CubeSats;
             
         end
         
@@ -104,8 +168,8 @@ classdef TOF
         function pc = loadSimFile(obj,filename)
             ptCloud = pcread(filename);
             
-            if sum(sum(sum(~isnan(ptCloud.Location))))==0
-                pc = struct('Count',0);
+            if nnz(~isnan(ptCloud.Location))==0
+                pc = pointCloud(nan(1,3));
             else
                 % Filter extraneous points
                 pts = reshape(ptCloud.Location,ptCloud.Count,3);
@@ -115,11 +179,12 @@ classdef TOF
             
             
             figure
-            pcshow(pc)
+            pcshow(pc,'markersize',50)
             hold on
-            plot3(0,0,0,'k*')
+            %plot3(0,0,0,'k*')
             grid on
             axis equal
+            hold off
             
         end
         
@@ -141,15 +206,14 @@ classdef TOF
         % Separates a raw point cloud into the points associated with
         % distinct cubesats
         %
-        % @param    pc          raw point cloud from file
-        % @param    CubeSats    array of initialized CubeSat objects
-        %                       @see CubeSat
+        % @param    pc              raw point cloud from file
         %
-        % @return	vector of identified cubesats (TOF.CubeSat class)
+        % @return	array of identified cubesats 
+        %           @see CubeSat_TOF class
         %
         % @author   Joshua Kirby
         % @date     03-Feb-2019
-        function [obj,CubeSats] = cubesatPointsFromPC(obj,pc,CubeSats)
+        function [obj,CubeSats_TOF] = cubesatPointsFromPC(obj,pc)
             % Pull out z values
             z = sort(pc.Location(:,3));
 
@@ -183,24 +247,25 @@ classdef TOF
 
             locs = flip(locs);
             nSplit = numel(locs);
+            
+            % Initialize array of CubeSat_TOF objects
+            CubeSats_TOF(1,nSplit+1) = VANTAGE.PostProcessing.CubeSat_TOF;
 
             % Separate point cloud by split planes
             if nSplit>0
                 for i = 1:nSplit
                     if i==1
                         I = pc.Location(:,3)>=locs(i);
-                        CubeSats(i).pc = pointCloud(pc.Location(I,:));
+                        CubeSats_TOF(i).pc = pointCloud(pc.Location(I,:));
                     else
-                        I = pc.Location(:,3)>=locs(i);
-                        CubeSats(i).pc = pointCloud(pc.Location(I,:));
-                        I = CubeSats(i).pc.Location(:,3)<locs(i-1);
-                        CubeSats(i).pc = pointCloud(CubeSats(i).pc.Location(I,:));
+                        I = (pc.Location(:,3)>=locs(i)) & (pc.Location(:,3)<locs(i-1));
+                        CubeSats_TOF(i).pc = pointCloud(pc.Location(I,:));
                     end
                 end
                 I = pc.Location(:,3)<locs(nSplit);
-                CubeSats(nSplit+1).pc = pointCloud(pc.Location(I,:));
+                CubeSats_TOF(nSplit+1).pc = pointCloud(pc.Location(I,:));
             else
-                CubeSats.pc = pc;
+                CubeSats_TOF.pc = pc;
             end
         
         % Save number of visible CubeSats
@@ -273,6 +338,7 @@ classdef TOF
                             % replace previous plane with this plane and delete this plane
                             planes(i) = planes(numPlanes);
                             planes(numPlanes) = [];
+                            numPlanes = numPlanes-1;
                         end
                     end
                 end

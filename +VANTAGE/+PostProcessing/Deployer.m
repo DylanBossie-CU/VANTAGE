@@ -3,6 +3,9 @@ classdef Deployer
     % This includes geometric expectations as well as timing expectations.
     
     properties (SetAccess = public)
+        
+        % Array of cubesat objects
+        CubesatArray = VANTAGE.PostProcessing.CubeSat.empty
 
     end
     properties (SetAccess = protected)
@@ -11,9 +14,6 @@ classdef Deployer
 
         % Number corresponding to the deployment tube expected to launch
         DeploymentTube
-
-        % Array of cubesat objects
-        CubesatArray = VANTAGE.PostProcessing.CubeSat.empty
 
         % Array of expected release time for each cubesat
         ExpectedRelease

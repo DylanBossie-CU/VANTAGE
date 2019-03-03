@@ -1,5 +1,13 @@
 clearvars;close all;clc
 
+
+Deployer = VANTAGE.PostProcessing.Deployer('config/Manifest.json','config/Deployer.json');
+SensorData = jsondecode(fileread('config/Testing/TOF/Sensors_TOFdev.json'));
+TOF = VANTAGE.PostProcessing.TOF('config/TOF.json');
+Deployer = TOF.TOFProcessing(SensorData,Deployer,'fileLims',[65,65]);
+
+%%
+if 0
 Deployer = VANTAGE.PostProcessing.Deployer('config/Manifest.json');
 CubeSats = Deployer.CubesatArray;
 TOF = VANTAGE.PostProcessing.TOF;
@@ -64,3 +72,6 @@ end
 l=legend(legendStrings,'location','eastoutside');
 l.FontSize = legendfontsize;
 hold off
+
+
+end

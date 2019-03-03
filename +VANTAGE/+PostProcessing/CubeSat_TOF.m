@@ -72,22 +72,9 @@ classdef CubeSat_TOF
     methods
         % Class Constructor:
         %
-        % @param      name        The name
-        % @param      rangeOrder  The range order
-        % @param      pos_init    The initial position
-        % @param      occlusion   CubeSat occluded? 0,1
-        % @param      expectedU   The expected U
+        % @return     A reference to an initialized Cubesat_TOF object
         %
-        % @return     A reference to an initialized CubeSat object
-        %
-        function obj = CubeSat(name, rangeOrder, pos_init, expectedU, actualDims)
-            if nargin == 5
-                obj.name = name;
-                obj.rangeOrder = rangeOrder;
-                obj.pos_init = pos_init;
-                obj.expectedU = expectedU;
-                obj.actualDims = actualDims;
-            end
+        function obj = CubeSat_TOF()
             
             % JMK HEY YOU, ALL THIS GEOMETRY SUCKS AND SHOULD BE TURNED INTO
             % SOMETHING MUCH MORE INTELLIGENT
