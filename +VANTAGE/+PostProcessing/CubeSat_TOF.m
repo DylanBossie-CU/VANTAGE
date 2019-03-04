@@ -74,7 +74,15 @@ classdef CubeSat_TOF
         %
         % @return     A reference to an initialized Cubesat_TOF object
         %
-        function obj = CubeSat_TOF()
+        function obj = CubeSat_TOF(CubeSat)
+            % Error checking
+            if ~isa(CubeSat,'VANTAGE.PostProcessing.CubeSat')
+                error('Input to CubeSat_TOF constructor must be a VANTAGE.PostProcessing.CubeSat')
+            end
+            obj.name = CubeSat.name;
+            obj.expectedU = CubeSat.expectedU;
+            obj.actualDims = CubeSat.actualDims;
+            
             
             % JMK HEY YOU, ALL THIS GEOMETRY SUCKS AND SHOULD BE TURNED INTO
             % SOMETHING MUCH MORE INTELLIGENT

@@ -43,7 +43,7 @@ classdef Model
         	import VANTAGE.PostProcessing.TOF
 
         	% Construct child classes
-            obj.Deployer = Deployer(manifestFilename, './Config/Deployer.json');
+            obj.Deployer = Deployer(manifestFilename, './Config/Deployer.json',obj);
             obj.Transform = Transform('./Config/Transform.json');
             obj.Optical = Optical('./Config/Optical.json', obj.Deployer.GetNumCubesats());
             obj.TOF = TOF('./Config/TOF.json',obj);
@@ -184,10 +184,10 @@ classdef Model
             [~,I] = sort(z,'descend');
             cubesatNames = cubesatNamesUnordered(I);
             
-            % Extract cubesat position data
+            % Extract cubesat position data in meters
             for i = 1:length(cubesatNames)
                 for j = 1:length(tmp)
-                    Truth.Cubesat(i).pos(j,:) = tmp(j).pos.(cubesatNames{i});
+                    Truth.Cubesat(i).pos(j,:) = tmp(j).pos.(cubesatNames{i})./100;
                 end
             end
             

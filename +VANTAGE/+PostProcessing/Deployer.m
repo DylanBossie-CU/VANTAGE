@@ -34,10 +34,11 @@ classdef Deployer
         %
         % @param      manifestFilename  The manifest filename
         % @param      configFilename    The configuration filename
+        % @param      Model             Model class instance (@see Model)
         %
         % @return     A reference to an initialized Deployer object
         %
-        function obj = Deployer(manifestFilename, configFilename)
+        function obj = Deployer(manifestFilename, configFilename, Model)
             % This constructor will need to read the deployment manifest file
             % and initialize an instance of the Deployer class. This constructor
             % should also create instances of the CubeSat class for every
@@ -63,9 +64,13 @@ classdef Deployer
                 manifestData.expectedRelease(6),...
                 manifestData.expectedRelease(7));
 
-            % Calculate cubesat initial positions
+            % Calculate cubesat true initial positions
             obj.numCubesats = numel(manifestData.CubesatArray);
+            I = [manifestData.CubesatArray.rangeOrder];
             pos_init = zeros(obj.numCubesats,3);
+            for i = 1:length(I)
+                pos_init(I(i),:) = Model.Truth.Cubesat(I(i)).pos(1,:);
+            end
 
             % Initialize cubesat array
             obj.CubesatArray(1,obj.numCubesats) = CubeSat(...

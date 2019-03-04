@@ -31,8 +31,8 @@ classdef TOF
     methods
         %% Constructor
         %
-        % @param      manifestFilename  The manifest filename
         % @param      configFilename    The configuration filename
+        % @param      Model             Model class instance (@see Model)
         %
         % @return     A reference to an initialized TOF object
         %
@@ -49,6 +49,9 @@ classdef TOF
                 error('Model input to TOF class object constructor must be a VANTAGE.PostProcessing.Model instance')
             end
             obj.Truth = Model.Truth;
+            
+            % Obtain transform instance from Model
+            obj.Transform = Model.Transform;
         end
 
         %% Getters
@@ -79,11 +82,19 @@ classdef TOF
             % Obtain filenames from SensorData TOFData dir
             ls = dir(SensorData.TOFData);
             ls = ls([ls.bytes]~=0);
+            % Error check data against truth
+            if length(obj.Truth.t) < length(ls)
+                error('There are more data files than truth data points')
+            end
+            
+            % Initialize varargin mutable parameters
             fileLims = [1,length(ls)];
+            presentResults = 0;
             
             % Process varargin
             if ~isempty(varargin)
                 for i = 1:length(varargin)
+                    % limiting which files to process from the directory
                     if strcmpi(varargin{i},'fileLims')
                         if size(varargin{i+1},1) == 1 && size(varargin{i+1},2) == 2
                             fileLims = varargin{i+1};
@@ -94,26 +105,43 @@ classdef TOF
                             error('fileLims requires a following [minFileIndex maxFileIndex] argument')
                         end
                     end
+                    % whether or not to plot results for every file
+                    % processed
+                    if strcmpi(varargin{i},'presentResults')
+                        if length(varargin{i+1}) == 1
+                            if varargin{i+1}
+                                presentResults = 1;
+                            end
+                        else
+                            error('presentResults requires a following 1x1 argument that is convertible to logical')
+                        end
+                    end
                 end
             end
             
             % Initialize CubeSats_TOF
-            CubeSats_TOF(1,obj.Truth.numCubeSats) = VANTAGE.PostProcessing.CubeSat_TOF;
+            for i = 1:length(CubeSats)
+                CubeSats_TOF(i) = VANTAGE.PostProcessing.CubeSat_TOF(CubeSats(i));
+            end
             
             % Loop over files for as long as there are files or until the
             % Cubesats leave the maxAllowableRange of the TOF camera
             stopProcessing = 0;
             outOfRange = 0;
             ii = fileLims(1);
-            warning('TOFProcessing currenlty processes all files, set a stopping condition based on maxAllowableRange as well')
+            warning('TOFProcessing currently processes all files, set a stopping condition based on maxAllowableRange as well')
             while ~stopProcessing
                 % Naively identify centroids in image
-                CubeSats_TOF = obj.naiveFindCentroids(ls(ii).name,SensorData);
+                [CubeSats_TOF,pc] = obj.naiveFindCentroids(ls(ii).name,SensorData,CubeSats_TOF);
                 % Associate with known cubesats within deployer
                 warning('unimplemented')
                 % Determine if cubesats have passed out of range (sets
                 % outOfRange)
                 warning('unimplemented')
+                % Present Results
+                if presentResults
+                    obj.plotResults(CubeSats_TOF,pc,obj.Truth.t(ii));
+                end
                 % Iterate counter
                 ii = ii + 1;
                 % Stop processing?
@@ -132,12 +160,20 @@ classdef TOF
         % Produces centroids of all CubeSats naively identified in a single
         % point cloud
         %
-        % @param    filename    filename, char
-        % @param    SensorData  struct of information about sensors
+        % @param    filename        filename for a single point cloud, char
+        % @param    SensorData      struct of information about sensors
+        % @param    CubeSats_TOF    initialized array of CubeSat_TOF
+        %                           objects ordered [first-out to
+        %                           last-out] and containing expectedU and
+        %                           actualDims
         %
         % @return	length-n array of Cubesat_TOF's containing identified
         %           TCF centroids
-        function [CubeSats_TOF] = naiveFindCentroids(obj,filename,SensorData)
+        % @return   raw point cloud from file
+        %
+        % @author   Joshua Kirby
+        % @date     04-Mar-2019
+        function [CubeSats_TOF,pc] = naiveFindCentroids(obj,filename,SensorData,CubeSats_TOF)
             % Extract point cloud locations
             filename = strcat(SensorData.TOFData,filename);
             
@@ -148,14 +184,17 @@ classdef TOF
             % Only proceed if the point cloud is valid
             if ~isempty(pc.XLimits)
                 % Separate point cloud into identified cubesats
-                [obj,CubeSats_TOF] = obj.cubesatPointsFromPC(pc);
+                [obj,CubeSats_TOF] = obj.cubesatPointsFromPC(pc,CubeSats_TOF);
 
                 for i = 1:length(CubeSats_TOF)
-                    % Identify visible planes for each cubesat
-                    CubeSats_TOF(i) = obj.fitPlanesToCubesat(CubeSats_TOF(i));
+                    % If a point cloud was found for this cubesat
+                    if ~isempty(CubeSats_TOF(i).pc)
+                        % Identify visible planes for each cubesat
+                        CubeSats_TOF(i) = obj.fitPlanesToCubesat(CubeSats_TOF(i));
 
-                    % Calculate centroids by projecting from identified planes
-                    CubeSats_TOF(i) = obj.findCentroidFromFaces(CubeSats_TOF(i));
+                        % Calculate centroids by projecting from identified planes
+                        CubeSats_TOF(i) = obj.findCentroidFromFaces(CubeSats_TOF(i));
+                    end
                 end
             else
                 CubeSats_TOF = VANTAGE.PostProcessing.CubeSat_TOF.empty;
@@ -186,17 +225,13 @@ classdef TOF
                 % Filter extraneous points
                 pts = reshape(ptCloud.Location,ptCloud.Count,3);
                 I = logical(prod(~isnan(pts),2));
-                pc = pointCloud([pts(I,1:2),-pts(I,3)]);
+                pc = pointCloud(pts(I,:));
             end
-            
-            
-            figure
-            pcshow(pc,'markersize',50)
-            hold on
-            %plot3(0,0,0,'k*')
-            grid on
-            axis equal
-            hold off
+            figure            
+            pcshow(pc)
+            xlabel('x')
+            ylabel('y')
+            zlabel('z')
             
         end
         
@@ -219,21 +254,25 @@ classdef TOF
         % distinct cubesats
         %
         % @param    pc              raw point cloud from file
+        % @param    CubeSats_TOF    initialized array of CubeSat_TOF
+        %                           objects ordered [first-out to
+        %                           last-out] and containing expectedU and
+        %                           actualDims
         %
         % @return	array of identified cubesats 
         %           @see CubeSat_TOF class
         %
         % @author   Joshua Kirby
         % @date     03-Feb-2019
-        function [obj,CubeSats_TOF] = cubesatPointsFromPC(obj,pc)
+        function [obj,CubeSats_TOF] = cubesatPointsFromPC(obj,pc,CubeSats_TOF)
             % Pull out z values
             z = sort(pc.Location(:,3));
 
             % Start the loop
             NPeaks = Inf;
-            bw = 0.005;
+            bw = 0.0065;
             counter = 0;
-            while NPeaks > 3
+            while NPeaks > length(CubeSats_TOF)-1
               % Calculate k-squares density
               [zDense,zBin] = ksdensity(z,'bandwidth',bw,'function','pdf');
 
@@ -259,9 +298,6 @@ classdef TOF
 
             locs = flip(locs);
             nSplit = numel(locs);
-            
-            % Initialize array of CubeSat_TOF objects
-            CubeSats_TOF(1,nSplit+1) = VANTAGE.PostProcessing.CubeSat_TOF;
 
             % Separate point cloud by split planes
             if nSplit>0
@@ -277,7 +313,7 @@ classdef TOF
                 I = pc.Location(:,3)<locs(nSplit);
                 CubeSats_TOF(nSplit+1).pc = pointCloud(pc.Location(I,:));
             else
-                CubeSats_TOF.pc = pc;
+                CubeSats_TOF(1).pc = pc;
             end
         
         % Save number of visible CubeSats
@@ -672,7 +708,7 @@ classdef TOF
                         case {1,2,3,4,5,6}
                             [~,offSize]  = min(abs(CubeSat.Lvec-lengthIntersect)); % this value says the U of the off-size
                         case 7
-                            offSize = u;
+                            offSize = CubeSat.expectedU;
                     end
                     % mid-plane diagonal unit vector
                     innerDiag = obj.unitvec(CubeSat.Lvec(offSize)*n(:,bestI) + CubeSat.Lvec(bestSize)*n(:,offI));
@@ -768,6 +804,129 @@ classdef TOF
             
         end
         
+        %
+        % Presents results from a single array of CubeSat_TOF objects
+        % (i.e. a single TOF point cloud)
+        %
+        % @param    CubeSats_TOF    array of CubeSat_TOF objects after
+        %                           processing the associated point cloud
+        % @param    pc              raw point cloud from file
+        % @param    truthTime       timestamp of truth data which
+        %                           corresponds to the data file whose
+        %                           results are being presented
+        %
+        % @author   Joshua Kirby
+        % @date     04-Mar-2019
+        function plotResults(obj,CubeSats_TOF,pc,truthTime)
+            
+            % Define indexing for use in looping over cubesats
+            CubesatIndexing = 1:length(CubeSats_TOF);
+            
+            % Extract true centroids from truth data for this file
+            I = find(obj.Truth.t == truthTime,1);
+            for i = 1:length(CubeSats_TOF)
+                trueCentroids_VCF(i,:) = obj.Truth.Cubesat(i).pos(I,:);
+            end
+            
+            % Transform true centroids from VCF to TCF
+            trueCentroids_TCF = [obj.Transform.tf('TCF',trueCentroids_VCF','VCF')]';
+            
+            % Fit line to trueCentroids to use as plotting centerline for
+            % reference
+            warning('off','curvefit:fit:equationBadlyConditioned')
+            trueCentroidsLine_TCF = fit(trueCentroids_TCF(:,2:3),trueCentroids_TCF(:,1),'poly11');
+            warning('on','curvefit:fit:equationBadlyConditioned')
+            
+            % Get point for plotting the centerline
+            minpt = min(trueCentroids_TCF,[],1);
+            maxpt = max(trueCentroids_TCF,[],1);
+            yCenterline = linspace(minpt(2),maxpt(2),2);
+            zCenterline = linspace(minpt(3),maxpt(3),2);
+            xCenterline = feval(trueCentroidsLine_TCF,yCenterline,zCenterline);
+            
+            % Plot results
+            figure('units','normalized','position',[1/16,1/8,14/16,6/8])
+            c = get(gca,'colororder');
+            markersize = 100;
+            fontsize = 20;
+            legendfontsize = 16;
+            
+            subplot(1,3,1)
+            hold on
+            grid on
+            grid minor
+            pcshow(pc,'markersize',markersize)
+            plot3(xCenterline,yCenterline,zCenterline,'k--')
+            title('Raw Pointcloud','fontsize',fontsize)
+            ax = gca;
+            zlimits = ax.ZLim;
+            ylimits = ax.YLim;
+            xlabel('x')
+            ylabel('y')
+            zlabel('z')
+            hold off
+            
+            
+            subplot(1,3,2)
+            grid on
+            grid minor
+            title('Identified CubeSats','fontsize',fontsize)
+            hold on
+            colorcounter = 1;
+            legendcounter = 1;
+            for i = CubesatIndexing
+                if ~isempty(CubeSats_TOF(i).pc)
+                    CubeSats_TOF(i).pc.Color = uint8(c(colorcounter,:).*255.*ones(CubeSats_TOF(i).pc.Count,3));
+                    pcshow(CubeSats_TOF(i).pc,'markersize',markersize)
+                    legendStrings{legendcounter} = ['CubeSat ',num2str(i)];
+                    colorcounter = colorcounter+1;
+                    legendcounter = legendcounter+1;
+                end
+            end
+            plot3(xCenterline,yCenterline,zCenterline,'k--')
+            %zlim(zlimits)
+            %ylim(ylimits)
+            l=legend(legendStrings,'location','eastoutside');
+            l.FontSize = legendfontsize;
+            xlabel('x')
+            ylabel('y')
+            zlabel('z')
+            hold off
+            
+            subplot(1,3,3)
+            hold on
+            grid on
+            grid minor
+            title({'Visible Faces','Per CubeSat'},'fontsize',fontsize)
+            legendStrings = [];
+            legendcounter = 1;
+            colorcounter = 1;
+            for i = CubesatIndexing
+                if ~isempty(CubeSats_TOF(i).pc)
+                    plot3(CubeSats_TOF(i).centroid_TCF(1),CubeSats_TOF(i).centroid_TCF(2),CubeSats_TOF(i).centroid_TCF(3),'r.','markersize',25)
+                    plot3(trueCentroids_TCF(i,1),trueCentroids_TCF(i,2),trueCentroids_TCF(i,3),'b.','markersize',25)
+                    legendStrings{legendcounter} = ['Calc. Sat',num2str(i),'Centroid'];
+                    legendStrings{legendcounter+1} = ['True Sat',num2str(i),'Centroid'];
+                    legendcounter = legendcounter+2;
+                    for j = 1:CubeSats_TOF(i).numVisibleFaces
+                        CubeSats_TOF(i).faces(j).planeCloud.Color = uint8(c(colorcounter,:).*255.*ones(CubeSats_TOF(i).faces(j).planeCloud.Count,3));
+                        pcshow(CubeSats_TOF(i).faces(j).planeCloud,'markersize',markersize)
+                        legendStrings{legendcounter} = ['Sat',num2str(i),'-Face',num2str(j)];
+                        colorcounter = colorcounter+1;
+                        legendcounter = legendcounter+1;
+                    end
+                end
+            end
+            plot3(xCenterline,yCenterline,zCenterline,'k--')
+            %zlim(zlimits)
+            %ylim(ylimits)
+            l=legend(legendStrings,'location','eastoutside');
+            l.FontSize = legendfontsize;
+            xlabel('x')
+            ylabel('y')
+            zlabel('z')
+            hold off
+        end
     end
     
     

@@ -1,4 +1,4 @@
 {
 	"maxAllowableRange": 8,
-	"ptMaxDistFromPlane": 0.001
+	"ptMaxDistFromPlane": 0.02
 }
