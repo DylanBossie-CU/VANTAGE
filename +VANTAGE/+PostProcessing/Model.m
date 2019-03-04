@@ -16,19 +16,26 @@ classdef Model
 
         % TOF camera class
         TOF
+        
+        % Truth data
+        Truth
     end
 
     methods
         % Class Constructor:
-        % @param      Deployer   The deployer class
-        % @param      Transform  Transform class for all coordinate transformations
-        % @param      Optical    Optical camera class used for image capture
-        % @param      TOF        TOF camera class used for point cloud capture
+        % @param      manifestFilename  full filename of manifest JSON file
+        % @param      truthFilename     full filename of truth data JSON file
         %
         % @return     A reference to an initialized Model object
         %
-        function obj = Model()
+        function obj = Model(manifestFilename,truthFilename)
+            
+            % Process truth data
+            obj.Truth = obj.processTruthData(truthFilename);
 
+            %%% NOTE: The following must be run AFTER the Model class has
+            %%% been fully initialized with all of its own properties
+            
         	% Import child classes
         	import VANTAGE.PostProcessing.Deployer
         	import VANTAGE.PostProcessing.Transform
@@ -36,10 +43,15 @@ classdef Model
         	import VANTAGE.PostProcessing.TOF
 
         	% Construct child classes
-            obj.Deployer = Deployer('./Config/Manifest.json', './Config/Deployer.json');
+            obj.Deployer = Deployer(manifestFilename, './Config/Deployer.json');
             obj.Transform = Transform('./Config/Transform.json');
             obj.Optical = Optical('./Config/Optical.json', obj.Deployer.GetNumCubesats());
-            obj.TOF = TOF('./Config/TOF.json');
+            obj.TOF = TOF('./Config/TOF.json',obj);
+            
+            % Error catching
+            if obj.Deployer.numCubesats ~= obj.Truth.numCubeSats
+                error('Truth data and manifest do not agree on the number of Cubesats')
+            end
         end
         
         % A method for synchronizing timestamps between the TOF and optical
@@ -143,6 +155,46 @@ classdef Model
         function OutputStateVector(obj)
             
         end
+        
+    end
+    
+    methods (Access = private)
+        %
+        % Processes truth data
+        %
+        % @param    truthFilename   full filename of truth data JSON file
+        %
+        % @return   struct containing truth data for the current execution
+        %           of VANTAGE post processing
+        %
+        % @author   Joshua Kirby
+        % @date     03-Mar-2019
+        function Truth = processTruthData(obj,truthFilename)
+            % Read json truth file
+            tmp = jsondecode(fileread(truthFilename));
+            
+            % extract timesteps
+            Truth.t = [tmp.t];
+            
+            % Order Cubesats [first-out to last-out]
+            cubesatNamesUnordered = fieldnames(tmp(1).pos);
+            for i = 1:length(cubesatNamesUnordered)
+                z(i) = tmp(1).pos.(cubesatNamesUnordered{i})(3);
+            end
+            [~,I] = sort(z,'descend');
+            cubesatNames = cubesatNamesUnordered(I);
+            
+            % Extract cubesat position data
+            for i = 1:length(cubesatNames)
+                for j = 1:length(tmp)
+                    Truth.Cubesat(i).pos(j,:) = tmp(j).pos.(cubesatNames{i});
+                end
+            end
+            
+            % Extract number cubesats
+            Truth.numCubeSats = length(cubesatNames);
+        end
+        
         
     end
 end

@@ -8,8 +8,10 @@ clc
 close all
 clear
 
-%% Process Deployment Manifest
-Model = VANTAGE.PostProcessing.Model();
+%% Process Deployment Manifest and Truth data
+manifestFilename = 'Config/Manifest.json';
+truthFilename    = '<truthFilename>';
+Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename);
 
 %% Send Sensor Ready Signal to RBP
 % pleaseAvionicsTeamSaveMe(wat);
@@ -21,7 +23,6 @@ Model = VANTAGE.PostProcessing.Model();
 % SeanAutomationCodeHere(yeet);
 
 %% Data Post-Processing
-
 
 % TOF Post-Processing
 %{

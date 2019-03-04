@@ -1,10 +1,12 @@
 clearvars;close all;clc
 
-
-Deployer = VANTAGE.PostProcessing.Deployer('config/Manifest.json','config/Deployer.json');
+truthFilename = 'Data/Simulation_TOF-Truth_3-3-19_Tube1/config_simulation_template_2_25_Josh_ToF_Calibration_tube1_truth_data.json';
+manifestFilename = 'config/Manifest.json';
+Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename);
+Deployer = Model.Deployer;
 SensorData = jsondecode(fileread('config/Testing/TOF/Sensors_TOFdev.json'));
-TOF = VANTAGE.PostProcessing.TOF('config/TOF.json');
-Deployer = TOF.TOFProcessing(SensorData,Deployer,'fileLims',[65,65]);
+TOF = VANTAGE.PostProcessing.TOF('config/TOF.json',Model);
+Deployer = TOF.TOFProcessing(SensorData,Deployer,'fileLims',[40,40]);
 
 %%
 if 0

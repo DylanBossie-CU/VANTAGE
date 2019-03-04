@@ -22,6 +22,9 @@ classdef TOF
         % Maximum allowed distance from a plane to be considered part of the plane
         ptMaxDistFromPlane
         
+        % Truth data struct
+        Truth
+        
     end
     
     %% Methods
@@ -33,13 +36,19 @@ classdef TOF
         %
         % @return     A reference to an initialized TOF object
         %
-        function obj = TOF(configFileneame)
+        function obj = TOF(configFileneame,Model)
             % Read data from configuration file
             configData = jsondecode(fileread(configFileneame));
 
             % Initialize confuiguration parameters
             obj.maxAllowableRange = configData.maxAllowableRange;
             obj.ptMaxDistFromPlane = configData.ptMaxDistFromPlane;
+            
+            % Obtain truth data from Model
+            if ~isa(Model,'VANTAGE.PostProcessing.Model')
+                error('Model input to TOF class object constructor must be a VANTAGE.PostProcessing.Model instance')
+            end
+            obj.Truth = Model.Truth;
         end
 
         %% Getters
@@ -65,7 +74,7 @@ classdef TOF
         % @date     01-Mar-2019
         function [Deployer] = TOFProcessing(obj,SensorData,Deployer,varargin)
             % Extract relevant data from inputs
-            Cubesats = Deployer.CubesatArray;
+            CubeSats = Deployer.CubesatArray;
             
             % Obtain filenames from SensorData TOFData dir
             ls = dir(SensorData.TOFData);
@@ -87,6 +96,9 @@ classdef TOF
                     end
                 end
             end
+            
+            % Initialize CubeSats_TOF
+            CubeSats_TOF(1,obj.Truth.numCubeSats) = VANTAGE.PostProcessing.CubeSat_TOF;
             
             % Loop over files for as long as there are files or until the
             % Cubesats leave the maxAllowableRange of the TOF camera
@@ -111,7 +123,7 @@ classdef TOF
             end
             
             % Update Deployer CubesatArray
-            Deployer.CubesatArray = Cubesats;
+            Deployer.CubesatArray = CubeSats;
             
         end
         
@@ -154,7 +166,7 @@ classdef TOF
     end
     
     %% Private Methods
-    methods % (Access = private)
+    methods  (Access = private)
         %% Loading point clouds from files
         %
         % Loads data from a simulation file
