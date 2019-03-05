@@ -136,6 +136,9 @@ classdef Optical
                 ['OpticalImageOutputs/' obj.VideoType ...
                 num2str(obj.CurrentFrameCount) '.jpg'])
         end
+        
+        %Transform centroid locations for output to sensor fusion
+        
     end
     
     %% Plot boundaries
@@ -527,6 +530,33 @@ classdef Optical
             hold on
         end
         %}
+    end
+    
+    function CubeSatUnitVectors = UnitVecTransform(~,CubeSats)
+        %Read optical camera parameters
+        CameraParameters = jsondecode(fileread('./Config/Sensors.json'));
+        focalLength = CameraParameters.OpticalFocalLength;
+        pixelSize = CameraParameters.OpticalPixelSize;
+        gridSize = CameraParameters.OpticalResolution;
+        origin = [gridSize(1)/2 gridSize(2)/2];
+        pixelSizeX = pixelSize;%m
+        pixelSizeY = pixelSize;%m
+
+        numCubeSats = length(CubeSats);
+        CubeSatUnitVectors = cell(numCubeSats,1);
+        for i = 1:numCubeSats
+            centroid = CubeSats{i}.centroid;
+            %Distance from origin in pixels
+            p_x = centroid(1) - origin(1);
+            p_y = -(centroid(2) - origin(2));
+            f = -focalLength;
+
+            x = p_x*pixelSizeX;
+            y = p_y*pixelSizeY;
+            S = [x y f];
+
+            CubeSatUnitVectors{i} = S/norm(S);
+        end
     end
 end
     

@@ -110,12 +110,34 @@ classdef Test_Optical < matlab.unittest.TestCase
         end
         
         function testOpticalConstruction(testCase)
+            return
             close all
             import VANTAGE.PostProcessing.*
+            %Commenting this out while Model/Deployer constructor work is
+            %being done
+            %ModelTest = Model;
             %Initialize Deployer
-            DeployerTest = Deployer('config/Manifest.json');
+            %DeployerTest = Deployer('config/Manifest.json','config/Deployer.json',ModelTest);
             %Create optical class to be tested
-            OpticalTest = Optical('./Config/Optical.json', DeployerTest.GetNumCubesats());
+            OpticalTest = Optical('./Config/Optical.json', 6);
+        end
+        
+        function testPixelTransform(testCase)
+            close all
+            import VANTAGE.PostProcessing.*
+            OpticalTest = Optical('./Config/Optical.json',6);
+            
+            %%% Process input video frames through Optical class
+            OpticalTest.CurrentFrameCount = 1;
+            while hasFrame(OpticalTest.Video)
+                if OpticalTest.Frame ~= []
+                    [OpticalTest,~] = OpticalTest.readInputFrame();
+                    OpticalTest.CurrentFrameCount = OpticalTest.CurrentFrameCount + 1;
+                else
+                    CubeSatUnitVectors = OpticalTest.UnitVecTransform(OpticalTest.CubeSats);
+                    break
+                end
+            end
         end
     end
     
