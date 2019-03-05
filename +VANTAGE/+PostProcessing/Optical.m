@@ -532,7 +532,18 @@ classdef Optical
         %}
     end
     
-    function CubeSatUnitVectors = UnitVecTransform(~,CubeSats)
+    % Convert pixel location to VCF unit vector
+    %
+    %
+    % @param      CubeSats     List of CubeSat classes containing centroid
+    %                          locations
+    % @return     CubeSatUnitVectors    List of unit vectors in VCF for
+    %                                   each centroid input
+    %
+    % @author     Dylan Bossie
+    % @date       4-Mar-2019
+    %
+    function CubeSatUnitVectors = PixelToUnitVec(~,CubeSats)
         %Read optical camera parameters
         CameraParameters = jsondecode(fileread('./Config/Sensors.json'));
         focalLength = CameraParameters.OpticalFocalLength;

@@ -134,7 +134,7 @@ classdef Test_Optical < matlab.unittest.TestCase
                     [OpticalTest,~] = OpticalTest.readInputFrame();
                     OpticalTest.CurrentFrameCount = OpticalTest.CurrentFrameCount + 1;
                 else
-                    CubeSatUnitVectors = OpticalTest.UnitVecTransform(OpticalTest.CubeSats);
+                    CubeSatUnitVectors = OpticalTest.PixelToUnitVec(OpticalTest.CubeSats);
                     break
                 end
             end
