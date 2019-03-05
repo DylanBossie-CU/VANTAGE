@@ -6,4 +6,4 @@ Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename);
 Deployer = Model.Deployer;
 SensorData = jsondecode(fileread('config/Testing/TOF/Sensors_TOFdev.json'));
 TOF = VANTAGE.PostProcessing.TOF('config/TOF.json',Model);
-Deployer = TOF.TOFProcessing(SensorData,Deployer,'fileLims',[80,80],'presentResults',1);
+Deployer = TOF.TOFProcessing(SensorData,Deployer,'fileLims',[65,65],'presentResults',1);

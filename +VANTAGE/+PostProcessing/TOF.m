@@ -23,7 +23,7 @@ classdef TOF
         ptMaxDistFromPlane
         
         % Truth data struct
-        Truth
+        Truth_VCF
         
     end
     
@@ -48,7 +48,7 @@ classdef TOF
             if ~isa(Model,'VANTAGE.PostProcessing.Model')
                 error('Model input to TOF class object constructor must be a VANTAGE.PostProcessing.Model instance')
             end
-            obj.Truth = Model.Truth;
+            obj.Truth_VCF = Model.Truth_VCF;
             
             % Obtain transform instance from Model
             obj.Transform = Model.Transform;
@@ -83,7 +83,7 @@ classdef TOF
             ls = dir(SensorData.TOFData);
             ls = ls([ls.bytes]~=0);
             % Error check data against truth
-            if length(obj.Truth.t) < length(ls)
+            if length(obj.Truth_VCF.t) < length(ls)
                 error('There are more data files than truth data points')
             end
             
@@ -133,14 +133,14 @@ classdef TOF
             while ~stopProcessing
                 % Naively identify centroids in image
                 [CubeSats_TOF,pc] = obj.naiveFindCentroids(ls(ii).name,SensorData,CubeSats_TOF);
-                % Associate with known cubesats within deployer
+                % Associate with known cubesats within Deployer
                 warning('unimplemented')
                 % Determine if cubesats have passed out of range (sets
                 % outOfRange)
                 warning('unimplemented')
                 % Present Results
                 if presentResults
-                    obj.plotResults(CubeSats_TOF,pc,obj.Truth.t(ii));
+                    obj.plotResults(CubeSats_TOF,pc,obj.Truth_VCF.t(ii));
                 end
                 % Iterate counter
                 ii = ii + 1;
@@ -199,7 +199,6 @@ classdef TOF
             else
                 CubeSats_TOF = VANTAGE.PostProcessing.CubeSat_TOF.empty;
             end
-            
         end
         
     end
@@ -216,7 +215,7 @@ classdef TOF
         %
         % @author       Joshua Kirby
         % @date         24-Jan-2019
-        function pc = loadSimFile(obj,filename)
+        function pc = loadSimFile(~,filename)
             ptCloud = pcread(filename);
             
             if nnz(~isnan(ptCloud.Location))==0
@@ -227,11 +226,11 @@ classdef TOF
                 I = logical(prod(~isnan(pts),2));
                 pc = pointCloud(pts(I,:));
             end
-            figure            
-            pcshow(pc)
-            xlabel('x')
-            ylabel('y')
-            zlabel('z')
+            %figure            
+            %pcshow(pc)
+            %xlabel('x')
+            %ylabel('y')
+            %zlabel('z')
             
         end
         
@@ -270,7 +269,7 @@ classdef TOF
 
             % Start the loop
             NPeaks = Inf;
-            bw = 0.0065;
+            bw = 0.006;
             counter = 0;
             while NPeaks > length(CubeSats_TOF)-1
               % Calculate k-squares density
@@ -278,7 +277,7 @@ classdef TOF
 
               % Identify split locations
               c = 0;
-              [~,locs] = findpeaks(-zDense,zBin,'MinPeakProminence',c);
+              [pks,locs] = findpeaks(-zDense,zBin,'MinPeakProminence',c);
 
               % Update bandwidth
               NPeaks = length(locs);
@@ -291,10 +290,15 @@ classdef TOF
               end
             end
 
-            %       figure
-            %       plot(zBin,-zDense);
-            %       xlabel('z (m)')
-            %       ylabel('Percent point density')
+                  figure
+                  hold on
+                  grid on
+                  grid minor
+                  plot(zBin,-zDense);
+                  plot(locs,pks,'r*')
+                  xlabel('z (m)')
+                  ylabel('Percent point density')
+                  hold off
 
             locs = flip(locs);
             nSplit = numel(locs);
@@ -543,6 +547,31 @@ classdef TOF
             face = polyshape(inPlane(I_bound,1),inPlane(I_bound,2),'simplify',false);
             [x,y] = centroid(face);
             
+            %%% Process using bounding box of face
+            % Find face boundary in face plane
+            [xlims,ylims] = boundingbox(face);
+            % Convert bounding box from face plane to TCF
+            cornercounter = 1;
+            for i = 1:length(xlims)
+                for j = 1:length(ylims)
+                    % NOTE: Corners are ordered moving CCW around
+                    % boundingbox
+                    corners(:,cornercounter) = planes(1).o + ...
+                        (xlims(i)*planes(1).V(:,1))' + (ylims(j)*planes(1).V(:,2))';
+                    cornercounter = cornercounter + 1;
+                end
+            end
+            % Determine if bounding box is near cubesat size
+            I = [1:4,1];
+            for i = 1:4
+                len(i) = norm(corners(:,I(i+1)) - corners(:,I(i)));
+            end
+            
+            bla = 1;
+            
+            
+            
+            if 0
             %%% Find corners of face
             r = zeros(size(face.Vertices,1),1);
             theta = zeros(size(r));
@@ -563,14 +592,16 @@ classdef TOF
             warning(['THIS NEEDS TO BE CHANGED TO USE THE IDENTIFIED U OF THE CUBESAT IN',...
                      ' ORDER TO ACCOUNT FOR ERRORS FROM TOF DATA NOT COVERING FULL SIDE OF',...
                      ' CUBESAT'])
+             
+            
             switch length(locs)
                 % Four Corners
                 case 4
-                    % Centroid is simple average
+                    %Centroid is simple average
                     tmp = mean(face.Vertices(locs,:),1);
                     x = tmp(1);
                     y = tmp(2);
-                    % Three Corners
+                % Three Corners
                 case 3
                     foundOffDiagonal = 0;
                     % Loop through points
@@ -597,22 +628,23 @@ classdef TOF
                     x = tmp(1);
                     y = tmp(2);
                     
-                    % Two Corners
+                % Two Corners
                 case 2
                     error('findpeaks only identifed two corners in the cubesat face, add the ability to handle this')
                     
-                    % One corner
+                % One corner
                 case 1
                     error('findpeaks only identified one corner in the cubesat face, create the ability to handle this?')
                     
-                    % No corners
+                % No corners
                 case 0
                     error('findpeaks could not identify any corners in the cubesat face')
                     
-                    % Some other number
+                % Some other number
                 otherwise
                     error('findpeaks identified an unhandled number of corners in the cubesat face, time to investigate...')
             end
+             end
             
             %%% Convert plane centroid to 3d point
             outPlane = planes(1).o + (x*planes(1).V(:,1))' + (y*planes(1).V(:,2))';
@@ -823,9 +855,9 @@ classdef TOF
             CubesatIndexing = 1:length(CubeSats_TOF);
             
             % Extract true centroids from truth data for this file
-            I = find(obj.Truth.t == truthTime,1);
+            I = find(obj.Truth_VCF.t == truthTime,1);
             for i = 1:length(CubeSats_TOF)
-                trueCentroids_VCF(i,:) = obj.Truth.Cubesat(i).pos(I,:);
+                trueCentroids_VCF(i,:) = obj.Truth_VCF.Cubesat(i).pos(I,:);
             end
             
             % Transform true centroids from VCF to TCF
@@ -905,8 +937,8 @@ classdef TOF
                 if ~isempty(CubeSats_TOF(i).pc)
                     plot3(CubeSats_TOF(i).centroid_TCF(1),CubeSats_TOF(i).centroid_TCF(2),CubeSats_TOF(i).centroid_TCF(3),'r.','markersize',25)
                     plot3(trueCentroids_TCF(i,1),trueCentroids_TCF(i,2),trueCentroids_TCF(i,3),'b.','markersize',25)
-                    legendStrings{legendcounter} = ['Calc. Sat',num2str(i),'Centroid'];
-                    legendStrings{legendcounter+1} = ['True Sat',num2str(i),'Centroid'];
+                    legendStrings{legendcounter} = ['Calc.Centr',num2str(i)];
+                    legendStrings{legendcounter+1} = ['True.Centr',num2str(i)];
                     legendcounter = legendcounter+2;
                     for j = 1:CubeSats_TOF(i).numVisibleFaces
                         CubeSats_TOF(i).faces(j).planeCloud.Color = uint8(c(colorcounter,:).*255.*ones(CubeSats_TOF(i).faces(j).planeCloud.Count,3));

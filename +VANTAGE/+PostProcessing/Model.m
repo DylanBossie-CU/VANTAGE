@@ -18,7 +18,7 @@ classdef Model
         TOF
         
         % Truth data
-        Truth
+        Truth_VCF
     end
 
     methods
@@ -31,7 +31,7 @@ classdef Model
         function obj = Model(manifestFilename,truthFilename)
             
             % Process truth data
-            obj.Truth = obj.processTruthData(truthFilename);
+            obj.Truth_VCF = obj.processTruthData(truthFilename);
 
             %%% NOTE: The following must be run AFTER the Model class has
             %%% been fully initialized with all of its own properties
@@ -49,7 +49,7 @@ classdef Model
             obj.TOF = TOF('./Config/TOF.json',obj);
             
             % Error catching
-            if obj.Deployer.numCubesats ~= obj.Truth.numCubeSats
+            if obj.Deployer.numCubesats ~= obj.Truth_VCF.numCubeSats
                 error('Truth data and manifest do not agree on the number of Cubesats')
             end
         end
@@ -77,7 +77,7 @@ classdef Model
         % @param      t_cam     The timestamps that correspond to the camera
         %                       position data
         %
-        % @return     pos_prop A Nx3 matrix of propogated positions
+        % @return     A Nx3 matrix of propogated positions
         %
         function [pos_prop] = TOFPropagate(obj, pos_init, pos_TOF, t_TOF, t_cam)
 
