@@ -77,11 +77,43 @@ classdef Optical
     % @date         24-Jan-2019
     function [I_binarized] = ImageProcessing(obj,frame)
         I = frame;
+        
         centerpoint = [ceil(obj.width/2),ceil(obj.height/2)];
         I_gray = rgb2gray(I);
-        binaryTolerance = 0.1;
-        I_binarized = imbinarize(I_gray,binaryTolerance);
+        
+        %%
+        I_gray_d=double(I_gray);
+        
+        maxI=max(max(I_gray_d));
+        
+        I_gray_norm=I_gray_d * (255/maxI);
+        minI=min(min(I_gray_norm));
+        
+        I_gray_std=I_gray_norm - minI;
+        
+        % I_gray_gmean=meanFilter(I_gray_std);
+        
+        I_gray_mean=imgaussfilt(I_gray_std,3);
+        
+        
+        %% memoized values
+        %adapt_Tresh: table of frame distributions saved for training test
+        %background: background pixel values to remove background
+        %idx=I_gray_mean>background;
+        % adapt_Thresh=prctile(I_gray_mean(idx),saved_threshhold(distance));
+        % I_binarized_mean=imbinarize(I_gray_mean/255,adapt_Thresh/255);
+        
+        %% adaptive
+        
+        
+        %I_binarized = imbinarize(I_gray_norm,binaryTolerance);
+        %I_binarized_norm = imbinarize(I_gray_norm,binaryTolerance);
+        %I_binarized_std = imbinarize(I_gray_std,binaryTolerance);
+        
+        I_binarized_mean = imbinarize(I_gray_mean/255,graythresh(I_gray_mean/255));
+        
         I_boundaries = bwboundaries(I_binarized);
+        
         
         %Isolate boundaries corresponding to CubeSats (remove noise)
         CubeSat_Boundaries = obj.detectObjects(I_boundaries);
@@ -90,10 +122,8 @@ classdef Optical
         centroids = obj.findCentroids(CubeSat_Boundaries);
         
         %Perform object association
-        %%%%% Fake occlusion results
-        occlusion = [true,false];
-        %%%%%
-        obj = obj.objectAssociation(centroids,centerpoint,occlusion);
+        occlusion = [false,false];
+        obj.objectAssociation(centroids,centerpoint,occlusion)
         
         if obj.PlotBinarizedImages
             close all
@@ -103,9 +133,12 @@ classdef Optical
             obj.plotObjectBoundaries(CubeSat_Boundaries,centerpoint,centroids)
             
             saveas(gcf,...
-                        ['OpticalImageOutputs/' obj.VideoType ...
-                        num2str(obj.CurrentFrameCount) '.jpg'])
+                ['OpticalImageOutputs/' obj.VideoType ...
+                num2str(obj.CurrentFrameCount) '.jpg'])
         end
+        
+        %Transform centroid locations for output to sensor fusion
+        
     end
     
     %% Plot boundaries
@@ -497,6 +530,44 @@ classdef Optical
             hold on
         end
         %}
+    end
+    
+    % Convert pixel location to VCF unit vector
+    %
+    %
+    % @param      CubeSats     List of CubeSat classes containing centroid
+    %                          locations
+    % @return     CubeSatUnitVectors    List of unit vectors in VCF for
+    %                                   each centroid input
+    %
+    % @author     Dylan Bossie
+    % @date       4-Mar-2019
+    %
+    function CubeSatUnitVectors = PixelToUnitVec(~,CubeSats)
+        %Read optical camera parameters
+        CameraParameters = jsondecode(fileread('./Config/Sensors.json'));
+        focalLength = CameraParameters.OpticalFocalLength;
+        pixelSize = CameraParameters.OpticalPixelSize;
+        gridSize = CameraParameters.OpticalResolution;
+        origin = [gridSize(1)/2 gridSize(2)/2];
+        pixelSizeX = pixelSize;%m
+        pixelSizeY = pixelSize;%m
+
+        numCubeSats = length(CubeSats);
+        CubeSatUnitVectors = cell(numCubeSats,1);
+        for i = 1:numCubeSats
+            centroid = CubeSats{i}.centroid;
+            %Distance from origin in pixels
+            p_x = centroid(1) - origin(1);
+            p_y = -(centroid(2) - origin(2));
+            f = -focalLength;
+
+            x = p_x*pixelSizeX;
+            y = p_y*pixelSizeY;
+            S = [x y f];
+
+            CubeSatUnitVectors{i} = S/norm(S);
+        end
     end
 end
     
