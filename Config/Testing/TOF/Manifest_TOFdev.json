@@ -8,19 +8,19 @@
 				"name": "TOF TestSat 3U",
 				"rangeOrder": 1,
 				"expectedU": 3,
-				"actualDims": [0.1,0.1,0.3395]
+				"actualDims": [0.1,0.1,0.3495]
 			},
 			{
 				"name": "TOF TestSat 2U", 
 				"rangeOrder": 2,
 				"expectedU": 2,
-				"actualDims": [0.1,0.1,0.226]
+				"actualDims": [0.1,0.1,0.236]
 			},
 			{
 				"name": "TOF TestSat 1U",
 				"rangeOrder": 3,
 				"expectedU": 1,
-				"actualDims": [0.1,0.1,0.1125]
+				"actualDims": [0.1,0.1,0.1225]
 			}
 		]
 }

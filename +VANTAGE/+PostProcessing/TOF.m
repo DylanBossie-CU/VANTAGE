@@ -25,6 +25,9 @@ classdef TOF
         % Truth data struct
         Truth_VCF
         
+        % Face length matching tolerance, for use in centroid1 method
+        faceLenMatchTol = 0.02; % m
+        
     end
     
     %% Methods
@@ -269,36 +272,39 @@ classdef TOF
 
             % Start the loop
             NPeaks = Inf;
-            bw = 0.006;
+            bw = 0.01;
             counter = 0;
             while NPeaks > length(CubeSats_TOF)-1
               % Calculate k-squares density
               [zDense,zBin] = ksdensity(z,'bandwidth',bw,'function','pdf');
 
               % Identify split locations
-              c = 0;
-              [pks,locs] = findpeaks(-zDense,zBin,'MinPeakProminence',c);
-
+              c = 0.3;
+              h = -1.5;
+              warning('off','signal:findpeaks:largeMinPeakHeight')
+              [pks,locs] = findpeaks(-zDense,zBin,'MinPeakProminence',c,'MinPeakHeight',h);
+              warning('on','signal:findpeaks:largeMinPeakHeight')
+              
               % Update bandwidth
               NPeaks = length(locs);
-              bw = length(locs)/3*bw;
+              bw = 1.05*bw;
 
               % give up if too many tries
               counter = counter + 1;
-              if counter > 10
+              if counter > 30
                 error('Bandwidth for point splitting ksdensity function did not converge in 10 tries, implement a better bw update')
               end
             end
 
-                  figure
-                  hold on
-                  grid on
-                  grid minor
-                  plot(zBin,-zDense);
-                  plot(locs,pks,'r*')
-                  xlabel('z (m)')
-                  ylabel('Percent point density')
-                  hold off
+%                   figure
+%                   hold on
+%                   grid on
+%                   grid minor
+%                   plot(zBin,-zDense);
+%                   plot(locs,pks,'r*')
+%                   xlabel('z (m)')
+%                   ylabel('Percent point density')
+%                   hold off
 
             locs = flip(locs);
             nSplit = numel(locs);
@@ -373,7 +379,7 @@ classdef TOF
                 remainPtCloud = select(remainPtCloud,outlierIndices);
                 
                 %%% Obtain planar basis
-                [planes(numPlanes).n,planes(numPlanes).V,planes(numPlanes).o] = obj.affine_fit(planes(numPlanes).planeCloud.Location);
+                [planes(numPlanes).n,planes(numPlanes).V,planes(numPlanes).o] = obj.affine_fit(double(planes(numPlanes).planeCloud.Location));
                 
                 %%% Remove if repeat plane (e.g. if this is the cubesat 'feet')
                 % For all previous planes
@@ -460,12 +466,12 @@ classdef TOF
         %
         % @author   Adrien Leygue
         % @date     30-Aug-2013
-        function [n,V,p] = affine_fit(obj,X)
+        function [n,V,p] = affine_fit(~,X)
             %the mean of the samples belongs to the plane
-            p = mean(X,1);
+            p = mean(X,1)';
             
             %The samples are reduced:
-            R = bsxfun(@minus,X,p);
+            R = bsxfun(@minus,X,p');
             %Computation of the principal directions if the samples cloud
             [V,~] = eig(R'*R);
             %Extract the output from the eigenvectors
@@ -474,35 +480,36 @@ classdef TOF
         end
         
         %
-        % Bla
+        % Calculate distance to project perpendicularly inward from a face
+        % to the cubesat centerline
         %
-        % @param   
+        % @param    CubeSat     instance of VANTAGE.PostProcessing.CubeSat_TOF
+        %                       @see CubeSat_TOF
+        % @param    faceArea    calculated area of face being projected in
+        %                       from
         %
         % @return  
         %
         % @author   Joshua Kirby
         % @date     07-Feb-2019
-        function [d] = distInFromFace(obj,CubeSat,face)
+        function [d] = distInFromFace(~,CubeSat,faceArea)
+            % Dimensions to choose from, corresponding to indices of
+            % CubeSat.actualDims
+            dims = 1:length(CubeSat.actualDims);
             
             % Calculate standard areas
-            Avec = CubeSat.Avec;
-            
-            % Calculate face area
-            A = area(face);
+            C = combnk(dims,2);
+            Avec = prod(CubeSat.actualDims(C),2);
             
             % Calculate difference between area and standard areas
-            dA = abs(A-Avec);
+            dA = abs(faceArea-Avec);
             
             % Choose nearest size
-            [~,I] = min(dA);
+            [~,areaI] = min(dA);
             
             % Set distance in for centroid
-            dVec = 0.5.*CubeSat.Lvec;
-            if I==7
-                d = dVec(CubeSat.expectedU);
-            else
-                d = dVec(7);
-            end
+            distI = dims(~ismember(dims,C(areaI,:)));
+            d = CubeSat.actualDims(distI)/2;
         end
         
         %
@@ -533,126 +540,99 @@ classdef TOF
         % @date     03-Feb-2019
         function CubeSat = centroid1(obj,CubeSat)
             %%% Data extract
-            %error('unfinished, working with distances')
             planes = CubeSat.faces;
             
             %%% Project points onto 2d plane
             plane = planes(1).planeCloud;
-            inPlane = double( (plane.Location-planes(1).o)*planes(1).V );
+            inPlane = double( (plane.Location-planes(1).o')*planes(1).V );
             
             %%% Find plane boundary points
             I_bound = boundary(inPlane(:,1),inPlane(:,2));
             
             %%% Find preliminary centroid of boundary
-            face = polyshape(inPlane(I_bound,1),inPlane(I_bound,2),'simplify',false);
+            boundaryPtsRaw = [inPlane(I_bound,1)';inPlane(I_bound,2)'];
+            order = 2;
+            frameLen = obj.roundToNearestOdd(size(boundaryPtsRaw,2)/5);
+            boundaryPts = sgolayfilt(boundaryPtsRaw,order,frameLen,[],2);
+            face = polyshape(inPlane(I_bound,1),inPlane(I_bound,2),'simplify',true);
             [x,y] = centroid(face);
+            faceCentr = planes(1).o + planes(1).V * [x;y];
             
-            %%% Process using bounding box of face
+            %%% Identify face corners using bounding box of face
+            fullFace = 1;
             % Find face boundary in face plane
-            [xlims,ylims] = boundingbox(face);
-            % Convert bounding box from face plane to TCF
-            cornercounter = 1;
-            for i = 1:length(xlims)
-                for j = 1:length(ylims)
-                    % NOTE: Corners are ordered moving CCW around
-                    % boundingbox
-                    corners(:,cornercounter) = planes(1).o + ...
-                        (xlims(i)*planes(1).V(:,1))' + (ylims(j)*planes(1).V(:,2))';
-                    cornercounter = cornercounter + 1;
-                end
-            end
-            % Determine if bounding box is near cubesat size
-            I = [1:4,1];
+            corners_inPlane = obj.minBoundingBox(boundaryPts);
+            % Convert to 3D
+            corners = zeros(3,4);
             for i = 1:4
-                len(i) = norm(corners(:,I(i+1)) - corners(:,I(i)));
+                corners(:,i) = planes(1).o + planes(1).V * corners_inPlane(:,i);
             end
             
-            bla = 1;
-            
-            
-            
-            if 0
-            %%% Find corners of face
-            r = zeros(size(face.Vertices,1),1);
-            theta = zeros(size(r));
-            for i = 1:size(face.Vertices,1)
-                r(i)     = norm(face.Vertices(i,:)-[x y]);
-                theta(i) = atan2d(face.Vertices(i,2)-y,face.Vertices(i,1)-x);
+            %%% Decide if full face is present or not
+            % Determine if bounding box is near cubesat size
+            len = zeros(1,2);
+            deltaLen = zeros(3,2);
+            for i = 1:2
+                len(i) = norm(corners(:,i+1) - corners(:,i));
+                deltaLen(:,i) = abs(len(i) - CubeSat.actualDims);
+                faceMatches{i} = find(deltaLen(:,i) < obj.faceLenMatchTol);
             end
-            [~,I] = sort(theta);
-            r = r(I);
-            face.Vertices(:,1) = face.Vertices(I,1);
-            face.Vertices(:,2) = face.Vertices(I,2);
-            % locs identify the corner indices in face.Vertices
-            %tmp = smooth(abs(gradient(r,theta)));
-            [~,locs] = findpeaks(padarray(r,10),'NPeaks',4,'sortstr','descend');
-            locs = locs - 10;
-            
-            %%% Identify centroid, algorithm varies based on number of corners found
-            warning(['THIS NEEDS TO BE CHANGED TO USE THE IDENTIFIED U OF THE CUBESAT IN',...
-                     ' ORDER TO ACCOUNT FOR ERRORS FROM TOF DATA NOT COVERING FULL SIDE OF',...
-                     ' CUBESAT'])
-             
-            
-            switch length(locs)
-                % Four Corners
-                case 4
-                    %Centroid is simple average
-                    tmp = mean(face.Vertices(locs,:),1);
-                    x = tmp(1);
-                    y = tmp(2);
-                % Three Corners
-                case 3
-                    foundOffDiagonal = 0;
-                    % Loop through points
-                    for i = 1:3
-                        vc = 1;
-                        % produce vectors from current point to other two points
-                        for j = [1:i-1 i+1:3]
-                            vec{vc} = face.Vertices(locs(j),:)-face.Vertices(locs(i),:);
-                            vc = vc + 1;
-                        end
-                        % if angle between those vectors is within 10 deg of 90 deg, the
-                        % current index (i) corresponds to the off-diagonal point
-                        if abs(acosd(dot(vec{1},vec{2})/(norm(vec{1})*norm(vec{2})))-90) < 10
-                            foundOffDiagonal = 1;
-                            break
-                        end
-                    end
-                    % Error if no off diagonal was found
-                    if ~foundOffDiagonal
-                        error('Off diagonal corner could not be found when findpeaks returns three corners, catching point could be method or 10 degree orthogonality threshold')
-                    end
-                    % centroid is mean of on-diagonal points
-                    tmp = mean(face.Vertices(locs([1:i-1 i+1:3]),:),1);
-                    x = tmp(1);
-                    y = tmp(2);
-                    
-                % Two Corners
-                case 2
-                    error('findpeaks only identifed two corners in the cubesat face, add the ability to handle this')
-                    
-                % One corner
-                case 1
-                    error('findpeaks only identified one corner in the cubesat face, create the ability to handle this?')
-                    
-                % No corners
-                case 0
-                    error('findpeaks could not identify any corners in the cubesat face')
-                    
-                % Some other number
-                otherwise
-                    error('findpeaks identified an unhandled number of corners in the cubesat face, time to investigate...')
+            % For fullFace, both faces must have a length match
+            fullFaceCondition = ~isempty(faceMatches{1}) & ~isempty(faceMatches{2});
+            % and each face must have an independent match
+            fullFaceCondition = fullFaceCondition & sum(ismember(faceMatches{1},faceMatches{2}))~=length(faceMatches{1});
+            fullFaceCondition = fullFaceCondition & sum(ismember(faceMatches{2},faceMatches{1}))~=length(faceMatches{2});
+            if ~fullFaceCondition
+                fullFace = 0;
             end
-             end
             
-            %%% Convert plane centroid to 3d point
-            outPlane = planes(1).o + (x*planes(1).V(:,1))' + (y*planes(1).V(:,2))';
+            %%% Find centroid of face in 3D
+            if fullFace
+                % mean corners to find centroid
+                centr = mean(corners,2);
+                % trusted side lengths are visible side lengths
+                trustedLen = len;
+            else
+                % project to centroid from two most distant (downrange) corners
+                %   NOTE: this assumes that the CubeSat has not tumbled much
+                %   since launching, which is very valid for the TOF camera
+                
+                % Determine trusted lengths
+                [trustedActualDimI,trustedLenI] = find(min(min(deltaLen))==deltaLen,1);
+                trustedLen = zeros(1,2);
+                trustedLen(1) = len(trustedLenI);
+                if trustedActualDimI ~= find(CubeSat.actualDims == max(CubeSat.actualDims))
+                    trustedLen(2) = max(CubeSat.actualDims);
+                else
+                    trustedLen(2) = min(CubeSat.actualDims);
+                end
+                
+                
+                % Obtain distant two corners and their midPt                
+                [~,I] = sort(corners(3,:),'descend');
+                farCorners = corners(:,I(1:2));
+                farMidPt = mean(farCorners,2);
+                
+                % Extract face normal vector
+                nhat = planes(1).n;
+                
+                % Obtain vector from midPt to a corner
+                relCorner = farCorners(:,2) - farMidPt;
+                
+                % Obtain projection direction from farMidPt orthogonal to corners and
+                % towards the face interior
+                midPtToInterior = faceCentr - farMidPt;
+                projHat = obj.unitvec( cross(nhat,relCorner) );
+                projHat = sign( dot(projHat,midPtToInterior) ) * projHat;
+                
+                % Project from farMidPt to the desired face centroid
+                centr = farMidPt + max(CubeSat.actualDims)/2 * projHat;
+            end
             
             %%% Project inward to volumetric centroid
-            d = obj.distInFromFace(CubeSat,face);
-            CubeSat.centroid_TCF = outPlane + d.*(sign(dot(outPlane,planes(1).n))*planes(1).n)';
-            
+            faceArea = prod(trustedLen);
+            d = obj.distInFromFace(CubeSat,faceArea);
+            CubeSat.centroid_TCF = centr + d*sign(dot(centr,planes(1).n))*planes(1).n;
         end
         
         %
@@ -699,10 +679,10 @@ classdef TOF
             [min_alongIntersect,I]  = min(pc_alongIntersect);
             tmp    = [planes(1).planeCloud.Location;planes(2).planeCloud.Location];
             if I <= planes(1).planeCloud.Count % if point is in plane 1
-                t = (dot(planes(2).n,planes(2).o)-dot(planes(2).n,tmp(I,:)))/norm(planes(2).n)^2;
+                t = (dot(planes(2).n,planes(2).o')-dot(planes(2).n,tmp(I,:)))/norm(planes(2).n)^2;
                 minpt = tmp(I,:)' + t*planes(2).n;
             else % if point is in plane 2
-                t = (dot(planes(1).n,planes(1).o)-dot(planes(1).n,tmp(I,:)))/norm(planes(1).n)^2;
+                t = (dot(planes(1).n,planes(1).o')-dot(planes(1).n,tmp(I,:)))/norm(planes(1).n)^2;
                 minpt = tmp(I,:)' + t*planes(1).n;
             end
             meanpt = minpt + (mean_alongIntersect-min_alongIntersect)*V;
@@ -722,7 +702,7 @@ classdef TOF
                     % Make best guess at which face is which
                     As = CubeSat.Avec;
                     for i = 1:2
-                        inPlane = double( (planes(i).planeCloud.Location-planes(i).o)*planes(i).V );
+                        inPlane = double( (planes(i).planeCloud.Location-planes(i).o')*planes(i).V );
                         I_bound = boundary(inPlane(:,1),inPlane(:,2));
                         face = polyshape(inPlane(I_bound,1),inPlane(I_bound,2),'simplify',false);
                         A = area(face);
@@ -788,7 +768,7 @@ classdef TOF
             % Make best guess for which face is which
             As = CubeSat.Avec;
             for i = 1:3
-                inPlane = double( (planes(i).planeCloud.Location-planes(i).o)*planes(i).V );
+                inPlane = double( (planes(i).planeCloud.Location-planes(i).o')*planes(i).V );
                 I_bound = boundary(inPlane(:,1),inPlane(:,2));
                 face = polyshape(inPlane(I_bound,1),inPlane(I_bound,2),'simplify',false);
                 A = area(face);
@@ -856,7 +836,7 @@ classdef TOF
             
             % Extract true centroids from truth data for this file
             I = find(obj.Truth_VCF.t == truthTime,1);
-            for i = 1:length(CubeSats_TOF)
+            for i = 1:obj.Truth_VCF.numCubeSats
                 trueCentroids_VCF(i,:) = obj.Truth_VCF.Cubesat(i).pos(I,:);
             end
             
@@ -873,7 +853,7 @@ classdef TOF
             minpt = min(trueCentroids_TCF,[],1);
             maxpt = max(trueCentroids_TCF,[],1);
             yCenterline = linspace(minpt(2),maxpt(2),2);
-            zCenterline = linspace(minpt(3),maxpt(3),2);
+            zCenterline = linspace(minpt(3)-0.3,maxpt(3)+0.3,2);
             xCenterline = feval(trueCentroidsLine_TCF,yCenterline,zCenterline);
             
             % Plot results
@@ -888,7 +868,7 @@ classdef TOF
             grid on
             grid minor
             pcshow(pc,'markersize',markersize)
-            plot3(xCenterline,yCenterline,zCenterline,'k--')
+            plot3(xCenterline,yCenterline,zCenterline,'k--','linewidth',2)
             title('Raw Pointcloud','fontsize',fontsize)
             ax = gca;
             zlimits = ax.ZLim;
@@ -905,6 +885,7 @@ classdef TOF
             title('Identified CubeSats','fontsize',fontsize)
             hold on
             colorcounter = 1;
+            legendstrings = [];
             legendcounter = 1;
             for i = CubesatIndexing
                 if ~isempty(CubeSats_TOF(i).pc)
@@ -915,11 +896,13 @@ classdef TOF
                     legendcounter = legendcounter+1;
                 end
             end
-            plot3(xCenterline,yCenterline,zCenterline,'k--')
-            %zlim(zlimits)
-            %ylim(ylimits)
-            l=legend(legendStrings,'location','eastoutside');
-            l.FontSize = legendfontsize;
+            plot3(xCenterline,yCenterline,zCenterline,'k--','linewidth',2)
+            zlim(zlimits)
+            ylim(ylimits)
+            if ~isempty(legendstrings)
+                l=legend(legendStrings,'location','eastoutside');
+                l.FontSize = legendfontsize;
+            end
             xlabel('x')
             ylabel('y')
             zlabel('z')
@@ -929,7 +912,7 @@ classdef TOF
             hold on
             grid on
             grid minor
-            title({'Visible Faces','Per CubeSat'},'fontsize',fontsize)
+            title('Visible Faces Per CubeSat','fontsize',fontsize)
             legendStrings = [];
             legendcounter = 1;
             colorcounter = 1;
@@ -949,16 +932,116 @@ classdef TOF
                     end
                 end
             end
-            plot3(xCenterline,yCenterline,zCenterline,'k--')
-            %zlim(zlimits)
-            %ylim(ylimits)
-            l=legend(legendStrings,'location','eastoutside');
-            l.FontSize = legendfontsize;
+            plot3(xCenterline,yCenterline,zCenterline,'k--','linewidth',2)
+            zlim(zlimits)
+            ylim(ylimits)
+            if ~isempty(legendstrings)
+                l=legend(legendStrings,'location','eastoutside');
+                l.FontSize = legendfontsize;
+            end
             xlabel('x')
             ylabel('y')
             zlabel('z')
             hold off
         end
+        
+        
+        % @author   Julien Diener
+        % @date     05-Mar-2019
+        function bb = minBoundingBox(~,X)
+            % compute the minimum bounding box of a set of 2D points
+            %   Use:   boundingBox = minBoundingBox(point_matrix)
+            %
+            % Input:  2xn matrix containing the [x,y] coordinates of n points
+            %         *** there must be at least 3 points which are not collinear
+            % output: 2x4 matrix containing the coordinates of the bounding box corners
+            %
+            % Example : generate a random set of point in a randomly rotated rectangle
+            %     n = 50000;
+            %     t = pi*rand(1);
+            %     X = [cos(t) -sin(t) ; sin(t) cos(t)]*[7 0; 0 2]*rand(2,n);
+            %     X = [X  20*(rand(2,1)-0.5)];  % add an outlier
+            %
+            %     tic
+            %     c = minBoundingBox(X);
+            %     toc
+            %
+            %     figure(42);
+            %     hold off,  plot(X(1,:),X(2,:),'.')
+            %     hold on,   plot(c(1,[1:end 1]),c(2,[1:end 1]),'r')
+            %     axis equal
+            
+            % compute the convex hull (CH is a 2*k matrix subset of X)
+            k = convhull(X(1,:),X(2,:));
+            CH = X(:,k);
+            
+            % compute the angle to test, which are the angle of the CH edges as:
+            %   "one side of the bounding box contains an edge of the convex hull"
+            E = diff(CH,1,2);           % CH edges
+            T = atan2(E(2,:),E(1,:));   % angle of CH edges (used for rotation)
+            T = unique(mod(T,pi/2));    % reduced to the unique set of first quadrant angles
+            
+            % create rotation matrix which contains
+            % the 2x2 rotation matrices for *all* angles in T
+            % R is a 2n*2 matrix
+            R = cos( reshape(repmat(T,2,2),2*length(T),2) ... % duplicate angles in T
+                + repmat([0 -pi ; pi 0]/2,length(T),1));   % shift angle to convert sine in cosine
+            
+            % rotate CH by all angles
+            RCH = R*CH;
+            
+            % compute border size  [w1;h1;w2;h2;....;wn;hn]
+            % and area of bounding box for all possible edges
+            bsize = max(RCH,[],2) - min(RCH,[],2);
+            area  = prod(reshape(bsize,2,length(bsize)/2));
+            
+            % find minimal area, thus the index of the angle in T
+            [~,i] = min(area);
+            
+            % compute the bound (min and max) on the rotated frame
+            Rf    = R(2*i+[-1 0],:);   % rotated frame
+            bound = Rf * CH;           % project CH on the rotated frame
+            bmin  = min(bound,[],2);
+            bmax  = max(bound,[],2);
+            
+            % compute the corner of the bounding box
+            Rf = Rf';
+            bb(:,4) = bmax(1)*Rf(:,1) + bmin(2)*Rf(:,2);
+            bb(:,1) = bmin(1)*Rf(:,1) + bmin(2)*Rf(:,2);
+            bb(:,2) = bmin(1)*Rf(:,1) + bmax(2)*Rf(:,2);
+            bb(:,3) = bmax(1)*Rf(:,1) + bmax(2)*Rf(:,2);
+        end
+        
+        % 
+        % Round to nearest odd integer
+        %
+        % @param    x   number to be rounded
+        % 
+        % @return   nearest odd integer
+        %
+        % @author   Joshua Kirby
+        % @date     06-Mar-2019
+        function y = roundToNearestOdd(obj,x)
+            y = 2*round(x/2) + obj.binarySign(x-round(x));
+        end
+        
+        % 
+        % Return sign without zero, for zero return 1
+        %  
+        % @param    num     number whose sign is to be determined
+        %
+        % @return   binary sign
+        %
+        % @author   Joshua Kirby
+        % @date     06-Mar-2019
+        function bSign = binarySign(~,num)
+            bSign = sign(num);
+            if ~bSign
+                bSign = 1;
+            end
+        end
+
+        
     end
     
     
