@@ -8,16 +8,16 @@ clc
 % High-level directory of all TOF information. This should contain the
 % executable data capture script and the desired location to save point
 % cloud outputs.
-tofDirName = '/home/vantage/Documents/githere/VANTAGE/Automation/TOF_Automation/examples/';
-tofDirPointClouds = strcat(tofDirName,'TOF_PointClouds/');
+tofDirName = '/home/vantage/Documents/githere/VANTAGE/Data/AutomatedTOFCapture/';
+tofScript = '/home/vantage/Documents/githere/VANTAGE/Automation/TOF_Automation/examples/TOF_Single_Frame_Capture.py';
+tofDirPointClouds = strcat(tofDirName,'SingleTOFCapture/');
 tofFlush = strcat(tofDirPointClouds,'pointcloud*');
 %tofScript = strcat(tofDirName,'TOF_Data_Capture.py');
-tofScript = strcat(tofDirName,'TOF_Single_Frame_Capture.py');
 
-opticalDirName = '/home/vantage/Documents/githere/VANTAGE/Automation/OpticalCam_Automation/';
-opticalDirImages = strcat(opticalDirName,'TestImages_Automated/');
+opticalDirName = '/home/vantage/Documents/githere/VANTAGE/Automation/AutomatedDataCapture/';
+opticalDirImages = strcat(opticalDirName,'SingleImageCapture/');
 opticalFlush = strcat(opticalDirImages,'VANTAGEOp*');
-opticalScript = strcat(opticalDirName,'Optical_Single_Frame.py');
+opticalScript = 'home/vantage/Documents/githere/VANTAGE/Automation/Optical_Automation/Optical_Single_Frame.py';
 
 % Flush all TOF point clouds detected in output directory
 unix(sprintf('rm %s',tofFlush));
@@ -46,3 +46,4 @@ for i=1:20
     pause(3)
     
 end
+
