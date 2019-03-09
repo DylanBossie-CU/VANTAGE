@@ -6,13 +6,12 @@ clc
 % High-level directory of all TOF information. This should contain the
 % executable data capture script and the desired location to save point
 % cloud outputs.
-tofDirName = '/home/vantage/Documents/githere/VANTAGE/Automation/TOF_Automation/examples/';
+tofDirName = '/home/vantage/Documents/githere/VANTAGE/Data/AutomatedTOFCapture/';
 tofDirPointClouds = strcat(tofDirName,'TOF_PointClouds/');
 tofFlush = strcat(tofDirPointClouds,'pointcloud*');
 tofScript = strcat(tofDirName,'TOF_Data_Capture.py');
-tofScript = strcat(tofDirName,'TOF_Data_Capture.py');
 
-opticalDirName = '/home/vantage/Documents/githere/VANTAGE/Automation/OpticalCam_Automation/';
+opticalDirName = '/home/vantage/Documents/githere/VANTAGE/Automation/AutomatedDataCapture/';
 opticalDirImages = strcat(opticalDirName,'TestImages_Automated/');
 opticalFlush = strcat(opticalDirImages,'VANTAGEOp*');
 opticalScript = strcat(opticalDirName,'Optical_Data_Capture.py');
