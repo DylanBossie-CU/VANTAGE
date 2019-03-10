@@ -69,7 +69,7 @@ classdef Deployer
             I = [manifestData.CubesatArray.rangeOrder];
             pos_init = zeros(obj.numCubesats,3);
             for i = 1:length(I)
-                pos_init(I(i),:) = Model.Truth.Cubesat(I(i)).pos(1,:);
+                pos_init(I(i),:) = Model.Truth_VCF.Cubesat(I(i)).pos(1,:);
             end
 
             % Initialize cubesat array
