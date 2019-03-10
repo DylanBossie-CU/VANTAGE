@@ -75,7 +75,7 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         24-Jan-2019
-    function [I_binarized] = ImageProcessing(obj,frame)
+    function [I_binarized_mean] = ImageProcessing(obj,frame)
         I = frame;
         
         centerpoint = [ceil(obj.width/2),ceil(obj.height/2)];
@@ -111,8 +111,8 @@ classdef Optical
         %I_binarized_std = imbinarize(I_gray_std,binaryTolerance);
         
         I_binarized_mean = imbinarize(I_gray_mean/255,graythresh(I_gray_mean/255));
-        
-        I_boundaries = bwboundaries(I_binarized);
+        imshow(I_binarized_mean);
+        I_boundaries = bwboundaries(I_binarized_mean);
         
         
         %Isolate boundaries corresponding to CubeSats (remove noise)
@@ -569,6 +569,38 @@ classdef Optical
             CubeSatUnitVectors{i} = S/norm(S);
         end
     end
+    
+    % Convert pixel location to VCF unit vector
+    %
+    %
+    % @param      UnitVecs          List of unit vectors for each C.S. centroid
+    % @return     PixelLocations    List of pixel locations for each C.S. centroid 
+    %
+    % @author     Dylan Bossie
+    % @date       5-Mar-2019
+    %
+    function PixelLocations = UnitVecToPixels(~,UnitVecs)
+        %Read optical camera parameters
+        CameraParameters = jsondecode(fileread('./Config/Sensors.json'));
+        focalLength = CameraParameters.OpticalFocalLength;
+        pixelSize = CameraParameters.OpticalPixelSize;
+        gridSize = CameraParameters.OpticalResolution;
+        origin = [gridSize(1)/2 gridSize(2)/2];
+        pixelSizeX = pixelSize;%m
+        pixelSizeY = pixelSize;%m
+        f = focalLength;
+
+        numCubeSats = length(UnitVecs);
+        PixelLocations = cell(numCubeSats,1);
+        for i = 1:numCubeSats
+            centroidVec = UnitVecs(i);
+
+            x = centroidVec[0]/pixelSizeX
+            y = centroidVec[1]/pixelSizeY
+
+            PixelLocations{i} = [x y]
+        end
+    end
 end
     
     
@@ -577,21 +609,6 @@ end
     
   %% Private methods
   methods (Access = private)
-    %% Index into nomen
-    %
-    % Random example of a private method
-    %
-    % @param        string to be found in obj.nomen
-    %
-    % @return       index of string in obj.nomen, set to 0 if string not
-    %               found
-    %
-    % @author       Dylan Bossie
-    % @date         24-Jan-2019
-    function [row] = findNomen(obj,str)
-
-    end
-
     %% ransac line fitting for obfuscation
     %
     % This function uses the ransac algorithm to fit a line to noisy data
