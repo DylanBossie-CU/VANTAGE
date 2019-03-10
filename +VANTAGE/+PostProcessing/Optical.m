@@ -75,7 +75,7 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         24-Jan-2019
-    function [I_binarized] = ImageProcessing(obj,frame)
+    function [I_binarized_mean] = ImageProcessing(obj,frame)
         I = frame;
         
         centerpoint = [ceil(obj.width/2),ceil(obj.height/2)];
@@ -105,19 +105,34 @@ classdef Optical
         
         %% adaptive
         
-        
         %I_binarized = imbinarize(I_gray_norm,binaryTolerance);
         %I_binarized_norm = imbinarize(I_gray_norm,binaryTolerance);
         %I_binarized_std = imbinarize(I_gray_std,binaryTolerance);
         
         I_binarized_mean = imbinarize(I_gray_mean/255,graythresh(I_gray_mean/255));
+        imshow(I_binarized_mean)
+        pause(0.5)
         
-        I_boundaries = bwboundaries(I_binarized);
+        I_boundaries = bwboundaries(I_binarized_mean);
         
         
         %Isolate boundaries corresponding to CubeSats (remove noise)
         CubeSat_Boundaries = obj.detectObjects(I_boundaries);
         
+        % Occlusion cutting
+        for i = 1:numel(I_boundaries)
+            cutPoly = obj.occlusionCut(I_boundaries{i}(:,1),I_boundaries{i}(:,2),'h',6);
+            %{
+            figure
+            for i = 1:numel(cutPoly)
+                plot(cutPoly{i})
+                hold on
+            end
+            pause(0.5)
+            close all
+            %}
+        end
+        %{
         %Find CubeSat centroids
         centroids = obj.findCentroids(CubeSat_Boundaries);
         
@@ -138,7 +153,7 @@ classdef Optical
         end
         
         %Transform centroid locations for output to sensor fusion
-        
+        %}
     end
     
     %% Plot boundaries
@@ -259,6 +274,7 @@ classdef Optical
     % @author       Dylan Bossie
     % @date         26-Jan-2019
     function CubeSats = detectObjects(obj,I_boundaries)
+        CubeSats = [];
         if isempty(I_boundaries)
             return
         end
@@ -269,8 +285,7 @@ classdef Optical
         %Set minimum size an object must meet relative to largest object to
         %be considered for processing
         objectSizeThreshold = 0.1*max(objectSizes);
-        
-        CubeSats = [];
+       
         for i = 1:length(objectSizes)
             if objectSizes(i) >= objectSizeThreshold
                 CubeSats = [CubeSats I_boundaries(i)];
@@ -354,7 +369,7 @@ classdef Optical
     % @author     Justin Fay
     % @date       21-Feb-2019
     %
-    function cutPoly = occlusionCut(x,y,posCase,numCubesats)
+    function cutPoly = occlusionCut(obj,x,y,posCase,numCubesats)
 
         %% concavity finding stuff
         % find convex hull
@@ -374,12 +389,12 @@ classdef Optical
         end
 
         % estimate number of concavity points
-        windowSize = ceil(numel(r)*0.001);
+        windowSize = ceil(numel(r)*0.1);
         b = (1/windowSize)*ones(1,windowSize);
         a = 1;
         r_filter = filter(b,a,r);
         minProm = 0.01;
-        [tmpPks,~,~,tmpProm] = findpeaks(r_filter,'SortStr','descend','MinPeakProminence',minProm);
+        [tmpPks,~,tmpWidth,tmpProm] = findpeaks(r_filter,'SortStr','descend','MinPeakProminence',minProm,'MaxPeakWidth',5);
         maxPks = numCubesats*2-2;
         if numel(tmpPks)>maxPks
             [~,diffI] = max(diff(sort(tmpProm)));
@@ -425,7 +440,7 @@ classdef Optical
         % fit lines to filtered results to find concavity indices
         fitPks = zeros(expectedPks,1);
         for i = 1:expectedPks
-            p = ransacLine(windowPercent,locs(:,i),10);
+            p = obj.ransacLine(windowPercent,locs(:,i),10);
             fitPks(i,1) = round(polyval(p,windowPercent(1)));
         end
 
@@ -523,9 +538,17 @@ classdef Optical
         end
         tmpPolyI = ptSets(numShapes,1):ptSets(numShapes,2);
         cutPoly{numShapes} = polyshape(x(tmpPolyI),y(tmpPolyI));
+        
+        cutArea = zeros(numShapes,1);
+        for i = 1:numShapes
+            cutArea(i) = area(cutPoly{i});
+        end
+        
+        I = cutArea(i)./max(cutArea) < 0.05;
+        cutPoly = cutPoly{~I};
 
         % plotting if you want it
-        %{
+        %
         figure
         for i = 1:numShapes
             plot(cutPoly{i})
@@ -606,7 +629,7 @@ end
     %
     % @author       Justin Fay
     % @date         21-Feb-2019
-    function p = ransacLine(x,y,maxDistance)
+    function p = ransacLine(obj,x,y,maxDistance)
         points = [x,y];
         sampleSize = 2; % number of points to sample per trial
 

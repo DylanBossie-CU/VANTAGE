@@ -1,6 +1,6 @@
 {
-	"OpticalData": "Data/OpticalData/",
-	"OpticalVideoInput": "TwoObjectsRender.mp4",
+	"OpticalData": "Data/Simulation_TOF-Truth_2-25-19_Tube1/Optical_Data/",
+	"OpticalVideoInput": "config_simulation_template_2_25_Josh_ToF_Calibration_tube1_Camera_a.mp4",
 	"DesiredFPS": 1,
 	"PlotBinarizedImages": false,
 	"PlotCentroids": false
