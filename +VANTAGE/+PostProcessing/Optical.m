@@ -38,6 +38,10 @@ classdef Optical
     
     % Video file
     VideoFilename
+    
+    % Daat directory
+    DataDirec
+    
     % Plotting option (binarized images)
     PlotBinarizedImages
     
@@ -48,13 +52,89 @@ classdef Optical
   
   %% Methods
   methods
+
+    %% Class Constructor:
+    %
+    % @param      configFilename  The configuration filename
+    % @param      numCubesats     Number of expected cubesats
+    %
+    % @return     A reference to an initialized CubeSat object
+    %
+    function obj = Optical(configFilename, numCubesats)
+        import VANTAGE.PostProcessing.CubeSat_Optical
+        SensorData = jsondecode(fileread(configFilename));
+        obj.CubeSats = cell(numCubesats,1);
+        for i = 1:numCubesats
+            obj.CubeSats{i} = CubeSat_Optical;
+            obj.CubeSats{i}.tag = i;
+            obj.CubeSats{i}.centroid = [0,0];
+        end
+        filename = strcat(SensorData.OpticalData,...
+            SensorData.OpticalVideoInput);
+        FrameIntervals = linspace(0,1,SensorData.DesiredFPS+1);
+        
+        obj.DesiredFPS = SensorData.DesiredFPS;
+        obj.PlotBinarizedImages = SensorData.PlotBinarizedImages;
+        obj.PlotCentroids = SensorData.PlotCentroids;
+        obj.DataDirec = SensorData.OpticalData;
+        obj.VideoFilename = filename;
+        obj.FrameIntervals = FrameIntervals;
+        obj.VideoType = SensorData.OpticalVideoInput;
+        if exist(obj.VideoFilename,'file')
+            obj.Video = VideoReader(obj.VideoFilename);
+        end
+    end
+
+    %% Read data directory
+    % Read and process input from directory of images Execute image frame processing from
+    % directory of images
+    %
+    % @param      obj   The object
+    %
+    % @return     didRead   returns true if the file was read successfully,
+    %             false otherwise
+    %
+    % @author     Justin Fay
+    % @date       10-Mar-2019
+    %
+    function [obj,didRead] = processInputFramesFromImages(obj)
+        
+        % Initialize read status
+        didRead = false;
+        
+        % Read data directory
+        direc = dir(obj.DataDirec);
+        numFile = numel(direc);
+        
+        % Exclude files that aren't data
+        tmp = false(numFile,1);
+        for i = 1:numFile
+            tmp(i) = contains(direc(i).name,'.jpg');
+        end
+        direc = direc(tmp);
+        
+        % Check read status
+        numFile = numel(direc);
+        if numFile<0
+            didRead = false;
+            return;
+        end
+        
+        % Process frames
+        for i = 1:numFile
+            obj.Frame = imread(strcat(obj.DataDirec,'/',direc(i).name));           
+            image = obj.ImageProcessing(obj.Frame);
+            obj.Image = image;
+        end
+    end
+
     %% Read input video file
     % Execute video frame processing based on provided automated naming
     % convention
     %
     % @author       Dylan Bossie
     % @date         24-Jan-2019
-    function [obj,didRead] = readInputFrame(obj)
+    function [obj,didRead] = readInputFrameFromVideo(obj)
         didRead = false;
         frame = readFrame(obj.Video);
         %Grab data in intervals of the desired FPS
@@ -79,7 +159,11 @@ classdef Optical
         I = frame;
         
         centerpoint = [ceil(obj.width/2),ceil(obj.height/2)];
-        I_gray = rgb2gray(I);
+        if size(I,3) > 1
+            I_gray = rgb2gray(I);
+        else
+            I_gray = I;
+        end
         
         %%
         I_gray_d=double(I_gray);
@@ -110,8 +194,6 @@ classdef Optical
         %I_binarized_std = imbinarize(I_gray_std,binaryTolerance);
         
         I_binarized_mean = imbinarize(I_gray_mean/255,graythresh(I_gray_mean/255));
-        imshow(I_binarized_mean)
-        pause(0.5)
         
         I_boundaries = bwboundaries(I_binarized_mean);
         
@@ -119,41 +201,45 @@ classdef Optical
         %Isolate boundaries corresponding to CubeSats (remove noise)
         CubeSat_Boundaries = obj.detectObjects(I_boundaries);
         
-        % Occlusion cutting
-        for i = 1:numel(I_boundaries)
-            cutPoly = obj.occlusionCut(I_boundaries{i}(:,1),I_boundaries{i}(:,2),'h',6);
-            %{
-            figure
-            for i = 1:numel(cutPoly)
-                plot(cutPoly{i})
-                hold on
+        if ~isempty(CubeSat_Boundaries)
+        
+            % Occlusion cutting
+            CubeSat_Boundaries_Cut = cell(0);
+            for i = 1:numel(CubeSat_Boundaries)
+                cutPoly = obj.occlusionCut(CubeSat_Boundaries{i}(:,1),CubeSat_Boundaries{i}(:,2),'h',6);
+                for j = 1:numel(cutPoly)
+                    CubeSat_Boundaries_Cut = [CubeSat_Boundaries_Cut; cutPoly{j}.Vertices];
+                end
             end
-            pause(0.5)
-            close all
-            %}
-        end
-        %{
-        %Find CubeSat centroids
-        centroids = obj.findCentroids(CubeSat_Boundaries);
-        
-        %Perform object association
-        occlusion = [false,false];
-        obj.objectAssociation(centroids,centerpoint,occlusion)
-        
-        if obj.PlotBinarizedImages
-            close all
-            imshow(I_binarized);
-            title('Binarized Frame');
-            hold on
-            obj.plotObjectBoundaries(CubeSat_Boundaries,centerpoint,centroids)
             
-            saveas(gcf,...
-                ['OpticalImageOutputs/' obj.VideoType ...
-                num2str(obj.CurrentFrameCount) '.jpg'])
+            % Check for occlusion
+            if numel(CubeSat_Boundaries_Cut)==numel(CubeSat_Boundaries)
+                occlusion = [false,false];
+            end
+
+            %
+            %Find CubeSat centroids
+            centroids = obj.findCentroids(CubeSat_Boundaries_Cut);
+            %{
+            %Perform object association
+            obj.objectAssociation(centroids,centerpoint,occlusion)
+
+            if obj.PlotBinarizedImages
+                close all
+                imshow(I_binarized);
+                title('Binarized Frame');
+                hold on
+                obj.plotObjectBoundaries(CubeSat_Boundaries,centerpoint,centroids)
+
+                saveas(gcf,...
+                    ['OpticalImageOutputs/' obj.VideoType ...
+                    num2str(obj.CurrentFrameCount) '.jpg'])
+            end
+            %}
         end
         
         %Transform centroid locations for output to sensor fusion
-        %}
+        %
     end
     
     %% Plot boundaries
@@ -278,15 +364,15 @@ classdef Optical
         if isempty(I_boundaries)
             return
         end
-        objectSizes = ones(length(I_boundaries),1);
-        for i = 1:length(I_boundaries)
+        objectSizes = ones(numel(I_boundaries),1);
+        for i = 1:numel(I_boundaries)
             objectSizes(i) = bwarea(I_boundaries{i});
         end
         %Set minimum size an object must meet relative to largest object to
         %be considered for processing
         objectSizeThreshold = 0.1*max(objectSizes);
        
-        for i = 1:length(objectSizes)
+        for i = 1:numel(objectSizes)
             if objectSizes(i) >= objectSizeThreshold
                 CubeSats = [CubeSats I_boundaries(i)];
             end
@@ -321,37 +407,6 @@ classdef Optical
         obj.VideoType = VideoType;
         obj.FrameIntervals = FrameIntervals;
     end
-    
-    % Class Constructor:
-    %
-    % @param      configFilename  The configuration filename
-    % @param      numCubesats     Number of expected cubesats
-    %
-    % @return     A reference to an initialized CubeSat object
-    %
-    function obj = Optical(configFilename, numCubesats)
-        import VANTAGE.PostProcessing.CubeSat_Optical
-        SensorData = jsondecode(fileread(configFilename));
-        obj.CubeSats = cell(numCubesats,1);
-        for i = 1:numCubesats
-            obj.CubeSats{i} = CubeSat_Optical;
-            obj.CubeSats{i}.tag = i;
-            obj.CubeSats{i}.centroid = [0,0];
-        end
-        filename = strcat(SensorData.OpticalData,...
-            SensorData.OpticalVideoInput);
-        FrameIntervals = linspace(0,1,SensorData.DesiredFPS+1);
-        
-        obj.DesiredFPS = SensorData.DesiredFPS;
-        obj.PlotBinarizedImages = SensorData.PlotBinarizedImages;
-        obj.PlotCentroids = SensorData.PlotCentroids;
-        obj.VideoFilename = filename;
-        obj.FrameIntervals = FrameIntervals;
-        obj.VideoType = SensorData.OpticalVideoInput;
-        if exist(obj.VideoFilename,'file')
-            obj.Video = VideoReader(obj.VideoFilename);
-        end
-    end
 
     % obfuscation identification for cubesat boundaries
     %
@@ -370,8 +425,10 @@ classdef Optical
     % @date       21-Feb-2019
     %
     function cutPoly = occlusionCut(obj,x,y,posCase,numCubesats)
+        
+        method1Success = true;
 
-        %% concavity finding stuff
+        %% concavity finding stuff        
         % find convex hull
         k = convhull(x,y);
         convHull_poly = polyshape(x(k),y(k));
@@ -389,12 +446,15 @@ classdef Optical
         end
 
         % estimate number of concavity points
-        windowSize = ceil(numel(r)*0.1);
+        windowSize = ceil(numel(r)*0.15);
         b = (1/windowSize)*ones(1,windowSize);
         a = 1;
         r_filter = filter(b,a,r);
-        minProm = 0.01;
-        [tmpPks,~,tmpWidth,tmpProm] = findpeaks(r_filter,'SortStr','descend','MinPeakProminence',minProm,'MaxPeakWidth',5);
+        minProm = 0.1;
+        [tmpPks,fitPks,~,tmpProm] = findpeaks(r_filter,'SortStr','descend',...
+            'MinPeakProminence',minProm,...
+            'MaxPeakWidth',5,...
+            'MinPeakHeight',max(r_filter)*0.1);
         maxPks = numCubesats*2-2;
         if numel(tmpPks)>maxPks
             [~,diffI] = max(diff(sort(tmpProm)));
@@ -409,10 +469,11 @@ classdef Optical
 
         if expectedPks==0
             cutPoly{1} = polyshape(x,y);
-            return;
+            method1Success = false;
         end
 
         % filter method for finding concavity
+        %{
         numFiltTrials = 20;
         windowPercent = linspace(1,10,numFiltTrials)'./100;
         pks = zeros(numFiltTrials,expectedPks);
@@ -443,112 +504,144 @@ classdef Optical
             p = obj.ransacLine(windowPercent,locs(:,i),10);
             fitPks(i,1) = round(polyval(p,windowPercent(1)));
         end
+        %}
 
         %% Associating Concavity Points
-        posCase = lower(posCase);
-        numSets = size(fitPks,1)/2;
+        if method1Success
+            posCase = lower(posCase);
+            numSets = size(fitPks,1)/2;
 
-        if numSets > 1
-            ptSets = zeros(numSets,2);
-            switch posCase
-                case 'v' % vertical tube
-                    % order x positions
-                    [~,iOrder] = sort(x(fitPks));
-                    fitPksOrder = fitPks(iOrder);
+            if numSets > 1
+                ptSets = zeros(numSets,2);
+                switch posCase
+                    case 'v' % vertical tube
+                        % order x positions
+                        [~,iOrder] = sort(x(fitPks));
+                        fitPksOrder = fitPks(iOrder);
 
-                    % find midline
-                    midLine = mean(y(fitPks));
+                        % find midline
+                        midLine = mean(y(fitPks));
 
-                    % find points greater than midline
-                    gtMid = y(fitPksOrder) > midLine;
+                        % find points greater than midline
+                        gtMid = y(fitPksOrder) > midLine;
 
-                    % store ordered connection points
-                    ptSets(:,1) = fitPksOrder(~gtMid);
-                    ptSets(:,2) = fitPksOrder(gtMid);    
-                case 'h' % horizontal tube
-                    % order x positions
-                    [~,iOrder] = sort(y(fitPks));
-                    fitPksOrder = fitPks(iOrder);
+                        % store ordered connection points
+                        ptSets(:,1) = fitPksOrder(~gtMid);
+                        ptSets(:,2) = fitPksOrder(gtMid);    
+                    case 'h' % horizontal tube
+                        % order x positions
+                        [~,iOrder] = sort(y(fitPks));
+                        fitPksOrder = fitPks(iOrder);
 
-                    % find midline
-                    midLine = mean(x(fitPks));
+                        % find midline
+                        midLine = mean(x(fitPks));
 
-                    % find points greater than midline
-                    gtMid = x(fitPksOrder) > midLine;
+                        % find points greater than midline
+                        gtMid = x(fitPksOrder) > midLine;
 
-                    % store ordered connection points
-                    ptSets(:,1) = fitPksOrder(~gtMid);
-                    ptSets(:,2) = fitPksOrder(gtMid);
-                case 'd' % diagonal tube
+                        % store ordered connection points
+                        ptSets(:,1) = fitPksOrder(~gtMid);
+                        ptSets(:,2) = fitPksOrder(gtMid);
+                    case 'd' % diagonal tube
 
-                    % extract coordinate points
-                    xPks = x(fitPks);
-                    yPks = y(fitPks);
+                        % extract coordinate points
+                        xPks = x(fitPks);
+                        yPks = y(fitPks);
 
-                    % order points by x position
-                    [xPks,iOrder] = sort(xPks);
-                    yPks = yPks(iOrder);
-                    fitPksOrder = fitPks(iOrder);
+                        % order points by x position
+                        [xPks,iOrder] = sort(xPks);
+                        yPks = yPks(iOrder);
+                        fitPksOrder = fitPks(iOrder);
 
-                    % fit line to points
-                    midLine = polyfit(xPks,yPks,1);
-                    midY = polyval(midLine,xPks);
-                    gtMid = yPks > midY;
+                        % fit line to points
+                        midLine = polyfit(xPks,yPks,1);
+                        midY = polyval(midLine,xPks);
+                        gtMid = yPks > midY;
 
-                    % store ordered connection points
-                    ptSets(:,1) = fitPksOrder(~gtMid);
-                    ptSets(:,2) = fitPksOrder(gtMid);
+                        % store ordered connection points
+                        ptSets(:,1) = fitPksOrder(~gtMid);
+                        ptSets(:,2) = fitPksOrder(gtMid);
+                end
+            else
+                ptSets = fitPks';
             end
+            %{
+            figure
+            plot(frame_poly)
+            hold on
+            plot(x(fitPks),y(fitPks),'ro')
+            for i = 1:numSets
+                plot( [x(ptSets(i,1)), x(ptSets(i,2))] , [y(ptSets(i,1)), y(ptSets(i,2))], 'k-+')
+            end
+            %}
+
+            %% Cutting into multiple polyshapes
+            numShapes = numSets+1;
+            numPts = numel(x);
+            cutPoly = cell(numShapes,1);
+
+            % sort concavity point sets
+            tmp = min(ptSets,[],2);
+            [~,ptSort] = sort(tmp);
+            ptSets = ptSets(ptSort,:);
+            ptSets = [1,numPts;ptSets];
+
+            % re-organize point sets for ease of use
+            for i = 1:numShapes
+                [~,tmpI] = min(ptSets(i,:));
+                if tmpI == 2
+                    ptSets(i,:) = fliplr(ptSets(i,:));
+                end  
+            end
+
+            % identify shape boundary indices and create cut poyshapes
+            for i = 1:numSets
+                tmpPolyI = [ptSets(i,1):ptSets(i+1,1),ptSets(i+1,2):ptSets(i,2)];
+                cutPoly{i} = polyshape(x(tmpPolyI),y(tmpPolyI));
+            end
+            tmpPolyI = ptSets(numShapes,1):ptSets(numShapes,2);
+            cutPoly{numShapes} = polyshape(x(tmpPolyI),y(tmpPolyI));
+
+            % remove cuts smaller than 5% max area
+            cutArea = zeros(numShapes,1);
+            for i = 1:numShapes
+                cutArea(i) = area(cutPoly{i});
+            end   
+            I = cutArea(i)./max(cutArea) < 0.05;
+            cutPoly = cutPoly{~I};
         else
-            ptSets = fitPks';
-        end
-        %{
-        figure
-        plot(frame_poly)
-        hold on
-        plot(x(fitPks),y(fitPks),'ro')
-        for i = 1:numSets
-            plot( [x(ptSets(i,1)), x(ptSets(i,2))] , [y(ptSets(i,1)), y(ptSets(i,2))], 'k-+')
-        end
-        %}
-        
-        %% Cutting into multiple polyshapes
-        numShapes = numSets+1;
-        numPts = numel(x);
-        cutPoly = cell(numShapes,1);
 
-        % sort concavity point sets
-        tmp = min(ptSets,[],2);
-        [~,ptSort] = sort(tmp);
-        ptSets = ptSets(ptSort,:);
-        ptSets = [1,numPts;ptSets];
-
-        % re-organize point sets for ease of use
-        for i = 1:numShapes
-            [~,tmpI] = min(ptSets(i,:));
-            if tmpI == 2
-                ptSets(i,:) = fliplr(ptSets(i,:));
-            end  
+            %% image gradient method for obfuscation
+            %{
+            % pull frame
+            inFrame = obj.Frame(min(x):max(x),min(y):max(y));
+            
+            % find gradient magnitude
+            [Gmag,Gdir] = imgradient(inFrame);
+            
+            % adjust x from cropping
+            tmpX = x - min(x);
+            tmpY = y - min(y);
+            polyTmp = polyshape(tmpY,tmpX);
+            
+            % ignore edge points
+            polyBuff = polybuffer(polyTmp,-5);
+            
+            in = false(size(Gmag,1),size(Gmag,2));
+            for i = 1:size(Gmag,1)
+                    in(i,1:size(Gmag,2)) = isinterior(polyBuff,1:size(Gmag,2), i.*ones(1,size(Gmag,2)));
+            end
+            
+            Gmag(~in) = 0;
+            
+            figure
+            surf(Gmag)
+            shading interp
+            %}
         end
-
-        % identify shape boundary indices and create cut poyshapes
-        for i = 1:numSets
-            tmpPolyI = [ptSets(i,1):ptSets(i+1,1),ptSets(i+1,2):ptSets(i,2)];
-            cutPoly{i} = polyshape(x(tmpPolyI),y(tmpPolyI));
-        end
-        tmpPolyI = ptSets(numShapes,1):ptSets(numShapes,2);
-        cutPoly{numShapes} = polyshape(x(tmpPolyI),y(tmpPolyI));
-        
-        cutArea = zeros(numShapes,1);
-        for i = 1:numShapes
-            cutArea(i) = area(cutPoly{i});
-        end
-        
-        I = cutArea(i)./max(cutArea) < 0.05;
-        cutPoly = cutPoly{~I};
 
         % plotting if you want it
-        %
+        %{
         figure
         for i = 1:numShapes
             plot(cutPoly{i})
@@ -620,10 +713,10 @@ classdef Optical
         for i = 1:numCubeSats
             centroidVec = UnitVecs(i);
 
-            x = centroidVec[0]/pixelSizeX
-            y = centroidVec[1]/pixelSizeY
+            x = centroidVec(0)/pixelSizeX;
+            y = centroidVec(1)/pixelSizeY;
 
-            PixelLocations{i} = [x y]
+            PixelLocations{i} = [x y];
         end
     end
 end
