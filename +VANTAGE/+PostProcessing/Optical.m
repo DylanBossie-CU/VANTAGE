@@ -362,9 +362,11 @@ classdef Optical
         convHull_poly = polyshape(x(k),y(k));
 
         % calculate distance from boundary to convex hull
-        [xMesh,yMesh] = meshgrid(1:max(x),1:max(y));
+        [xMesh,yMesh] = meshgrid(1:max(x)+2,1:max(y)+2);
+        xMesh = xMesh - 1;
+        yMesh = yMesh - 1;
         convHullOuterBin = ~isinterior(convHull_poly,xMesh(:),yMesh(:));
-        convHullOuterBin = reshape(convHullOuterBin,[max(y),max(x)]);
+        convHullOuterBin = reshape(convHullOuterBin,[max(y)+2,max(x)+2]);
         D = bwdist(convHullOuterBin);
         r = zeros(numel(x),1);
         for i = 1:numel(x)
