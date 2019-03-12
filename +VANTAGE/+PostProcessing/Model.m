@@ -1,4 +1,4 @@
-classdef Model
+classdef Model < handle
     % Model is a class used to store the estimation methods that utilize both
     % TOF and camera data.
 
@@ -45,8 +45,8 @@ classdef Model
         	% Construct child classes
             obj.Deployer = Deployer(manifestFilename, './Config/Deployer.json',obj);
             obj.Transform = Transform('./Config/Transform.json');
-            obj.Optical = Optical('./Config/Optical.json', obj.Deployer.GetNumCubesats());
-            obj.TOF = TOF('./Config/TOF.json',obj);
+            obj.Optical = Optical(obj,'./Config/Optical.json', obj.Deployer.GetNumCubesats());
+            obj.TOF = TOF(obj,'./Config/TOF.json');
             
             % Error catching
             if obj.Deployer.numCubesats ~= obj.Truth_VCF.numCubeSats

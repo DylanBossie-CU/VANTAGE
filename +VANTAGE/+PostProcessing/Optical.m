@@ -46,6 +46,9 @@ classdef Optical
     PlotBinarizedImages
     
     PlotCentroids
+
+    % Model handle class
+    ModelRef
   end
   
   
@@ -60,8 +63,9 @@ classdef Optical
     %
     % @return     A reference to an initialized CubeSat object
     %
-    function obj = Optical(configFilename, numCubesats)
+    function obj = Optical(ModelRef, configFilename, numCubesats)
         import VANTAGE.PostProcessing.CubeSat_Optical
+        obj.ModelRef = ModelRef;
         SensorData = jsondecode(fileread(configFilename));
         obj.CubeSats = cell(numCubesats,1);
         for i = 1:numCubesats
