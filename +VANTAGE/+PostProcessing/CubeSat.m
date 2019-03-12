@@ -23,6 +23,15 @@ classdef CubeSat
 
         %% Calculated Properties
         %
+        % all centroids over time nx3
+        centroids_VCF
+        
+        % time vector, length-n
+        time
+        
+        % boolean vector for whether each centroid point is an outlier,
+        % length-n
+        isOutlier
         
         
         %% True Properties
