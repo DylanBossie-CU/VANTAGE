@@ -24,6 +24,9 @@ classdef TOF
         % Reference to Model class
         ModelRef
         
+        % fps
+        fps
+        
     end
     
     %% Methods
@@ -43,8 +46,9 @@ classdef TOF
             configData = jsondecode(fileread(configFileneame));
 
             % Initialize confuiguration parameters
-            obj.maxAllowableRange = configData.maxAllowableRange;
+            obj.maxAllowableRange  = configData.maxAllowableRange;
             obj.ptMaxDistFromPlane = configData.ptMaxDistFromPlane;
+            obj.fps                = configData.fps;
             
             % Obtain truth data from Model
             if ~isa(obj.ModelRef,'VANTAGE.PostProcessing.Model')
@@ -87,6 +91,11 @@ classdef TOF
             % Error check data against truth
             if length(obj.Truth_VCF.t) < length(ls)
                 error('There are more data files than truth data points')
+            end
+            % Calculate timestamps
+            warning('Verify that the current method of obtaining timestamps works for real data')
+            for i = 1:length(ls)
+                ls(i).time = i*1/obj.fps;
             end
             
             % Initialize varargin mutable parameters
@@ -134,9 +143,9 @@ classdef TOF
             warning('TOFProcessing currently processes all files, set a stopping condition based on maxAllowableRange as well')
             while ~stopProcessing
                 % Naively identify centroids in image
-                [CubeSats_TOF,pc] = obj.naiveFindCentroids(ls(ii).name,SensorData,CubeSats_TOF);
+                [CubeSats_TOF,pc] = obj.naiveFindCentroids(ls(ii).name,ls(ii).time,SensorData,CubeSats_TOF);
                 % Associate with known cubesats within Deployer
-                warning('unimplemented')
+                [CubeSats] = obj.associateCentroids(CubeSats_TOF,CubeSats);
                 % Determine if cubesats have passed out of range (sets
                 % outOfRange)
                 warning('unimplemented')
@@ -163,6 +172,7 @@ classdef TOF
         % point cloud
         %
         % @param    filename        filename for a single point cloud, char
+        % @param    time            timestamp of this file, scalar
         % @param    SensorData      struct of information about sensors
         % @param    CubeSats_TOF    initialized array of CubeSat_TOF
         %                           objects ordered [first-out to
@@ -175,13 +185,16 @@ classdef TOF
         %
         % @author   Joshua Kirby
         % @date     04-Mar-2019
-        function [CubeSats_TOF,pc] = naiveFindCentroids(obj,filename,SensorData,CubeSats_TOF)
+        function [CubeSats_TOF,pc] = naiveFindCentroids(obj,filename,time,SensorData,CubeSats_TOF)
             % Extract point cloud locations
             filename = strcat(SensorData.TOFData,filename);
             
             % Load point cloud from file
             warning('Load script is currently only designed to work with simulated .pcd files')
             pc = obj.loadSimFile(filename);
+            for i = 1:length(CubeSats_TOF)
+                CubeSats_TOF(i).time = time;
+            end
             
             % Only proceed if the point cloud is valid
             if ~isempty(pc.XLimits)
@@ -195,11 +208,77 @@ classdef TOF
                         CubeSats_TOF(i) = obj.fitPlanesToCubesat(CubeSats_TOF(i));
 
                         % Calculate centroids by projecting from identified planes
-                        CubeSats_TOF(i) = obj.findCentroidFromFaces(CubeSats_TOF(i));
+                        if CubeSats_TOF(i).trustedSat
+                            CubeSats_TOF(i) = obj.findCentroidFromFaces(CubeSats_TOF(i));
+                        end
                     end
                 end
             else
                 CubeSats_TOF = VANTAGE.PostProcessing.CubeSat_TOF.empty;
+            end
+        end
+        
+        %% Associate centroids from CubeSats_TOF with CubeSats
+        %
+        % 
+        %
+        % @param    CubeSats_TOF    CubeSat_TOF object with naive
+        %                           centroids in TCF
+        % @param    CubeSats        CubeSat object with all previous
+        %                           centroids in VCF
+        %
+        % @return   CubeSats object with a new set of centroids from
+        %           CubeSats_TOF
+        %
+        % @author   Joshua Kirby
+        % @date     10-Mar-2019
+        function [CubeSats] = associateCentroids(obj,CubeSats_TOF,CubeSats)
+            
+            % Determine populated indices of CubeSats_TOF
+            I = find(~cellfun(@isempty,{CubeSats_TOF.centroid_TCF}));
+            
+            % Transform naive centroids to VCF
+            for ii = I
+                centroid_VCF(:,ii) = obj.Transform.tf('VCF',CubeSats_TOF(ii).centroid_TCF,'TCF');
+            end
+            
+            %%% NOTE: The issue in the following loop is that it loops over
+            %%% CubeSats_TOF and indexes CubeSats, need to split up the
+            %%% loops since they are independent objects
+                
+            for ii = I
+                % Determine if at least 10 previous centroids exist
+                if length(CubeSats(ii).time) > 5
+                    % remove outliers from data
+                    prevCentroids_VCF = CubeSats(ii).centroids_VCF(:,~CubeSats(ii).isOutlier);
+                    prevTimes = CubeSats(ii).time(~CubeSats(ii).isOutlier);
+                    % Fit to x, y, z data and determine standard deviations
+                    [pX,SX] = polyfit(prevTimes,prevCentroids_VCF(1,:),1);
+                    [~,stdX] = polyval(pX,prevTimes,SX);
+                    stdX = mean(stdX);
+                    [pY,SY] = polyfit(prevTimes,prevCentroids_VCF(2,:),1);
+                    [~,stdY] = polyval(pY,prevTimes,SY);
+                    stdY = mean(stdY);
+                    [pZ,SZ] = polyfit(prevTimes,prevCentroids_VCF(3,:),1);
+                    [~,stdZ] = polyval(pZ,prevTimes,SZ);
+                    stdZ = mean(stdZ);
+                    % Determine if current point is near a prediction or is
+                    % an outlier
+                    stdAll(ii) = norm([stdX stdY stdZ]);
+                    predPt(:,ii) = [polyval(pX,CubeSats_TOF(ii).time),...
+                              polyval(pY,CubeSats_TOF(ii).time),...
+                              polyval(pZ,CubeSats_TOF(ii).time)]';
+                    for jj = 1:length(CubeSats_TOF)
+                        deltaPredPt(ii,jj) = norm(predPt(:,ii) - centroid_VCF(:,jj));
+                    end
+                    bla = 1;
+                    
+                else
+                    % save data point as a non-outlier
+                    CubeSats(ii).centroids_VCF = [CubeSats(ii).centroids_VCF,centroid_VCF];
+                    CubeSats(ii).time = [CubeSats(ii).time,CubeSats_TOF(ii).time];
+                    CubeSats(ii).isOutlier = [CubeSats(ii).isOutlier,0];
+                end
             end
         end
         
@@ -350,7 +429,7 @@ classdef TOF
 
             % Initialize planes structure
             numPlanes = 0;
-            planes = struct;
+            planes = CubeSat.faces;
             
             % Tracking of points not associated with any plane
             remainPtCloud = CubeSat.pc;
@@ -415,12 +494,14 @@ classdef TOF
             end
 
             %%% Check that planes are mutually orthogonal
+            CubeSat.trustedSat = 1;
             for i = 1:numPlanes
-              for j = 1:numPlanes
-                if abs(asind(dot(planes(i).n,planes(j).n))) > 2 && i~=j
-                  warning('fitPlanesToCubesat identified planes which are not mutually orthogonal by greater than 2 deg')
+                for j = 1:numPlanes
+                    if abs(asind(dot(planes(i).n,planes(j).n))) > 8 && i~=j
+                        CubeSat.trustedSat = 0;
+                        %warning('fitPlanesToCubesat identified planes which are not mutually orthogonal by greater than 4 deg')
+                    end
                 end
-              end
             end
             
             %%% Package planes and numPlanes into CubeSat object
@@ -466,17 +547,17 @@ classdef TOF
         % @author   Joshua Kirby
         % @date     03-Feb-2019
         function CubeSat_TOF = centroid1(obj,CubeSat_TOF)
-            %%% Data extract
-            face = CubeSat_TOF.faces;
-            
             %%% Find plane boundary points and centroid
-            [face.faceCentr,face.corners] = obj.getFaceCentroidAndCorners(face);
+            [CubeSat_TOF.faces] = obj.getFaceCentroidAndCorners(CubeSat_TOF.faces);
             
             %%% Identify face corners using bounding box of face
-            [fullFace,trustedLen,~,faceIndex] = obj.diagnoseFace(face,CubeSat_TOF);
+            [CubeSat_TOF] = obj.diagnoseFace(CubeSat_TOF);
+            
+            %%% Extract data
+            face = CubeSat_TOF.faces;
             
             %%% Find centroid of face in 3D
-            if fullFace
+            if face.fullFace
                 % mean corners to find centroid
                 centr = mean(face.corners,2);
             else
@@ -488,8 +569,8 @@ classdef TOF
                 
                 % Determine which trustedLen corresponds to the side that
                 % is orthogonal to corners
-                [~,I] = min(abs(trustedLen-norm(farCorners(:,1)-farCorners(:,2))));
-                projLength = trustedLen([1:I-1,I+1:end]);
+                [~,I] = min(abs(face.trustedLen-norm(farCorners(:,1)-farCorners(:,2))));
+                projLength = face.trustedLen([1:I-1,I+1:end]);
                 
                 % Extract face normal vector
                 nhat = face(1).n;
@@ -508,7 +589,7 @@ classdef TOF
             end
             
             %%% Project inward to volumetric centroid
-            d = obj.distInFromFace(CubeSat_TOF,faceIndex);
+            d = obj.distInFromFace(CubeSat_TOF,face.faceIndex);
             CubeSat_TOF.centroid_TCF = centr + d*sign(dot(centr,face.n))*face.n;
         end
         
@@ -526,22 +607,18 @@ classdef TOF
         % @author   Joshua Kirby
         % @date     03-Feb-2019
         function CubeSat_TOF = centroid2(obj,CubeSat_TOF)
-            %%% Extract data
-            faces = CubeSat_TOF.faces;
-            
             %%% Check that planes intersect as expected
-            if rank([faces.n]) ~= 2
+            if rank([CubeSat_TOF.faces.n]) ~= 2
                 error('The two planes identified do not intersect as a line')
             end
             
             %%% Find faces' centroids and corners
             %%%     and determine if each face qualifies as a fullFace
-            for i = 1:length(faces)
-                [faces(i).faceCentr,faces(i).corners] = ...
-                    obj.getFaceCentroidAndCorners(faces(i));
-                [~,~,faces(i).trustedCorners,faces(i).faceIndex] = ...
-                    obj.diagnoseFace(faces(i),CubeSat_TOF);
-            end
+            CubeSat_TOF.faces = obj.getFaceCentroidAndCorners(CubeSat_TOF.faces);
+            CubeSat_TOF = obj.diagnoseFace(CubeSat_TOF);
+            
+            %%% Extract data
+            faces = CubeSat_TOF.faces;
             
             %%% Determine unit vector parallel to intersection
             v_intersect = cross(faces(1).n,faces(2).n);
@@ -584,271 +661,215 @@ classdef TOF
         % projecting inward from the faces to the centroid.  Assumes that
         % the expectedU of the CubeSat is the actual U
         %
-        % @param    CubeSat     CubeSat object to be analyzed
+        % @param    CubeSat_TOF     CubeSat object to be analyzed
         %                       @see CubeSat
         %
-        % @return   CubeSat     CubeSat object with calculated TCF centroid
-        %                       populated
+        % @return   CubeSat object with calculated TCF centroid
+        %           populated
         %
         % @author   Joshua Kirby
         % @date     03-Feb-2019
         function CubeSat_TOF = centroid3(obj,CubeSat_TOF)
+            %%% Find faces' centroids and corners
+            %%%     and determine if each face qualifies as a fullFace
+            CubeSat_TOF.faces = obj.getFaceCentroidAndCorners(CubeSat_TOF.faces);
+            CubeSat_TOF = obj.diagnoseFace(CubeSat_TOF);
+            
             %%% Extract data
             faces = CubeSat_TOF.faces;
             
-            %%% Find faces' centroids and corners
-            %%%     and determine if each face qualifies as a fullFace
-            for i = 1:length(faces)
-                [faces(i).faceCentr,faces(i).corners] = ...
-                    obj.getFaceCentroidAndCorners(faces(i));
-                [~,~,faces(i).trustedCorners,faces(i).faceIndex] = ...
-                    obj.diagnoseFace(faces(i),CubeSat_TOF);
-            end
-            
             %%% Find plane intersection
-            if rank(A) ~= 3
-                error('Planes do not intersect in the expected way')
-            end
+            A = zeros(3);
+            b = zeros(3,1);
             for i = 1:3
                 A(i,1:3) = faces(i).n;
                 b(i,1)   = faces(i).n(1)*faces(i).o(1) + faces(i).n(2)*faces(i).o(2) + faces(i).n(3)*faces(i).o(3);
+            end
+            if rank(A) ~= 3
+                error('Planes do not intersect in the expected way')
             end
             ptIntersect = (A\b);
             
             %%% Project into centroid from intersection point
             n = zeros(3,3);
+            d = zeros(1,3);
             for i = 1:3
                 % ensure that unit normals are inward facing
                 n(:,i) = sign(dot(ptIntersect,faces(i).n))*faces(i).n;
                 % calculate orthogonal distance from each face to the centroid
                 d(i) = obj.distInFromFace(CubeSat_TOF,faces(i).faceIndex);
             end
+            % Orthogonalize n
+            [Q,R] = qr(n);
+            n_orth = sign(diag(R))' .* Q;
             % Project to centroid
-            CubeSat_TOF.centroid_TCF = ptIntersect + sum(d.*n,2);
-            
-            if 0
-            %%% Find Best-Guess Face
-            % ensure that unitvectors are inward facing
-            for i = 1:3
-                n(:,i) = sign(dot(ptIntersect,faces(i).n))*faces(i).n;
-            end
-            % Make best guess for which face is which
-            As = CubeSat_TOF.Avec;
-            for i = 1:3
-                inPlane = double( (faces(i).planeCloud.Location-faces(i).o')*faces(i).V );
-                I_bound = boundary(inPlane(:,1),inPlane(:,2));
-                face = polyshape(inPlane(I_bound,1),inPlane(I_bound,2),'simplify',false);
-                A = area(face);
-                [dAmin(i),J(i)] = min(abs(As-A));
-            end
-            [~,I] = min(dAmin);
-            bestI = I; % this index is the plane corresonding to bestSize
-            bestSize = J(bestI); % this value says what U is bestI
-            
-            %%% Determine other face sizes based on intersect length with best-guess face
-            c = 1;
-            for i = [1:I-1 I+1:3]
-                % unit vector parallel to intersection
-                V = cross(faces(bestI).n,faces(i).n);
-                % project point cloud onto this unit vector direction
-                pc_alongIntersect = [faces(bestI).planeCloud.Location;faces(i).planeCloud.Location]*V;
-                % Determine length of intersection
-                lengthIntersect   = max(pc_alongIntersect)-min(pc_alongIntersect);
-                
-                % Make best guess at which face this is
-                switch bestSize
-                    case {1,7}
-                        offI(c)    = i;
-                        offSize(c) = u;
-                    case u
-                        offI(c)        = i;
-                        [~,offSize(c)] = min(abs(CubeSat_TOF.Lvec-lengthIntersect));
-                    otherwise
-                        error('Best-guess for face size does not match an allowable size (1 or U)')
-                end
-                c = c + 1;
-            end
-            
-            %%% Find volumetric centroid
-            % volumetric diagonal
-            switch bestSize
-                case {1,7}
-                    innerDiag = unitvec(n(:,bestI)*CubeSat_TOF.u_long*u + n(:,offI(1))*CubeSat_TOF.Lvec(bestSize) + n(:,offI(2))*CubeSat_TOF.Lvec(bestSize));
-                case u
-                    innerDiag = unitvec(n(:,bestI)*CubeSat_TOF.Lvec(7) + n(:,offI(1))*CubeSat_TOF.Lvec(offSize(2)) + n(:,offI(2))*CubeSat_TOF.Lvec(offSize(1)));
-                otherwise
-                    error('Best-guess for face size does not match an allowable size (1 or U)')
-            end
-            CubeSat_TOF.centroid_TCF = ptIntersect + 0.5*sqrt((u*CubeSat_TOF.u_long)^2+2*(CubeSat_TOF.u_short)^2)*innerDiag;
-            end
+            CubeSat_TOF.centroid_TCF = ptIntersect + sum(d.*n_orth,2);
         end
         
         
         %% Subroutines
-                %
+        %
         % Smooths a face boundary and returns the smoothed boundary and
         % face centroid
         %
-        % @param    face    scalar CubeSat_TOF.faces struct 
+        % @param    faces    CubeSat_TOF.faces struct
         % 
-        % @return   centroid of face
-        % @return   corners of face
+        % @return   struct with identified face centroids and corners
         %
         % @author   Joshua Kirby
         % @date     07-Mar-2019
-        function [faceCentr, corners] = getFaceCentroidAndCorners(obj,face)
-            %%% Project points onto 2d plane
-            plane = face.planeCloud;
-            inPlane = double( (plane.Location-face(1).o')*face.V );
-            
-            %%% Find plane boundary points
-            I_bound = boundary(inPlane(:,1),inPlane(:,2));
-            
-            %%% Find filtered boundary
-            boundaryPtsRaw = [inPlane(I_bound,1)';inPlane(I_bound,2)'];
-            order = 2;
-            frameLen = obj.roundToNearestOdd(size(boundaryPtsRaw,2)/5);
-            boundaryPts = sgolayfilt(boundaryPtsRaw,order,frameLen,[],2);
-            
-            %%% Find face centroid
-            faceShape = polyshape(inPlane(I_bound,1),inPlane(I_bound,2),'simplify',true);
-            [x,y] = centroid(faceShape);
-            faceCentr = face.o + face.V * [x;y];
-            
-            % Find face boundary in face plane
-            corners_inPlane = obj.minBoundingBox(boundaryPts);
-            % Convert to 3D
-            corners = zeros(3,4);
-            for i = 1:4
-                corners(:,i) = face.o + face.V * corners_inPlane(:,i);
+        function [faces] = getFaceCentroidAndCorners(obj,faces)
+            for ii = 1:length(faces)
+                face = faces(ii);
+                %%% Project points onto 2d plane
+                plane = face.planeCloud;
+                inPlane = double( (plane.Location-face(1).o')*face.V );
+
+                %%% Find plane boundary points
+                I_bound = boundary(inPlane(:,1),inPlane(:,2));
+
+                %%% Find filtered boundary
+                boundaryPtsRaw = [inPlane(I_bound,1)';inPlane(I_bound,2)'];
+                order = 2;
+                frameLen = obj.roundToNearestOdd(size(boundaryPtsRaw,2)/5);
+                if frameLen == 1
+                    boundaryPts = boundaryPtsRaw;
+                else
+                    boundaryPts = sgolayfilt(boundaryPtsRaw,order,frameLen,[],2);
+                end
+
+                %%% Find face centroid
+                faceShape = polyshape(inPlane(I_bound,1),inPlane(I_bound,2),'simplify',false);
+                [x,y] = centroid(faceShape);
+                face.faceCentr = face.o + face.V * [x;y];
+
+                % Find face boundary in face plane
+                corners_inPlane = obj.minBoundingBox(boundaryPts);
+                % Convert to 3D
+                face.corners = zeros(3,4);
+                for i = 1:4
+                    face.corners(:,i) = face.o + face.V * corners_inPlane(:,i);
+                end
+                
+                %%% repackage into faces
+                faces(ii) = face;
             end
         end
         
         % 
         % Determines if a CubeSat.face struct is a full CubeSat face
         %
-        % @params   face            CubeSat_TOF.face struct containing
-        %                           corners calculated using
+        % @params   CubeSat_TOF     CubeSat_TOF object with faces struct
+        %                           already updated using
         %                           getFaceCentroidAndCorners
-        % @params   CubeSat_TOF     CubeSat_TOF object with which the
-        %                           corners are associated, used only for
-        %                           obtaining actualDims
         %
-        % @return   boolean isFullFacePresent? 0-no, 1-yes
-        % @return   the trusted side lengths of the face, even if a full face is
-        %           not present
-        % @return   index of face, indices correspond to faces composed of
-        %           CubeSat.actualDims([combnk(1:3,2)](index,i))
+        % @return   CubeSat_TOF with fullFace boolean, trusted side
+        %           lengths, trusted corners, and face index
         %
         % @author   Joshua Kirby
         % @date     07-Mar-2019
-        function [fullFace,trustedLen,trustedCorners,faceIndex] = ...
-                diagnoseFace(obj,face,CubeSat_TOF)
-            % Extract data
-            corners = face.corners;
-            
-            % Initialize boolean
-            fullFace = 1;
-            
-            %%% Decide if full face is present or not
-            % Determine if bounding box is near cubesat size
-            len = zeros(1,2);
-            deltaLen = zeros(3,2);
-            for i = 1:2
-                len(i) = norm(corners(:,i+1) - corners(:,i));
-                deltaLen(:,i) = abs(len(i) - CubeSat_TOF.actualDims);
-                faceMatches{i} = find(deltaLen(:,i) < obj.faceLenMatchTol);
-            end
-            % For fullFace, both sides must have a length match
-            fullFaceCondition = ~isempty(faceMatches{1}) & ~isempty(faceMatches{2});
-            % and each side must have an independent match
-            matchCombinations = combvec(faceMatches{1}',faceMatches{2}');
-            diffSides = ~(matchCombinations(1,:)-matchCombinations(2,:));
-            fullFaceCondition = fullFaceCondition & any(diffSides);
-            
-            %fullFaceCondition = fullFaceCondition & sum(ismember(faceMatches{1},faceMatches{2}))~=length(faceMatches{1});
-            %fullFaceCondition = fullFaceCondition & sum(ismember(faceMatches{2},faceMatches{1}))~=length(faceMatches{2});
-            if ~fullFaceCondition
-                fullFace = 0;
-            end
-            
-            %%% Determine trusted lengths
-            if fullFace
-                % trusted side lengths are visible side lengths
-                trustedLen = len;
-            else
-                % NOTE: this assumes that the CubeSat has not tumbled much
-                %   since launching, which is very valid for the TOF camera
-                % Determine trusted lengths
-                [trustedActualDimI,trustedLenI] = find(min(min(deltaLen))==deltaLen,1);
-                trustedLen = zeros(1,2);
-                trustedLen(1) = len(trustedLenI);
-                if trustedActualDimI ~= find(CubeSat_TOF.actualDims == max(CubeSat_TOF.actualDims))
-                    trustedLen(2) = max(CubeSat_TOF.actualDims);
-                else
-                    trustedLen(2) = min(CubeSat_TOF.actualDims);
-                end
-            end
-            
-            %%% Determine trusted corners
-            % project to centroid from two most distant (downrange) corners
-            % Obtain distant two corners and their midPt                
-            [~,I] = sort(face.corners(3,:),'descend');
-            farCorners = face.corners(:,I(1:2));
-            nearBadCornersUnordered = face.corners(:,I(3:4));
-            farMidPt = mean(farCorners,2);
+        function [CubeSat_TOF] = diagnoseFace(obj,CubeSat_TOF)
+            %%% for all faces
+            for ii = 1:length(CubeSat_TOF.faces)
+                % Extract data
+                face = CubeSat_TOF.faces(ii);
+                corners = face.corners;
 
-            % Determine which trustedLen corresponds to the side that
-            % is orthogonal to corners
-            [~,I] = min(abs(trustedLen-norm(farCorners(:,1)-farCorners(:,2))));
-            projLength = trustedLen([1:I-1,I+1:end]);
-            
-            % Determine near bad corners which correspond to far corners
-            nearBadCorners = zeros(3,2);
-            for i = 1:size(farCorners,2)
-                for j = 1:size(nearBadCornersUnordered,2)
-                    v1 = farCorners(:,[1:i-1,i+1:end]) - farCorners(:,i);
-                    v2 = nearBadCornersUnordered(:,j) - farCorners(:,i);
-                    if abs(dot(v1,v2)) < 1e-06
-                        nearBadCorners(:,i) = nearBadCornersUnordered(:,j);
+                % Initialize boolean
+                face.fullFace = 1;
+
+                %%% Decide if full face is present or not
+                % Determine if bounding box is near cubesat size
+                len = zeros(1,2);
+                deltaLen = zeros(3,2);
+                faceMatches = cell(1,2);
+                for i = 1:2
+                    len(i) = norm(corners(:,i+1) - corners(:,i));
+                    deltaLen(:,i) = abs(len(i) - CubeSat_TOF.actualDims);
+                    faceMatches{i} = find(deltaLen(:,i) < obj.faceLenMatchTol);
+                end
+                % For fullFace, both sides must have a length match
+                fullFaceCondition = ~isempty(faceMatches{1}) & ~isempty(faceMatches{2});
+                % and each side must have an independent match
+                matchCombinations = combvec(faceMatches{1}',faceMatches{2}');
+                diffSides = ~(matchCombinations(1,:)-matchCombinations(2,:));
+                fullFaceCondition = fullFaceCondition & any(diffSides);
+
+                %fullFaceCondition = fullFaceCondition & sum(ismember(faceMatches{1},faceMatches{2}))~=length(faceMatches{1});
+                %fullFaceCondition = fullFaceCondition & sum(ismember(faceMatches{2},faceMatches{1}))~=length(faceMatches{2});
+                if ~fullFaceCondition
+                    face.fullFace = 0;
+                end
+
+                %%% Determine trusted lengths
+                if face.fullFace
+                    % trusted side lengths are visible side lengths
+                    face.trustedLen = len;
+                else
+                    % NOTE: this assumes that the CubeSat has not tumbled much
+                    %   since launching, which is very valid for the TOF camera
+                    % Determine trusted lengths
+                    [trustedActualDimI,trustedLenI] = find(min(min(deltaLen))==deltaLen,1);
+                    face.trustedLen = zeros(1,2);
+                    face.trustedLen(1) = len(trustedLenI);
+                    if trustedActualDimI ~= find(CubeSat_TOF.actualDims == max(CubeSat_TOF.actualDims))
+                        face.trustedLen(2) = max(CubeSat_TOF.actualDims);
+                    else
+                        face.trustedLen(2) = min(CubeSat_TOF.actualDims);
                     end
                 end
+
+                %%% Determine trusted corners
+                % project to centroid from two most distant (downrange) corners
+                % Obtain distant two corners and their midPt                
+                [~,I] = sort(face.corners(3,:),'descend');
+                farCorners = face.corners(:,I(1:2));
+                nearBadCornersUnordered = face.corners(:,I(3:4));
+
+                % Determine which trustedLen corresponds to the side that
+                % is orthogonal to corners
+                [~,I] = min(abs(face.trustedLen-norm(farCorners(:,1)-farCorners(:,2))));
+                projLength = face.trustedLen([1:I-1,I+1:end]);
+
+                % Determine near bad corners which correspond to far corners
+                nearBadCorners = zeros(3,2);
+                for i = 1:size(farCorners,2)
+                    for j = 1:size(nearBadCornersUnordered,2)
+                        v1 = farCorners(:,[1:i-1,i+1:end]) - farCorners(:,i);
+                        v2 = nearBadCornersUnordered(:,j) - farCorners(:,i);
+                        if abs(dot(v1,v2)) < 1e-06
+                            nearBadCorners(:,i) = nearBadCornersUnordered(:,j);
+                        end
+                    end
+                end
+
+                % Project through near bad corners to near corners
+                nearCorners = zeros(3,2);
+                for i = 1:2
+                    u = obj.unitvec(nearBadCorners(:,i) - farCorners(:,i));
+                    nearCorners(:,i) = farCorners(:,i) + projLength*u;
+                end
+
+                % Assemble corners in circular order
+                face.trustedCorners = [fliplr(nearCorners),farCorners];
+
+                %%% Determine faceIndex
+                % Dimensions to choose from, corresponding to indices of
+                %   CubeSat.actualDims
+                dims = 1:length(CubeSat_TOF.actualDims);
+                % Calculate standard areas
+                C = combnk(dims,2);
+                Avec = prod(CubeSat_TOF.actualDims(C),2);
+                % Calculate difference between area and standard areas
+                faceArea = prod(face.trustedLen);
+                dA = abs(faceArea-Avec);
+                % Choose nearest size
+                [~,face.faceIndex] = min(dA);
+                
+                %%% Repackage into CubeSat
+                CubeSat_TOF.faces(ii) = face;
             end
             
-            % Project through near bad corners to near corners
-            nearCorners = zeros(3,2);
-            for i = 1:2
-                u = obj.unitvec(nearBadCorners(:,i) - farCorners(:,i));
-                nearCorners(:,i) = farCorners(:,i) + projLength*u;
-            end
-            
-            % Assemble corners in circular order
-            trustedCorners = [fliplr(nearCorners),farCorners];
-
-            % Extract face normal vector
-            nhat = face(1).n;
-
-            % Obtain vector from midPt to a corner
-            relCorner = farCorners(:,2) - farMidPt;
-
-            % Obtain projection direction from farMidPt orthogonal to corners and
-            % towards the face interior
-            midPtToInterior = face.faceCentr - farMidPt;
-            projHat = obj.unitvec( cross(nhat,relCorner) );
-            projHat = sign( dot(projHat,midPtToInterior) ) * projHat;
-            
-            %%% Determine faceIndex
-            % Dimensions to choose from, corresponding to indices of
-            %   CubeSat.actualDims
-            dims = 1:length(CubeSat_TOF.actualDims);
-            % Calculate standard areas
-            C = combnk(dims,2);
-            Avec = prod(CubeSat_TOF.actualDims(C),2);
-            % Calculate difference between area and standard areas
-            faceArea = prod(trustedLen);
-            dA = abs(faceArea-Avec);
-            % Choose nearest size
-            [~,faceIndex] = min(dA);
         end
 
         %
@@ -1018,7 +1039,7 @@ classdef TOF
             legendcounter = 1;
             colorcounter = 1;
             for i = CubesatIndexing
-                if ~isempty(CubeSats_TOF(i).pc)
+                if ~isempty(CubeSats_TOF(i).centroid_TCF)
                     plot3(CubeSats_TOF(i).centroid_TCF(1),CubeSats_TOF(i).centroid_TCF(2),CubeSats_TOF(i).centroid_TCF(3),'r.','markersize',25)
                     plot3(trueCentroids_TCF(i,1),trueCentroids_TCF(i,2),trueCentroids_TCF(i,3),'b.','markersize',25)
                     legendStrings{legendcounter} = ['Calc.Centr',num2str(i)];

@@ -1,5 +1,5 @@
 {
-	"DeploymentTube": 1,
+	"DeploymentTube": 6,
 	"VantageTube": 4,
 	"expectedRelease": [2019,2,12,13,46,20,536],
 	"CubesatArray": 

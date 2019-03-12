@@ -7,7 +7,7 @@ classdef CubeSat_TOF
     %
     %% Properties
     properties
-        %% Pre-defined Properties
+        %%% Pre-defined Properties
         %
         % string containing cubesat name
         name
@@ -23,18 +23,8 @@ classdef CubeSat_TOF
 
         % dimensions of cubesat in meters
         actualDims
-        
-        % Lots of geometric stuff...a better method for this should
-        % be developed
-        Avec
-        Lvec
-        u_short
-        u_long
-        Dvec
-        D_short
-        D_long
 
-        %% Calculated Properties
+        %%% Calculated Properties
         %
         % point cloud comprising cubesat
         pc
@@ -46,7 +36,16 @@ classdef CubeSat_TOF
         inferredU
         
         % struct containing information about each plane/face
-        faces
+        faces = struct('planeCloud',[],...
+                       'n',[],...
+                       'V',[],...
+                       'o',[],...
+                       'faceCentr',[],...
+                       'corners',[],...
+                       'fullFace',[],...
+                       'trustedLen',[],...
+                       'trustedCorners',[],...
+                       'faceIndex',[]);
         
         % inferred plane/face U
         faceU
@@ -54,7 +53,7 @@ classdef CubeSat_TOF
         % calculated centroid in TCF
         centroid_TCF
         
-        %% True Properties
+        %%% True Properties
         %
         % true U if known (here for aggregation/debugging)
         trueU
@@ -64,6 +63,14 @@ classdef CubeSat_TOF
 
         % occlusion tracking (integer)
         occlusion
+        
+        %%% Other properties
+        %
+        % timestamp of current point cloud
+        time
+        
+        % says whether faces are good enough to be trusted
+        trustedSat
         
         
     end
@@ -82,29 +89,6 @@ classdef CubeSat_TOF
             obj.name = CubeSat.name;
             obj.expectedU = CubeSat.expectedU;
             obj.actualDims = CubeSat.actualDims;
-            
-            
-            % JMK HEY YOU, ALL THIS GEOMETRY SUCKS AND SHOULD BE TURNED INTO
-            % SOMETHING MUCH MORE INTELLIGENT
-            % (U)nit length
-            obj.u_short = 0.1; % m
-            obj.u_long  = 0.1125; % m
-            % U
-            U = [1 2 3 4 5 6];
-            % Side Lengths
-            L_short = obj.u_short;
-            L_long  = obj.u_long .*U;
-            obj.Lvec = [L_long L_short];
-            % Face Areas
-            A_short = obj.u_short^2;
-            % Note this is a hack, A_long should use obj.u_long but this works better for
-            % now, should use better heuristics so this hack is not necessary
-            A_long  = U.*obj.u_short^2;
-            obj.Avec = [A_long A_short];
-            % Face Diagonals
-            obj.D_short = sqrt(obj.u_short^2 + L_short^2);
-            obj.D_long  = sqrt(obj.u_short^2 + L_long.^2);
-            obj.Dvec = [obj.D_long obj.D_short];
         end
     end
     

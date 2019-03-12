@@ -1,5 +1,5 @@
 {
 	"maxAllowableRange": 8,
-	"ptMaxDistFromPlane": 0.018,
+	"ptMaxDistFromPlane": 0.01,
     "fps": 20
 }
