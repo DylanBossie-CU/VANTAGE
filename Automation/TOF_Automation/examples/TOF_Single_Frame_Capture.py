@@ -114,8 +114,8 @@ def main():
 		#plt.show()
 		#plt.close()
     #This format of directory is necessary to communicate with MATLAB
-    fileDirectory = '/home/vantage/Documents/githere/VANTAGE/Automation/TOF_Automation/examples/TOF_PointClouds/pointcloud_'
-    for pc, timeStamp in zip(pointCloudStorage, timeStamps):
-        pypcd.save_point_cloud(pc, fileDirectory + str(timeStamp) + ".pcd")
+    fileDirectory = '/home/vantage/Documents/githere/VANTAGE/Data/pointcloud_'
+    # for pc, timeStamp in zip(pointCloudStorage, timeStamps):
+    #     pypcd.save_point_cloud(pc, fileDirectory + str(timeStamp) + ".pcd")
 if __name__ == '__main__':
     main()

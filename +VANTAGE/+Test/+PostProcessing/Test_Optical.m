@@ -123,6 +123,7 @@ classdef Test_Optical < matlab.unittest.TestCase
         end
         
         function testPixelTransform(testCase)
+            return
             close all
             import VANTAGE.PostProcessing.*
             OpticalTest = Optical('./Config/Optical.json',6);
@@ -139,6 +140,7 @@ classdef Test_Optical < matlab.unittest.TestCase
                 end
             end
         end
+        
     end
     
     

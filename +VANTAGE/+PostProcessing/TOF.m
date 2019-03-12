@@ -20,6 +20,9 @@ classdef TOF
         
         % Face length matching tolerance, for use in centroid1 method
         faceLenMatchTol = 0.02; % m
+
+        % Reference to Model class
+        ModelRef
         
         % fps
         fps
@@ -28,14 +31,17 @@ classdef TOF
     
     %% Methods
     methods
-        %% Constructor
+        % Constructor
         %
-        % @param      configFilename    The configuration filename
-        % @param      Model             Model class instance (@see Model)
+        % @param      modelRef         Model class handle (@see Model)
+        % @param      configFileneame  The configuration filename
         %
         % @return     A reference to an initialized TOF object
         %
-        function obj = TOF(configFileneame,Model)
+        function obj = TOF(ModelRef,configFileneame)
+            % Store Model class reference
+            obj.ModelRef = ModelRef;
+
             % Read data from configuration file
             configData = jsondecode(fileread(configFileneame));
 
@@ -45,13 +51,13 @@ classdef TOF
             obj.fps                = configData.fps;
             
             % Obtain truth data from Model
-            if ~isa(Model,'VANTAGE.PostProcessing.Model')
-                error('Model input to TOF class object constructor must be a VANTAGE.PostProcessing.Model instance')
+            if ~isa(obj.ModelRef,'VANTAGE.PostProcessing.Model')
+                error('Model input to TOF class object constructor must be a VANTAGE.PostProcessing.Model handle')
             end
-            obj.Truth_VCF = Model.Truth_VCF;
+            obj.Truth_VCF = obj.ModelRef.Truth_VCF;
             
             % Obtain transform instance from Model
-            obj.Transform = Model.Transform;
+            obj.Transform = obj.ModelRef.Transform;
         end
 
         %% Getters
