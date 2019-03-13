@@ -1021,7 +1021,7 @@ classdef TOF
                 if ~isempty(CubeSats_TOF(i).pc)
                     CubeSats_TOF(i).pc.Color = uint8(c(colorcounter,:).*255.*ones(CubeSats_TOF(i).pc.Count,3));
                     pcshow(CubeSats_TOF(i).pc,'markersize',markersize)
-                    legendStrings{legendcounter} = ['CubeSat ',num2str(i)];
+                    legendstrings{legendcounter} = ['CubeSat ',num2str(i)];
                     colorcounter = colorcounter+1;
                     legendcounter = legendcounter+1;
                 end
@@ -1030,7 +1030,7 @@ classdef TOF
             zlim(zlimits)
             ylim(ylimits)
             if ~isempty(legendstrings)
-                l=legend(legendStrings,'location','eastoutside');
+                l=legend(legendstrings,'location','eastoutside');
                 l.FontSize = legendfontsize;
             end
             xlabel('x')
@@ -1043,20 +1043,20 @@ classdef TOF
             grid on
             grid minor
             title('Visible Faces Per CubeSat','fontsize',fontsize)
-            legendStrings = [];
+            legendstrings = [];
             legendcounter = 1;
             colorcounter = 1;
             for i = CubesatIndexing
                 if ~isempty(CubeSats_TOF(i).centroid_TCF)
                     plot3(CubeSats_TOF(i).centroid_TCF(1),CubeSats_TOF(i).centroid_TCF(2),CubeSats_TOF(i).centroid_TCF(3),'r.','markersize',25)
                     plot3(trueCentroids_TCF(i,1),trueCentroids_TCF(i,2),trueCentroids_TCF(i,3),'b.','markersize',25)
-                    legendStrings{legendcounter} = ['Calc.Centr',num2str(i)];
-                    legendStrings{legendcounter+1} = ['True.Centr',num2str(i)];
+                    legendstrings{legendcounter} = ['Calc.Centr',num2str(i)];
+                    legendstrings{legendcounter+1} = ['True.Centr',num2str(i)];
                     legendcounter = legendcounter+2;
                     for j = 1:CubeSats_TOF(i).numVisibleFaces
                         CubeSats_TOF(i).faces(j).planeCloud.Color = uint8(c(colorcounter,:).*255.*ones(CubeSats_TOF(i).faces(j).planeCloud.Count,3));
                         pcshow(CubeSats_TOF(i).faces(j).planeCloud,'markersize',markersize)
-                        legendStrings{legendcounter} = ['Sat',num2str(i),'-Face',num2str(j)];
+                        legendstrings{legendcounter} = ['Sat',num2str(i),'-Face',num2str(j)];
                         colorcounter = colorcounter+1;
                         legendcounter = legendcounter+1;
                     end
@@ -1066,7 +1066,7 @@ classdef TOF
             zlim(zlimits)
             ylim(ylimits)
             if ~isempty(legendstrings)
-                l=legend(legendStrings,'location','eastoutside');
+                l=legend(legendstrings,'location','eastoutside');
                 l.FontSize = legendfontsize;
             end
             xlabel('x')
