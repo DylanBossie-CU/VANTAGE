@@ -75,13 +75,15 @@ classdef TOF
         % @param    Deployer    Deployer class instance, containing
         %                       Cubesats and manifest data
         %
-        % @return   Deployer    Deployer class instance, containing
-        %                       Cubesats populated with TOF centroid 
-        %                       results
+        % @return   Deployer class instance, containing
+        %           Cubesats populated with TOF centroid 
+        %           results
+        % @return   length-n struct of CubeSats_TOF with naive centroids in
+        %           TCF
         %
         % @author   Joshua Kirby
         % @date     01-Mar-2019
-        function [Deployer] = TOFProcessing(obj,SensorData,Deployer,varargin)
+        function [Deployer,naiveCentroids] = TOFProcessing(obj,SensorData,Deployer,varargin)
             % Extract relevant data from inputs
             CubeSats = Deployer.CubesatArray;
             
@@ -144,6 +146,12 @@ classdef TOF
             while ~stopProcessing
                 % Naively identify centroids in image
                 [CubeSats_TOF,pc] = obj.naiveFindCentroids(ls(ii).name,ls(ii).time,SensorData,CubeSats_TOF);
+                % Save naive centroids for Dylan 3-13-19
+                naiveCentroids(ii-fileLims(1)+1).CubeSats_TOF = CubeSats_TOF;
+                for j = 1:obj.Truth_VCF.numCubeSats
+                    naiveCentroids(ii-fileLims(1)+1).Truth_TCF_colvecs(:,j) = ...
+                        obj.Transform.tf('TCF',obj.Truth_VCF.Cubesat(j).pos(ii,:)','VCF');
+                end
                 % Associate with known cubesats within Deployer
                 %[CubeSats] = obj.associateCentroids(CubeSats_TOF,CubeSats);
                 % Determine if cubesats have passed out of range (sets
