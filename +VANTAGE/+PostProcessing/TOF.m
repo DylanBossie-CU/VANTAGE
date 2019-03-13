@@ -38,12 +38,12 @@ classdef TOF
         %
         % @return     A reference to an initialized TOF object
         %
-        function obj = TOF(ModelRef,configFileneame)
+        function obj = TOF(ModelRef,configFilename)
             % Store Model class reference
             obj.ModelRef = ModelRef;
 
             % Read data from configuration file
-            configData = jsondecode(fileread(configFileneame));
+            configData = jsondecode(fileread(configFilename));
 
             % Initialize confuiguration parameters
             obj.maxAllowableRange  = configData.maxAllowableRange;
@@ -145,7 +145,7 @@ classdef TOF
                 % Naively identify centroids in image
                 [CubeSats_TOF,pc] = obj.naiveFindCentroids(ls(ii).name,ls(ii).time,SensorData,CubeSats_TOF);
                 % Associate with known cubesats within Deployer
-                [CubeSats] = obj.associateCentroids(CubeSats_TOF,CubeSats);
+                %[CubeSats] = obj.associateCentroids(CubeSats_TOF,CubeSats);
                 % Determine if cubesats have passed out of range (sets
                 % outOfRange)
                 warning('unimplemented')
