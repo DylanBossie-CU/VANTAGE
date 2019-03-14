@@ -141,6 +141,34 @@ classdef Test_Optical < matlab.unittest.TestCase
             end
         end
         
+        function testModularData(testCase)
+            return
+            close all
+            import VANTAGE.PostProcessing.*
+            OpticalTest = Optical('yes','./Config/OpticalTest.json',6);
+            
+            frame = 'Data/9Mar/Modular_Still_BrightnessUpped_ContrastDown.jpg';
+            frame = imread(frame);
+            [binarizedFrame,centroids,...
+                CubeSatBoundaries] = OpticalTest.ImageProcessing(frame);
+            
+            OpticalTest.plotObjectBoundaries(frame,...
+                CubeSatBoundaries,centroids)
+        end
+        
+        function testSimulatedData(testCase)
+            close all
+            import VANTAGE.PostProcessing.*
+            OpticalTest = Optical('yes','./Config/OpticalTest.json',6);
+            
+            frame = 'Data/AlignedCubeSats.jpg';
+            frame = imread(frame);
+            [~,centroids,CubeSatBoundaries] = OpticalTest.ImageProcessing(frame);
+            
+            OpticalTest.plotObjectBoundaries(frame,...
+                CubeSatBoundaries,centroids)
+        end
+        
     end
     
     

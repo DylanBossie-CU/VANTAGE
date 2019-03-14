@@ -159,7 +159,7 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         24-Jan-2019
-    function [I_binarized_mean] = ImageProcessing(obj,frame)
+    function [I_binarized_mean,centroids,CubeSat_Boundaries_Cut] = ImageProcessing(obj,frame)
         I = frame;
         
         centerpoint = [ceil(obj.width/2),ceil(obj.height/2)];
@@ -181,7 +181,7 @@ classdef Optical
         
         % I_gray_gmean=meanFilter(I_gray_std);
         
-        I_gray_mean=imgaussfilt(I_gray_std,3);
+        I_gray_mean=imgaussfilt(I_gray_std,1);
         
         
         %% memoized values
@@ -199,8 +199,10 @@ classdef Optical
         
         I_binarized_mean = imbinarize(I_gray_mean/255,graythresh(I_gray_mean/255));
         
-        I_boundaries = bwboundaries(I_binarized_mean);
+        %Basic binarization filter
+        %I_binarized_mean = imbinarize(I_gray,0.03);
         
+        I_boundaries = bwboundaries(I_binarized_mean);
         
         %Isolate boundaries corresponding to CubeSats (remove noise)
         CubeSat_Boundaries = obj.detectObjects(I_boundaries);
@@ -257,19 +259,21 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         26-Jan-2019
-    function plotObjectBoundaries(obj,CubeSats,~,centroids)
-        for i = 1:length(CubeSats)
+    function plotObjectBoundaries(~,grayImage,boundaries,centroids)
+        imshow(grayImage)
+        hold on
+        for i = 1:length(boundaries)
             %bwboundaries has an odd convention for placing X in col. 2 and
             %Y in col. 1
-            X = CubeSats{i}(:,2);
-            Y = CubeSats{i}(:,1);
+            X = boundaries{i}(:,2);
+            Y = boundaries{i}(:,1);
+            %Plot boundary for obj{i}
             plot(X,Y)
             
-            if obj.PlotCentroids
-                scatter(centroids{i}(1),centroids{i}(2),'r','+','LineWidth',30)
-                text(centroids{i}(1)+centroids{i}(1)*.05,centroids{i}(2)+...
-                    centroids{i}(2)*.05,'Calculated Centroid','Color','r')
-            end
+            %Plot centroids for obj{i}
+            scatter(centroids{i}(1),centroids{i}(2),'r','+','LineWidth',30)
+            text(centroids{i}(1)+centroids{i}(1)*.05,centroids{i}(2)+...
+                centroids{i}(2)*.05,'Calculated Centroid','Color','r')
         end
     end
     
