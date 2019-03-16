@@ -142,6 +142,7 @@ classdef Test_Optical < matlab.unittest.TestCase
         end
         
         function testModularData(testCase)
+            return
             close all
             import VANTAGE.PostProcessing.*
             OpticalTest = Optical('yes','./Config/OpticalTest.json',6);
@@ -149,7 +150,7 @@ classdef Test_Optical < matlab.unittest.TestCase
             frame = 'Data/Cropped/AIAA1.jpg';
             frame = imread(frame);
             OpticalTest.Frame = frame;
-            [binarizedFrame,centroids,...
+            [~,centroids,...
                 CubeSatBoundaries] = OpticalTest.ImageProcessing(frame);
             
             OpticalTest.plotObjectBoundaries(frame,...
@@ -157,17 +158,22 @@ classdef Test_Optical < matlab.unittest.TestCase
         end
         
         function testSimulatedData(testCase)
-            return
             close all
             import VANTAGE.PostProcessing.*
-            OpticalTest = Optical('yes','./Config/OpticalTest.json',6);
+            truthFilename = 'config/Testing/TruthDataTest.json';
+            manifestFilename = 'Config/Manifest.json';
+            Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename);
+            OpticalTest = Model.Optical;
             
-            frame = 'Data/AlignedCubeSats.jpg';
-            frame = imread(frame);
-            [~,centroids,CubeSatBoundaries] = OpticalTest.ImageProcessing(frame);
-            
-            OpticalTest.plotObjectBoundaries(frame,...
+            dataFiles = dir(strcat(OpticalTest.DataDirec,OpticalTest.FileExtension));
+            for i = 1:length(dataFiles)
+                frameTitle = dataFiles(i).name;
+                frame = imread(strcat(OpticalTest.DataDirec,frameTitle));
+                [~,centroids,CubeSatBoundaries] = OpticalTest.ImageProcessing(frame);
+                OpticalTest.plotObjectBoundaries(frame,...
                 CubeSatBoundaries,centroids)
+            end
+            
         end
         
     end

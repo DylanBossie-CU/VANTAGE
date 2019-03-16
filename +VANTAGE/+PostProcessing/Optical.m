@@ -49,6 +49,9 @@ classdef Optical
 
     % Model handle class
     ModelRef
+
+    % Data filenames
+    FileExtension
   end
   
   
@@ -81,12 +84,8 @@ classdef Optical
         obj.PlotBinarizedImages = SensorData.PlotBinarizedImages;
         obj.PlotCentroids = SensorData.PlotCentroids;
         obj.DataDirec = SensorData.OpticalData;
-        obj.VideoFilename = filename;
         obj.FrameIntervals = FrameIntervals;
-        obj.VideoType = SensorData.OpticalVideoInput;
-        if exist(obj.VideoFilename,'file')
-            obj.Video = VideoReader(obj.VideoFilename);
-        end
+        obj.FileExtension = SensorData.OpticalFileExtension;
     end
 
     %% Read data directory
@@ -204,9 +203,6 @@ classdef Optical
         
         %I_binarized_mean = imbinarize(I_gray_mean/255,graythresh(I_gray_mean/255));
         
-        %Basic binarization filter
-        %I_binarized_mean = imbinarize(I_gray,0.15);
-        
         I_boundaries = bwboundaries(I_binarized);
         
         %Isolate boundaries corresponding to CubeSats (remove noise)
@@ -230,7 +226,14 @@ classdef Optical
 
             %
             %Find CubeSat centroids
-            centroids = obj.findCentroids(CubeSat_Boundaries_Cut);
+            centroids = obj.findCentroids(CubeSat_Boundaries);
+            
+            
+            %Plot results
+            if obj.PlotBinarizedImages
+                obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries,centroids)
+            end
+            
             %{
             %Perform object association
             obj.objectAssociation(centroids,centerpoint,occlusion)
@@ -265,6 +268,7 @@ classdef Optical
     % @author       Dylan Bossie
     % @date         26-Jan-2019
     function plotObjectBoundaries(~,grayImage,boundaries,centroids)
+        figure
         imshow(grayImage)
         hold on
         for i = 1:length(boundaries)
@@ -281,6 +285,7 @@ classdef Optical
                 centroids{i}(2)*.05,'Calculated Centroid','Color','r')
         end
     end
+    
     
     %% Find Object Centroids
     % Use CubeSat boundaries to determine their respective centroid
@@ -757,12 +762,15 @@ classdef Optical
         
         %Find distribution of visual magnitude remaining in I_gray
         visualMagnitudes = I_gray(I_gray~=0);
-        figure
-        histValues = histogram(visualMagnitudes,80);
-        [~,maxIndex] = max(histValues.Values);
-        adaptiveThreshold = histValues.BinEdges(floor(maxIndex/10))/255;
+        [histValues,histEdges,~] = histcounts(visualMagnitudes,80);
+        [~,maxIndex] = max(histValues);
+        
+        %Set adaptive threshold based 10% of the maximum bin count
+        %(brightest part of CubeSat, peak of image)
+        adaptiveThreshold = histEdges(floor(maxIndex/10))/255;
+        
+        %Binarize image again using the new adapative threshold
         I_binarized = imbinarize(I_gray,adaptiveThreshold);
-        imshow(I_binarized);
     end
 end
     

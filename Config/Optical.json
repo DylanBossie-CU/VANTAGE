@@ -1,5 +1,6 @@
 {
-	"OpticalData": "Data/Simulation_TOF-Truth_2-25-19_Tube1/Optical_Data/",
+	"OpticalData": "Data/Cropped/",
+	"OpticalFileExtension": "AIAA*",
 	"OpticalVideoInput": "none",
 	"DesiredFPS": 1,
 	"PlotBinarizedImages": false,
