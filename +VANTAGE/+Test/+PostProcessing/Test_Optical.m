@@ -142,13 +142,13 @@ classdef Test_Optical < matlab.unittest.TestCase
         end
         
         function testModularData(testCase)
-            return
             close all
             import VANTAGE.PostProcessing.*
             OpticalTest = Optical('yes','./Config/OpticalTest.json',6);
             
-            frame = 'Data/9Mar/Modular_Still_BrightnessUpped_ContrastDown.jpg';
+            frame = 'Data/Cropped/AIAA1.jpg';
             frame = imread(frame);
+            OpticalTest.Frame = frame;
             [binarizedFrame,centroids,...
                 CubeSatBoundaries] = OpticalTest.ImageProcessing(frame);
             
@@ -157,6 +157,7 @@ classdef Test_Optical < matlab.unittest.TestCase
         end
         
         function testSimulatedData(testCase)
+            return
             close all
             import VANTAGE.PostProcessing.*
             OpticalTest = Optical('yes','./Config/OpticalTest.json',6);

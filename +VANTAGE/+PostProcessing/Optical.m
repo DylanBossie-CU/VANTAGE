@@ -182,7 +182,8 @@ classdef Optical
         % I_gray_gmean=meanFilter(I_gray_std);
         
         I_gray_mean=imgaussfilt(I_gray_std,1);
-        
+        %Placeholder - remove Gaussian filter
+        %I_gray_mean = I_gray_std;
         
         %% memoized values
         %adapt_Tresh: table of frame distributions saved for training test
@@ -197,10 +198,10 @@ classdef Optical
         %I_binarized_norm = imbinarize(I_gray_norm,binaryTolerance);
         %I_binarized_std = imbinarize(I_gray_std,binaryTolerance);
         
-        I_binarized_mean = imbinarize(I_gray_mean/255,graythresh(I_gray_mean/255));
+        %I_binarized_mean = imbinarize(I_gray_mean/255,graythresh(I_gray_mean/255));
         
         %Basic binarization filter
-        %I_binarized_mean = imbinarize(I_gray,0.03);
+        I_binarized_mean = imbinarize(I_gray,0.15);
         
         I_boundaries = bwboundaries(I_binarized_mean);
         
@@ -645,7 +646,7 @@ classdef Optical
             figure
             surf(Gmag)
             shading interp
-            %}
+        %}
         end
 
         % plotting if you want it
