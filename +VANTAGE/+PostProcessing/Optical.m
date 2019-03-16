@@ -159,7 +159,7 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         24-Jan-2019
-    function [I_binarized_mean,centroids,CubeSat_Boundaries_Cut] = ImageProcessing(obj,frame)
+    function [I_binarized,centroids,CubeSat_Boundaries_Cut] = ImageProcessing(obj,frame)
         I = frame;
         
         centerpoint = [ceil(obj.width/2),ceil(obj.height/2)];
@@ -170,18 +170,18 @@ classdef Optical
         end
         
         %%
-        I_gray_d=double(I_gray);
+        %I_gray_d=double(I_gray);
         
-        maxI=max(max(I_gray_d));
+        %maxI=max(max(I_gray_d));
         
-        I_gray_norm=I_gray_d * (255/maxI);
-        minI=min(min(I_gray_norm));
+        %I_gray_norm=I_gray_d * (255/maxI);
+        %minI=min(min(I_gray_norm));
         
-        I_gray_std=I_gray_norm - minI;
+        %I_gray_std=I_gray_norm - minI;
         
         % I_gray_gmean=meanFilter(I_gray_std);
         
-        I_gray_mean=imgaussfilt(I_gray_std,1);
+        %I_gray_mean=imgaussfilt(I_gray_std,1);
         %Placeholder - remove Gaussian filter
         %I_gray_mean = I_gray_std;
         
@@ -198,12 +198,16 @@ classdef Optical
         %I_binarized_norm = imbinarize(I_gray_norm,binaryTolerance);
         %I_binarized_std = imbinarize(I_gray_std,binaryTolerance);
         
+        % Adaptive Thresholding Binarization
+        I_binarized = obj.Binarization(I_gray);
+        
+        
         %I_binarized_mean = imbinarize(I_gray_mean/255,graythresh(I_gray_mean/255));
         
         %Basic binarization filter
-        I_binarized_mean = imbinarize(I_gray,0.15);
+        %I_binarized_mean = imbinarize(I_gray,0.15);
         
-        I_boundaries = bwboundaries(I_binarized_mean);
+        I_boundaries = bwboundaries(I_binarized);
         
         %Isolate boundaries corresponding to CubeSats (remove noise)
         CubeSat_Boundaries = obj.detectObjects(I_boundaries);
@@ -727,6 +731,38 @@ classdef Optical
 
             PixelLocations{i} = [x y];
         end
+    end
+    
+    % Convert pixel location to VCF unit vector
+    %
+    %
+    % @param      I_gray            Grayscale image of current frame
+    % @return     I_binarized       Adaptively binarized image
+    %
+    % @author     Dylan Bossie
+    % @date       16-Mar-2019
+    %
+    function I_binarized = Binarization(~,I_gray)
+        baseThreshold = 0.05;
+        I_basebinarized = imbinarize(I_gray,baseThreshold);
+        
+        %Update I_gray with [0 0 0] for values below base threshold
+        for i = 1:length(I_gray(:,1))
+            for j = 1:length(I_gray(1,:))
+                if I_basebinarized(i,j) == 0
+                    I_gray(i,j) = 0;
+                end
+            end
+        end
+        
+        %Find distribution of visual magnitude remaining in I_gray
+        visualMagnitudes = I_gray(I_gray~=0);
+        figure
+        histValues = histogram(visualMagnitudes,80);
+        [~,maxIndex] = max(histValues.Values);
+        adaptiveThreshold = histValues.BinEdges(floor(maxIndex/10))/255;
+        I_binarized = imbinarize(I_gray,adaptiveThreshold);
+        imshow(I_binarized);
     end
 end
     
