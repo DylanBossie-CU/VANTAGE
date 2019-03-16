@@ -299,7 +299,7 @@ classdef Optical
     function centroids = findCentroids(~,CubeSats)
         centroids = cell(length(CubeSats),1);
         for i = 1:length(CubeSats)
-            [x,y] = centroid(CubeSats{i});
+            [y,x] = centroid(CubeSats{i});
             centroids{i} = [x,y];
             %{
             centroids{i} = zeros(1,2);
