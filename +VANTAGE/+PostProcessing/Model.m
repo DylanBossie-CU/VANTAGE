@@ -28,7 +28,7 @@ classdef Model < handle
         %
         % @return     A reference to an initialized Model object
         %
-        function obj = Model(manifestFilename,truthFilename)
+        function obj = Model(manifestFilename,truthFilename,configDirecName)
             
             % Process truth data
             obj.Truth_VCF = obj.processTruthData(truthFilename);
@@ -43,15 +43,25 @@ classdef Model < handle
         	import VANTAGE.PostProcessing.TOF
 
         	% Construct child classes
-            obj.Deployer = Deployer(manifestFilename, './Config/Deployer.json',obj);
-            obj.Transform = Transform('./Config/Transform.json');
-            obj.Optical = Optical(obj,'./Config/Optical.json', obj.Deployer.GetNumCubesats());
-            obj.TOF = TOF(obj,'./Config/TOF.json');
+            obj.Deployer = Deployer(manifestFilename, strcat(configDirecName,'/Deployer.json'),obj);
+            obj.Transform = Transform(strcat(configDirecName,'/Transform.json'));
+            obj.Optical = Optical(obj,strcat(configDirecName,'/Optical.json'), obj.Deployer.GetNumCubesats());
+            obj.TOF = TOF(obj,strcat(configDirecName,'/TOF.json'));
             
             % Error catching
             if obj.Deployer.numCubesats ~= obj.Truth_VCF.numCubeSats
                 error('Truth data and manifest do not agree on the number of Cubesats')
             end
+        end
+
+        % A method for looping through optical data and performing sensor fusion
+        % to return a final state output
+        %
+        % @param      obj   The object
+        %
+        %
+        function obj = ComputeStateOutput(obj)
+
         end
         
         % A method for synchronizing timestamps between the TOF and optical
@@ -77,7 +87,7 @@ classdef Model < handle
         % @param      t_cam     The timestamps that correspond to the camera
         %                       position data
         %
-        % @return     A Nx3 matrix of propogated positions
+        % @return     A cell array of propogated positions
         %
         function [pos_prop] = TOFPropagate(obj, pos_init, pos_TOF, t_TOF, t_cam)
 

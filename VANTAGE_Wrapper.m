@@ -11,7 +11,7 @@ clear
 %% Process Deployment Manifest and Truth data
 manifestFilename = 'Config/Manifest.json';
 truthFilename    = '<truthFilename>';
-Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename);
+Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename,'./Config');
 
 %% Send Sensor Ready Signal to RBP
 % pleaseAvionicsTeamSaveMe(wat);
