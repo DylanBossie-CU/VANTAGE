@@ -115,7 +115,7 @@ classdef Deployer
         %
         % @return     the camera origin
         %
-        function [camOrigin] = GetCamOrigin(obj)
+        function [camOrigin] = GetCamOriginVCF(obj)
             camOrigin = obj.DeployerGeometry.CAMERA_LOC;
         end
     end
