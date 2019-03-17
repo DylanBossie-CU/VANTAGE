@@ -161,7 +161,7 @@ classdef Optical
     function [I_binarized,centroids,CubeSat_Boundaries_Cut] = ImageProcessing(obj,frame)
         I = frame;
         
-        centerpoint = [ceil(obj.width/2),ceil(obj.height/2)];
+        centerpoint = [ceil(length(frame(:,1)/2)),ceil(length(frame(1,:))/2)];
         if size(I,3) > 1
             I_gray = rgb2gray(I);
         else
@@ -191,7 +191,6 @@ classdef Optical
         % adapt_Thresh=prctile(I_gray_mean(idx),saved_threshhold(distance));
         % I_binarized_mean=imbinarize(I_gray_mean/255,adapt_Thresh/255);
         
-        %% adaptive
         
         %I_binarized = imbinarize(I_gray_norm,binaryTolerance);
         %I_binarized_norm = imbinarize(I_gray_norm,binaryTolerance);
@@ -209,7 +208,8 @@ classdef Optical
         CubeSat_Boundaries = obj.detectObjects(I_boundaries);
         
         if ~isempty(CubeSat_Boundaries)
-        
+            numCubeSats = length(obj.CubeSats);
+            
             % Occlusion cutting
             CubeSat_Boundaries_Cut = cell(0);
             for i = 1:numel(CubeSat_Boundaries)
@@ -220,40 +220,24 @@ classdef Optical
             end
             
             % Check for occlusion
-            if numel(CubeSat_Boundaries_Cut)==numel(CubeSat_Boundaries)
-                occlusion = [false,false];
-            end
+            numOccluded = numCubeSats-length(CubeSat_Boundaries_Cut);
 
             %
             %Find CubeSat centroids
             centroids = obj.findCentroids(CubeSat_Boundaries);
             
+            % Perform object association
+            obj.objectAssociation(centroids,centerpoint,numOccluded);
             
             %Plot results
             if obj.PlotBinarizedImages
                 obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries,centroids)
             end
             
-            %{
-            %Perform object association
-            obj.objectAssociation(centroids,centerpoint,occlusion)
-
-            if obj.PlotBinarizedImages
-                close all
-                imshow(I_binarized);
-                title('Binarized Frame');
-                hold on
-                obj.plotObjectBoundaries(CubeSat_Boundaries,centerpoint,centroids)
-
-                saveas(gcf,...
-                    ['OpticalImageOutputs/' obj.VideoType ...
-                    num2str(obj.CurrentFrameCount) '.jpg'])
-            end
-            %}
         end
         
         %Transform centroid locations for output to sensor fusion
-        %
+        % To be input soon :) - method exists
     end
     
     %% Plot boundaries
