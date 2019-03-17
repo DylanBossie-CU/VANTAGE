@@ -265,7 +265,7 @@ classdef Optical
             end
 
             %Plot results
-            if true% obj.PlotBinarizedImages
+            if obj.PlotBinarizedImages
                 obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries_Cut,centroids)
             end
 
@@ -730,10 +730,10 @@ classdef Optical
         numCubeSats = length(CubeSats);
         CubeSatUnitVectors = cell(numCubeSats,1);
         for i = 1:numCubeSats
-            centroid = CubeSats{i};
+            Centroid = CubeSats{i};
             %Distance from origin in pixels
-            p_x = centroid(1) - origin(1);
-            p_y = -(centroid(2) - origin(2));
+            p_x = Centroid(1) - origin(1);
+            p_y = -(Centroid(2) - origin(2));
             f = -focalLength;
 
             x = p_x*pixelSizeX;
