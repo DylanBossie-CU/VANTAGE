@@ -28,7 +28,7 @@ classdef Model < handle
         %
         % @return     A reference to an initialized Model object
         %
-        function obj = Model(manifestFilename,truthFilename)
+        function obj = Model(manifestFilename,truthFilename,configDirecName)
             
             % Process truth data
             obj.Truth_VCF = obj.processTruthData(truthFilename);
@@ -43,15 +43,25 @@ classdef Model < handle
         	import VANTAGE.PostProcessing.TOF
 
         	% Construct child classes
-            obj.Deployer = Deployer(manifestFilename, './Config/Deployer.json',obj);
-            obj.Transform = Transform('./Config/Transform.json');
-            obj.Optical = Optical(obj,'./Config/Optical.json', obj.Deployer.GetNumCubesats());
-            obj.TOF = TOF(obj,'./Config/TOF.json');
+            obj.Deployer = Deployer(manifestFilename, strcat(configDirecName,'/Deployer.json'),obj);
+            obj.Transform = Transform(strcat(configDirecName,'/Transform.json'));
+            obj.Optical = Optical(obj,strcat(configDirecName,'/Optical.json'), obj.Deployer.GetNumCubesats());
+            obj.TOF = TOF(obj,strcat(configDirecName,'/TOF.json'));
             
             % Error catching
             if obj.Deployer.numCubesats ~= obj.Truth_VCF.numCubeSats
                 error('Truth data and manifest do not agree on the number of Cubesats')
             end
+        end
+
+        % A method for looping through optical data and performing sensor fusion
+        % to return a final state output
+        %
+        % @param      obj   The object
+        %
+        %
+        function obj = ComputeStateOutput(obj)
+
         end
         
         % A method for synchronizing timestamps between the TOF and optical
@@ -77,7 +87,7 @@ classdef Model < handle
         % @param      t_cam     The timestamps that correspond to the camera
         %                       position data
         %
-        % @return     A Nx3 matrix of propogated positions
+        % @return     A cell array of propogated positions
         %
         function [pos_prop] = TOFPropagate(obj, pos_init, pos_TOF, t_TOF, t_cam)
 
@@ -89,6 +99,61 @@ classdef Model < handle
 
             % Propogate position to camera timestamps
             pos_prop = pos_init + t_cam(1).*V_TOF + (t_cam-t_cam(1)).*V_TOF;
+        end
+
+        % A method for approximating a cubesat centroid using a weighted
+        % centroiding method
+        %
+        % @param      obj               The object
+        % @param      isSystemCentroid  Indicates if system centroid
+        % @param      camOrigin         camera origin in the VANTAGE Cartesian
+        %                               Frame
+        % @param      camVecs           cell array of vectors pointing from
+        %                               camera origin to estimated centroid in
+        %                               VCF
+        % @param      pos_TOF           VCF position estimates from the TOF
+        %                               sensor suite
+        % @param      sig_cam           uncertainty in camera estimates in the
+        %                               VCF
+        % @param      sig_TOF           uncertainty in the TOF estimates in the
+        %                               VCF
+        %
+        % @return     pos       position estimate of cubesat centroids in the VCF
+        %             frame using both sensor method returns
+        %
+        function [pos] = RunSensorFusion(obj, isSystemCentroid, camOrigin, camVecs, pos_TOF, sig_cam, sig_TOF)
+
+        	% Initialize position cell array
+        	numCubesats = obj.Deployer.GetNumCubesats();
+        	pos = cell{numCubesats,1};
+
+        	% Perform sensor fusion
+        	if isSystemCentroid
+
+        		% Find system centroid from TOF estimates
+        		meanTOF = zeros(1,3);
+        		for i = 1:numCubesats
+        			meanTOF = meanTOF + pos_TOF{i};
+        		end
+        		meanTOF = meanTOF./numCubesats;
+
+        		% Run sensor fusion on system centroid estimates
+        		tmp = SensorFusion(obj, camOrigin, camVecs{1}, meanTOF, sig_cam, sig_TOF)
+
+        		% Calculate adjustment vector
+        		sensorFusionDiff = tmp-mean_TOF;
+
+        		% Adjust TOF vectors to find new centroids
+        		for i = 1:numCubesats
+        			pos{i} = pos_TOF{i} + sensorFusionDiff;
+        		end
+        	else
+        		% Loop through estimates individually and perform sensor fusion
+        		for i = 1:numCubesats
+        			pos{i} = SensorFusion(obj, camOrigin, camVecs{i}, pos_TOF{i}, sig_cam, sig_TOF)
+        		end
+    		end
+
         end
         
         % A method for approximating a cubesat centroid using a weighted

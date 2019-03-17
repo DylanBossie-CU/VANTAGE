@@ -159,7 +159,7 @@ classdef Test_Optical < matlab.unittest.TestCase
             import VANTAGE.PostProcessing.*
             truthFilename = 'config/Testing/TruthDataTest.json';
             manifestFilename = 'Config/Manifest.json';
-            Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename);
+            Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename,'./Config');
             OpticalTest = Model.Optical;
             
             dataFiles = dir(strcat(OpticalTest.DataDirec,OpticalTest.FileExtension));

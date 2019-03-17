@@ -103,7 +103,7 @@ classdef Optical
     % @author     Justin Fay
     % @date       10-Mar-2019
     %
-    function [obj,didRead] = processInputFramesFromImages(obj)
+    function [obj,didRead,direc] = readInputFramesFromImages(obj)
         
         % Initialize read status
         didRead = false;
@@ -115,7 +115,7 @@ classdef Optical
         % Exclude files that aren't data
         tmp = false(numFile,1);
         for i = 1:numFile
-            tmp(i) = contains(direc(i).name,'.jpg');
+            tmp(i) = contains(direc(i).name,'.jpg') && ~direc(i).isdir;
         end
         direc = direc(tmp);
         
@@ -127,11 +127,13 @@ classdef Optical
         end
         
         % Process frames
+        %{
         for i = 1:numFile
             obj.Frame = imread(strcat(obj.DataDirec,'/',direc(i).name));           
             image = obj.ImageProcessing(obj.Frame);
             obj.Image = image;
         end
+        %}
     end
 
     %% Read input video file
