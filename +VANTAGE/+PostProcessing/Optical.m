@@ -46,9 +46,14 @@ classdef Optical
     PlotBinarizedImages
     
     PlotCentroids
+    
+    PlotHist
 
     % Model handle class
     ModelRef
+
+    % Data filenames
+    FileExtension
   end
   
   
@@ -81,12 +86,9 @@ classdef Optical
         obj.PlotBinarizedImages = SensorData.PlotBinarizedImages;
         obj.PlotCentroids = SensorData.PlotCentroids;
         obj.DataDirec = SensorData.OpticalData;
-        obj.VideoFilename = filename;
         obj.FrameIntervals = FrameIntervals;
-        obj.VideoType = SensorData.OpticalVideoInput;
-        if exist(obj.VideoFilename,'file')
-            obj.Video = VideoReader(obj.VideoFilename);
-        end
+        obj.FileExtension = SensorData.OpticalFileExtension;
+        obj.PlotHist = SensorData.PlotHist;
     end
 
     %% Read data directory
@@ -101,7 +103,7 @@ classdef Optical
     % @author     Justin Fay
     % @date       10-Mar-2019
     %
-    function [obj,didRead] = processInputFramesFromImages(obj)
+    function [obj,didRead,direc] = readInputFramesFromImages(obj)
         
         % Initialize read status
         didRead = false;
@@ -113,7 +115,7 @@ classdef Optical
         % Exclude files that aren't data
         tmp = false(numFile,1);
         for i = 1:numFile
-            tmp(i) = contains(direc(i).name,'.jpg');
+            tmp(i) = contains(direc(i).name,'.jpg') && ~direc(i).isdir;
         end
         direc = direc(tmp);
         
@@ -125,11 +127,13 @@ classdef Optical
         end
         
         % Process frames
+        %{
         for i = 1:numFile
             obj.Frame = imread(strcat(obj.DataDirec,'/',direc(i).name));           
             image = obj.ImageProcessing(obj.Frame);
             obj.Image = image;
         end
+        %}
     end
 
     %% Read input video file
@@ -152,6 +156,19 @@ classdef Optical
             obj.Image = image;
         end
     end
+
+    %% Perform optical processing
+    % Process optical frames to find the estimated cubesat positions
+    %
+    % @author       Justin Fay
+    % @date         17-Mar-2019
+    function [pos] = OpticalProcessing(obj)
+
+        % Process current frame
+        centroids = obj.ImageProcessing(obj,obj.Frame)
+
+
+    end
     
     %% Perform image processing
     % Execute video frame processing based on provided automated naming
@@ -159,10 +176,9 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         24-Jan-2019
-    function [I_binarized_mean] = ImageProcessing(obj,frame)
+    function [centroids, isSystemCentroid] = ImageProcessing(obj,frame)
         I = frame;
-        
-        centerpoint = [ceil(obj.width/2),ceil(obj.height/2)];
+        centerpoint = [ceil(length(frame(:,1)/2)),ceil(length(frame(1,:))/2)];
         if size(I,3) > 1
             I_gray = rgb2gray(I);
         else
@@ -170,19 +186,20 @@ classdef Optical
         end
         
         %%
-        I_gray_d=double(I_gray);
+        %I_gray_d=double(I_gray);
         
-        maxI=max(max(I_gray_d));
+        %maxI=max(max(I_gray_d));
         
-        I_gray_norm=I_gray_d * (255/maxI);
-        minI=min(min(I_gray_norm));
+        %I_gray_norm=I_gray_d * (255/maxI);
+        %minI=min(min(I_gray_norm));
         
-        I_gray_std=I_gray_norm - minI;
+        %I_gray_std=I_gray_norm - minI;
         
         % I_gray_gmean=meanFilter(I_gray_std);
         
-        I_gray_mean=imgaussfilt(I_gray_std,3);
-        
+        %I_gray_mean=imgaussfilt(I_gray_std,1);
+        %Placeholder - remove Gaussian filter
+        %I_gray_mean = I_gray_std;
         
         %% memoized values
         %adapt_Tresh: table of frame distributions saved for training test
@@ -191,59 +208,69 @@ classdef Optical
         % adapt_Thresh=prctile(I_gray_mean(idx),saved_threshhold(distance));
         % I_binarized_mean=imbinarize(I_gray_mean/255,adapt_Thresh/255);
         
-        %% adaptive
         
         %I_binarized = imbinarize(I_gray_norm,binaryTolerance);
         %I_binarized_norm = imbinarize(I_gray_norm,binaryTolerance);
         %I_binarized_std = imbinarize(I_gray_std,binaryTolerance);
         
-        I_binarized_mean = imbinarize(I_gray_mean/255,graythresh(I_gray_mean/255));
+        % Adaptive Thresholding Binarization
+        I_binarized = obj.Binarization(I_gray);
         
-        I_boundaries = bwboundaries(I_binarized_mean);
         
+        %I_binarized_mean = imbinarize(I_gray_mean/255,graythresh(I_gray_mean/255));
+        
+        I_boundaries = bwboundaries(I_binarized);
         
         %Isolate boundaries corresponding to CubeSats (remove noise)
         CubeSat_Boundaries = obj.detectObjects(I_boundaries);
         
         if ~isempty(CubeSat_Boundaries)
-        
+            numCubeSats = length(obj.CubeSats);
+            
             % Occlusion cutting
             CubeSat_Boundaries_Cut = cell(0);
+            CubeSat_polyshapes = cell(0);
+            n = 1;
             for i = 1:numel(CubeSat_Boundaries)
                 cutPoly = obj.occlusionCut(CubeSat_Boundaries{i}(:,1),CubeSat_Boundaries{i}(:,2),'h',6);
                 for j = 1:numel(cutPoly)
-                    CubeSat_Boundaries_Cut = [CubeSat_Boundaries_Cut; cutPoly{j}.Vertices];
+                    CubeSat_Boundaries_Cut{n} = cutPoly{j}.Vertices;
+                    CubeSat_polyshapes{n} = cutPoly{j};
+                    n = n+1;
                 end
             end
             
             % Check for occlusion
-            if numel(CubeSat_Boundaries_Cut)==numel(CubeSat_Boundaries)
-                occlusion = [false,false];
-            end
+            numOccluded = numCubeSats-length(CubeSat_Boundaries_Cut);
 
             %
             %Find CubeSat centroids
-            centroids = obj.findCentroids(CubeSat_Boundaries_Cut);
-            %{
-            %Perform object association
-            obj.objectAssociation(centroids,centerpoint,occlusion)
+            centroids = obj.findCentroids(CubeSat_polyshapes);
+            
+            % Perform object association
+            obj.objectAssociation(centroids,centerpoint,numOccluded);
 
-            if obj.PlotBinarizedImages
-                close all
-                imshow(I_binarized);
-                title('Binarized Frame');
-                hold on
-                obj.plotObjectBoundaries(CubeSat_Boundaries,centerpoint,centroids)
-
-                saveas(gcf,...
-                    ['OpticalImageOutputs/' obj.VideoType ...
-                    num2str(obj.CurrentFrameCount) '.jpg'])
+            % Check number of found centroids
+            if numel(centroids) == numCubeSats
+                isSystemCentroid = false;
+            else
+                isSystemCentroid = true;
+                meanCent = zeros(1,2);
+                for i = 1:numel(centroids)
+                    meanCent = meanCent + centroids{i};
+                end
+                meanCent = meanCent./numel(centroids);
+                centroids = cell(1);
+                centroids{1} = meanCent;
             end
-            %}
+
+            %Plot results
+            if true% obj.PlotBinarizedImages
+                obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries_Cut,centroids)
+            end
+
         end
-        
-        %Transform centroid locations for output to sensor fusion
-        %
+
     end
     
     %% Plot boundaries
@@ -257,21 +284,26 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         26-Jan-2019
-    function plotObjectBoundaries(obj,CubeSats,~,centroids)
-        for i = 1:length(CubeSats)
+    function plotObjectBoundaries(~,grayImage,boundaries,centroids)
+        figure
+        imshow(grayImage)
+        hold on
+        for i = 1:length(boundaries)
             %bwboundaries has an odd convention for placing X in col. 2 and
             %Y in col. 1
-            X = CubeSats{i}(:,2);
-            Y = CubeSats{i}(:,1);
+            X = boundaries{i}(:,2);
+            Y = boundaries{i}(:,1);
+            %Plot boundary for obj{i}
             plot(X,Y)
-            
-            if obj.PlotCentroids
-                scatter(centroids{i}(1),centroids{i}(2),'r','+','LineWidth',30)
-                text(centroids{i}(1)+centroids{i}(1)*.05,centroids{i}(2)+...
-                    centroids{i}(2)*.05,'Calculated Centroid','Color','r')
-            end
+        end
+        for i = 1:numel(centroids)
+            %Plot centroids for obj{i}
+            scatter(centroids{i}(1),centroids{i}(2),'r','+','LineWidth',30)
+            text(centroids{i}(1)+centroids{i}(1)*.05,centroids{i}(2)+...
+                centroids{i}(2)*.05,'Calculated Centroid','Color','r')
         end
     end
+    
     
     %% Find Object Centroids
     % Use CubeSat boundaries to determine their respective centroid
@@ -283,9 +315,13 @@ classdef Optical
     function centroids = findCentroids(~,CubeSats)
         centroids = cell(length(CubeSats),1);
         for i = 1:length(CubeSats)
+            [y,x] = centroid(CubeSats{i});
+            centroids{i} = [x,y];
+            %{
             centroids{i} = zeros(1,2);
             centroids{i}(1) = mean(CubeSats{i}(:,2));
             centroids{i}(2) = mean(CubeSats{i}(:,1));
+            %}
         end
     end
     
@@ -444,21 +480,36 @@ classdef Optical
         convHullOuterBin = ~isinterior(convHull_poly,xMesh(:),yMesh(:));
         convHullOuterBin = reshape(convHullOuterBin,[max(y)+2,max(x)+2]);
         D = bwdist(convHullOuterBin);
+        %{
+        tmp = polyshape(x,y);
+        for i = 1:size(xMesh,1)
+            i
+            [I,J] = isinterior(tmp,[xMesh(i,:)',yMesh(i,:)']);
+            D(i,:) = D(i,:).*J';
+        end
+        %}
         r = zeros(numel(x),1);
         for i = 1:numel(x)
             r(i) = D(y(i),x(i));
+            if r(i) <= 5
+                r(i) = 0;
+            end
         end
 
         % estimate number of concavity points
-        windowSize = ceil(numel(r)*0.15);
+        windowSize = ceil(numel(r)*0.05);
         b = (1/windowSize)*ones(1,windowSize);
         a = 1;
         r_filter = filter(b,a,r);
         minProm = 0.1;
-        [tmpPks,fitPks,~,tmpProm] = findpeaks(r_filter,'SortStr','descend',...
-            'MinPeakProminence',minProm,...
-            'MaxPeakWidth',5,...
-            'MinPeakHeight',max(r_filter)*0.1);
+        [tmpPks,fitPks,~,tmpProm] = findpeaks(r_filter,'SortStr','descend');
+        [tmpPks,fitPks,~,tmpProm] = findpeaks(r,'SortStr','descend',...
+            'MinPeakProminence',max(tmpProm.*0.05),...
+            'MinPeakWidth',0,...
+            'MaxPeakWidth',Inf,...
+            'MinPeakHeight',0,...
+            'MinPeakDistance',numel(r_filter)*0.25);
+        %fitPks = fitPks - round(windowSize./2);
         maxPks = numCubesats*2-2;
         if numel(tmpPks)>maxPks
             [~,diffI] = max(diff(sort(tmpProm)));
@@ -470,6 +521,7 @@ classdef Optical
             expectedPks = numel(tmpPks);
         end
         expectedPks = expectedPks - mod(expectedPks,2);
+        fitPks = fitPks(1:expectedPks);
 
         if expectedPks==0
             cutPoly{1} = polyshape(x,y);
@@ -579,7 +631,7 @@ classdef Optical
             end
             %}
 
-            %% Cutting into multiple polyshapes
+            %% Cutting into multiple polyshapes           
             numShapes = numSets+1;
             numPts = numel(x);
             cutPoly = cell(numShapes,1);
@@ -611,8 +663,8 @@ classdef Optical
             for i = 1:numShapes
                 cutArea(i) = area(cutPoly{i});
             end   
-            I = cutArea(i)./max(cutArea) < 0.05;
-            cutPoly = cutPoly{~I};
+            I = cutArea./max(cutArea) < 0.05;
+            cutPoly = cutPoly(~I);
         else
 
             %% image gradient method for obfuscation
@@ -641,7 +693,7 @@ classdef Optical
             figure
             surf(Gmag)
             shading interp
-            %}
+        %}
         end
 
         % plotting if you want it
@@ -665,7 +717,7 @@ classdef Optical
     % @author     Dylan Bossie
     % @date       4-Mar-2019
     %
-    function CubeSatUnitVectors = PixelToUnitVec(~,CubeSats)
+    function CubeSatUnitVectors = PixelToUnitVec(obj,CubeSats)
         %Read optical camera parameters
         CameraParameters = jsondecode(fileread('./Config/Sensors.json'));
         focalLength = CameraParameters.OpticalFocalLength;
@@ -678,7 +730,7 @@ classdef Optical
         numCubeSats = length(CubeSats);
         CubeSatUnitVectors = cell(numCubeSats,1);
         for i = 1:numCubeSats
-            centroid = CubeSats{i}.centroid;
+            centroid = CubeSats{i};
             %Distance from origin in pixels
             p_x = centroid(1) - origin(1);
             p_y = -(centroid(2) - origin(2));
@@ -723,6 +775,47 @@ classdef Optical
             PixelLocations{i} = [x y];
         end
     end
+    
+    % Convert pixel location to VCF unit vector
+    %
+    %
+    % @param      I_gray            Grayscale image of current frame
+    % @return     I_binarized       Adaptively binarized image
+    %
+    % @author     Dylan Bossie
+    % @date       16-Mar-2019
+    %
+    function I_binarized = Binarization(obj,I_gray)
+        baseThreshold = 0.05;
+        I_basebinarized = imbinarize(I_gray,baseThreshold);
+        
+        %Update I_gray with [0 0 0] for values below base threshold
+        for i = 1:length(I_gray(:,1))
+            for j = 1:length(I_gray(1,:))
+                if I_basebinarized(i,j) == 0
+                    I_gray(i,j) = 0;
+                end
+            end
+        end
+        
+        %Find distribution of visual magnitude remaining in I_gray
+        visualMagnitudes = I_gray(I_gray~=0);
+        bins = 80;
+        [histValues,histEdges,~] = histcounts(visualMagnitudes,bins);
+        histValues = sgolayfilt(histValues,2,obj.roundToNearestOdd(bins/10));
+        if obj.PlotHist
+            figure
+            plot(histEdges(1:end-1),histValues)
+        end
+        [~,maxIndex] = max(histValues);
+        
+        %Set adaptive threshold based 10% of the maximum bin count
+        %(brightest part of CubeSat, peak of image)
+        adaptiveThreshold = histEdges(floor(maxIndex/10))/255;
+        
+        %Binarize image again using the new adapative threshold
+        I_binarized = imbinarize(I_gray,adaptiveThreshold);
+    end
 end
     
     
@@ -755,7 +848,36 @@ end
           sampleSize,maxDistance);
       
         p = polyfit(points(inlierIdx,1),points(inlierIdx,2),1);
-    end  
+    end
+    
+    % 
+        % Round to nearest odd integer
+        %
+        % @param    x   number to be rounded
+        % 
+        % @return   nearest odd integer
+        %
+        % @author   Joshua Kirby
+        % @date     06-Mar-2019
+        function y = roundToNearestOdd(obj,x)
+            y = 2*round(x/2) + obj.binarySign(x-round(x));
+        end
+        
+        % 
+        % Return sign without zero, for zero return 1
+        %  
+        % @param    num     number whose sign is to be determined
+        %
+        % @return   binary sign
+        %
+        % @author   Joshua Kirby
+        % @date     06-Mar-2019
+        function bSign = binarySign(~,num)
+            bSign = sign(num);
+            if ~bSign
+                bSign = 1;
+            end
+        end
   end
   
   

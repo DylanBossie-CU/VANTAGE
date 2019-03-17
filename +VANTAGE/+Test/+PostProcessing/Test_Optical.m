@@ -141,6 +141,40 @@ classdef Test_Optical < matlab.unittest.TestCase
             end
         end
         
+        function testModularData(testCase)
+            return
+            close all
+            import VANTAGE.PostProcessing.*
+            OpticalTest = Optical('yes','./Config/OpticalTest.json',6);
+            
+            frame = 'Data/Cropped/AIAA1.jpg';
+            frame = imread(frame);
+            OpticalTest.Frame = frame;
+            [~,centroids,...
+                CubeSatBoundaries] = OpticalTest.ImageProcessing(frame);
+        end
+        
+        function testPipeline(testCase)
+            %This test case operates as the method for
+            %Optical.OpticalProcessing until Optical I/O is satisfactory
+            close all
+            import VANTAGE.PostProcessing.*
+            truthFilename = 'config/Testing/TruthDataTest.json';
+            manifestFilename = 'Config/Manifest.json';
+            Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename,'./Config');
+            OpticalTest = Model.Optical;
+            
+            dataFiles = dir(strcat(OpticalTest.DataDirec,OpticalTest.FileExtension));
+            for i = 1:length(dataFiles)
+                if ~dataFiles(i).isdir
+                    frameTitle = dataFiles(i).name;
+                    frame = imread(strcat(OpticalTest.DataDirec,frameTitle));
+                    [centroids] = OpticalTest.ImageProcessing(frame);
+                end
+            end
+            
+        end
+        
     end
     
     
