@@ -69,8 +69,9 @@ classdef CubeSat_TOF
         % timestamp of current point cloud
         time
         
-        % says whether faces are good enough to be trusted
-        trustedSat
+        % says whether faces are good enough to be trusted, defaults to
+        % true
+        trustedSat = 1
         
         
     end
