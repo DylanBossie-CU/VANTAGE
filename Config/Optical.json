@@ -3,7 +3,8 @@
 	"OpticalFileExtension": "AIAA*",
 	"OpticalVideoInput": "none",
 	"DesiredFPS": 1,
-	"PlotBinarizedImages": false,
-	"PlotCentroids": false
+	"PlotBinarizedImages": true,
+	"PlotCentroids": true,
+	"PlotHist": false
 	
 }

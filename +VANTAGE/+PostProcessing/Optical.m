@@ -46,6 +46,8 @@ classdef Optical
     PlotBinarizedImages
     
     PlotCentroids
+    
+    PlotHist
 
     % Model handle class
     ModelRef
@@ -86,6 +88,7 @@ classdef Optical
         obj.DataDirec = SensorData.OpticalData;
         obj.FrameIntervals = FrameIntervals;
         obj.FileExtension = SensorData.OpticalFileExtension;
+        obj.PlotHist = SensorData.PlotHist;
     end
 
     %% Read data directory
@@ -160,7 +163,6 @@ classdef Optical
     % @date         24-Jan-2019
     function [I_binarized,centroids,CubeSat_Boundaries_Cut] = ImageProcessing(obj,frame)
         I = frame;
-        
         centerpoint = [ceil(length(frame(:,1)/2)),ceil(length(frame(1,:))/2)];
         if size(I,3) > 1
             I_gray = rgb2gray(I);
@@ -232,12 +234,10 @@ classdef Optical
             
             % Perform object association
             obj.objectAssociation(centroids,centerpoint,numOccluded);
-
-            centroids = obj.findCentroids(CubeSat_polyshapes);
             
             %Plot results
             if obj.PlotBinarizedImages
-                obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries,centroids)
+                obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries_Cut,centroids)
             end
 
         end
@@ -463,7 +463,7 @@ classdef Optical
         r = zeros(numel(x),1);
         for i = 1:numel(x)
             r(i) = D(y(i),x(i));
-            if r(i) <= 3
+            if r(i) <= 5
                 r(i) = 0;
             end
         end
@@ -757,7 +757,7 @@ classdef Optical
     % @author     Dylan Bossie
     % @date       16-Mar-2019
     %
-    function I_binarized = Binarization(~,I_gray)
+    function I_binarized = Binarization(obj,I_gray)
         baseThreshold = 0.05;
         I_basebinarized = imbinarize(I_gray,baseThreshold);
         
@@ -772,7 +772,13 @@ classdef Optical
         
         %Find distribution of visual magnitude remaining in I_gray
         visualMagnitudes = I_gray(I_gray~=0);
-        [histValues,histEdges,~] = histcounts(visualMagnitudes,80);
+        bins = 80;
+        [histValues,histEdges,~] = histcounts(visualMagnitudes,bins);
+        histValues = sgolayfilt(histValues,2,obj.roundToNearestOdd(bins/10));
+        if obj.PlotHist
+            figure
+            plot(histEdges(1:end-1),histValues)
+        end
         [~,maxIndex] = max(histValues);
         
         %Set adaptive threshold based 10% of the maximum bin count
@@ -814,7 +820,36 @@ end
           sampleSize,maxDistance);
       
         p = polyfit(points(inlierIdx,1),points(inlierIdx,2),1);
-    end  
+    end
+    
+    % 
+        % Round to nearest odd integer
+        %
+        % @param    x   number to be rounded
+        % 
+        % @return   nearest odd integer
+        %
+        % @author   Joshua Kirby
+        % @date     06-Mar-2019
+        function y = roundToNearestOdd(obj,x)
+            y = 2*round(x/2) + obj.binarySign(x-round(x));
+        end
+        
+        % 
+        % Return sign without zero, for zero return 1
+        %  
+        % @param    num     number whose sign is to be determined
+        %
+        % @return   binary sign
+        %
+        % @author   Joshua Kirby
+        % @date     06-Mar-2019
+        function bSign = binarySign(~,num)
+            bSign = sign(num);
+            if ~bSign
+                bSign = 1;
+            end
+        end
   end
   
   

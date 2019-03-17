@@ -2,7 +2,7 @@
 	"OpticalData": "Data/9Mar/Modular_Still_BrightnessUpped.jpg",
 	"OpticalVideoInput": "none",
 	"DesiredFPS": 1,
-	"PlotBinarizedImages": true,
-	"PlotCentroids": true
+	"PlotBinarizedImages": false,
+	"PlotCentroids": false
 	
 }

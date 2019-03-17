@@ -152,9 +152,6 @@ classdef Test_Optical < matlab.unittest.TestCase
             OpticalTest.Frame = frame;
             [~,centroids,...
                 CubeSatBoundaries] = OpticalTest.ImageProcessing(frame);
-            
-            OpticalTest.plotObjectBoundaries(frame,...
-                CubeSatBoundaries,centroids)
         end
         
         function testSimulatedData(testCase)
@@ -171,8 +168,6 @@ classdef Test_Optical < matlab.unittest.TestCase
                     frameTitle = dataFiles(i).name;
                     frame = imread(strcat(OpticalTest.DataDirec,frameTitle));
                     [~,centroids,CubeSatBoundaries] = OpticalTest.ImageProcessing(frame);
-                    OpticalTest.plotObjectBoundaries(frame,...
-                    CubeSatBoundaries,centroids)
                 end
             end
             
