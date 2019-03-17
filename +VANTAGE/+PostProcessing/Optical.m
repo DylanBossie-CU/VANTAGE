@@ -240,10 +240,10 @@ classdef Optical
                 obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries_Cut,centroids)
             end
 
+            % Unit vector transform
+            obj.PixelToUnitVec(centroids);
         end
-        
-        %Transform centroid locations for output to sensor fusion
-        % To be input soon :) - method exists
+
     end
     
     %% Plot boundaries
@@ -689,7 +689,7 @@ classdef Optical
     % @author     Dylan Bossie
     % @date       4-Mar-2019
     %
-    function CubeSatUnitVectors = PixelToUnitVec(~,CubeSats)
+    function CubeSatUnitVectors = PixelToUnitVec(obj,CubeSats)
         %Read optical camera parameters
         CameraParameters = jsondecode(fileread('./Config/Sensors.json'));
         focalLength = CameraParameters.OpticalFocalLength;
