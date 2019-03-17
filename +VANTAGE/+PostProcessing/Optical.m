@@ -176,7 +176,7 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         24-Jan-2019
-    function [centroids] = ImageProcessing(obj,frame)
+    function [centroids, isSystemCentroid] = ImageProcessing(obj,frame)
         I = frame;
         centerpoint = [ceil(length(frame(:,1)/2)),ceil(length(frame(1,:))/2)];
         if size(I,3) > 1
@@ -250,8 +250,22 @@ classdef Optical
             % Perform object association
             obj.objectAssociation(centroids,centerpoint,numOccluded);
 
+            % Check number of found centroids
+            if numel(centroids) == numCubeSats
+                isSystemCentroid = false;
+            else
+                isSystemCentroid = true;
+                meanCent = zeros(1,2);
+                for i = 1:numel(centroids)
+                    meanCent = meanCent + centroids{i};
+                end
+                meanCent = meanCent./numel(centroids);
+                centroids = cell(1);
+                centroids{1} = meanCent;
+            end
+
             %Plot results
-            if obj.PlotBinarizedImages
+            if true% obj.PlotBinarizedImages
                 obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries_Cut,centroids)
             end
 
@@ -281,7 +295,8 @@ classdef Optical
             Y = boundaries{i}(:,1);
             %Plot boundary for obj{i}
             plot(X,Y)
-            
+        end
+        for i = 1:numel(centroids)
             %Plot centroids for obj{i}
             scatter(centroids{i}(1),centroids{i}(2),'r','+','LineWidth',30)
             text(centroids{i}(1)+centroids{i}(1)*.05,centroids{i}(2)+...
