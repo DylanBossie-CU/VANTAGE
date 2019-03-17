@@ -103,7 +103,7 @@ classdef Optical
     % @author     Justin Fay
     % @date       10-Mar-2019
     %
-    function [obj,didRead,direc] = readInputFramesFromImages(obj)
+    function [didRead,direc] = readInputFramesFromImages(obj)
         
         % Initialize read status
         didRead = false;
