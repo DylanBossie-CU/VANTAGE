@@ -61,16 +61,17 @@ classdef Model < handle
         %
         function obj = ComputeStateOutput(obj)
         	% Get odirectory of optical frames
-        	[obj,didRead,direc] = readInputFramesFromImages(obj.Optical);
+        	[obj.Optical,didRead,direc] = readInputFramesFromImages(obj.Optical);
 
         	if didRead
 	        	% Loop though optical frames
 	        	for i = 1:numel(direc)
 	        		% Read frame
-	        		obj.Optical.Frame = imread(strcat(obj.Optical.DataDirec,'/',direc(i).name));
+	        		obj.Optical.Frame = direc(i);
 
 	        		% Run optical processing
-	        		[camVecs, camTimestep, isSystemCentroid] = obj.Optical.OpticalProcessing();
+	        		[CamUnitVecsVCF, CamTimestep, isSystemCentroid] =...
+                        obj.Optical.OpticalProcessing(obj.Optical.Frame);
 
 	        		% Get propogated TOF positions
 	        		%pos_TOF = obj.TOF.propogatedShit(camTimestep)
