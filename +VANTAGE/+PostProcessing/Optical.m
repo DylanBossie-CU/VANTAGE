@@ -212,10 +212,14 @@ classdef Optical
             
             % Occlusion cutting
             CubeSat_Boundaries_Cut = cell(0);
+            CubeSat_polyshapes = cell(0);
+            n = 1;
             for i = 1:numel(CubeSat_Boundaries)
                 cutPoly = obj.occlusionCut(CubeSat_Boundaries{i}(:,1),CubeSat_Boundaries{i}(:,2),'h',6);
                 for j = 1:numel(cutPoly)
-                    CubeSat_Boundaries_Cut = [CubeSat_Boundaries_Cut; cutPoly{j}.Vertices];
+                    CubeSat_Boundaries_Cut{n} = cutPoly{j}.Vertices;
+                    CubeSat_polyshapes{n} = cutPoly{j};
+                    n = n+1;
                 end
             end
             
@@ -228,12 +232,14 @@ classdef Optical
             
             % Perform object association
             obj.objectAssociation(centroids,centerpoint,numOccluded);
+
+            centroids = obj.findCentroids(CubeSat_polyshapes);
             
             %Plot results
             if obj.PlotBinarizedImages
                 obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries,centroids)
             end
-            
+
         end
         
         %Transform centroid locations for output to sensor fusion
@@ -281,9 +287,13 @@ classdef Optical
     function centroids = findCentroids(~,CubeSats)
         centroids = cell(length(CubeSats),1);
         for i = 1:length(CubeSats)
+            [y,x] = centroid(CubeSats{i});
+            centroids{i} = [x,y];
+            %{
             centroids{i} = zeros(1,2);
             centroids{i}(1) = mean(CubeSats{i}(:,2));
             centroids{i}(2) = mean(CubeSats{i}(:,1));
+            %}
         end
     end
     
@@ -442,21 +452,36 @@ classdef Optical
         convHullOuterBin = ~isinterior(convHull_poly,xMesh(:),yMesh(:));
         convHullOuterBin = reshape(convHullOuterBin,[max(y)+2,max(x)+2]);
         D = bwdist(convHullOuterBin);
+        %{
+        tmp = polyshape(x,y);
+        for i = 1:size(xMesh,1)
+            i
+            [I,J] = isinterior(tmp,[xMesh(i,:)',yMesh(i,:)']);
+            D(i,:) = D(i,:).*J';
+        end
+        %}
         r = zeros(numel(x),1);
         for i = 1:numel(x)
             r(i) = D(y(i),x(i));
+            if r(i) <= 3
+                r(i) = 0;
+            end
         end
 
         % estimate number of concavity points
-        windowSize = ceil(numel(r)*0.15);
+        windowSize = ceil(numel(r)*0.05);
         b = (1/windowSize)*ones(1,windowSize);
         a = 1;
         r_filter = filter(b,a,r);
         minProm = 0.1;
-        [tmpPks,fitPks,~,tmpProm] = findpeaks(r_filter,'SortStr','descend',...
-            'MinPeakProminence',minProm,...
-            'MaxPeakWidth',5,...
-            'MinPeakHeight',max(r_filter)*0.1);
+        [tmpPks,fitPks,~,tmpProm] = findpeaks(r_filter,'SortStr','descend');
+        [tmpPks,fitPks,~,tmpProm] = findpeaks(r,'SortStr','descend',...
+            'MinPeakProminence',max(tmpProm.*0.05),...
+            'MinPeakWidth',0,...
+            'MaxPeakWidth',Inf,...
+            'MinPeakHeight',0,...
+            'MinPeakDistance',numel(r_filter)*0.25);
+        %fitPks = fitPks - round(windowSize./2);
         maxPks = numCubesats*2-2;
         if numel(tmpPks)>maxPks
             [~,diffI] = max(diff(sort(tmpProm)));
@@ -468,6 +493,7 @@ classdef Optical
             expectedPks = numel(tmpPks);
         end
         expectedPks = expectedPks - mod(expectedPks,2);
+        fitPks = fitPks(1:expectedPks);
 
         if expectedPks==0
             cutPoly{1} = polyshape(x,y);
@@ -577,7 +603,7 @@ classdef Optical
             end
             %}
 
-            %% Cutting into multiple polyshapes
+            %% Cutting into multiple polyshapes           
             numShapes = numSets+1;
             numPts = numel(x);
             cutPoly = cell(numShapes,1);
@@ -609,8 +635,8 @@ classdef Optical
             for i = 1:numShapes
                 cutArea(i) = area(cutPoly{i});
             end   
-            I = cutArea(i)./max(cutArea) < 0.05;
-            cutPoly = cutPoly{~I};
+            I = cutArea./max(cutArea) < 0.05;
+            cutPoly = cutPoly(~I);
         else
 
             %% image gradient method for obfuscation
