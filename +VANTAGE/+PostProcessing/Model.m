@@ -61,7 +61,7 @@ classdef Model < handle
         %
         function obj = ComputeStateOutput(obj)
         	% Get odirectory of optical frames
-        	[obj,didRead,direc] = readInputFramesFromImages(obj.Optical);
+        	[didRead,direc] = readInputFramesFromImages(obj.Optical);
 
         	if didRead
 	        	% Loop though optical frames
