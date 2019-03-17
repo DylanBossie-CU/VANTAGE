@@ -12,22 +12,25 @@ classdef Test_TOF < matlab.unittest.TestCase
     methods (Test)
          
         function testTOFProcessing(testcase)
+            close all;clearvars
             tube = 6;
             switch tube
                 case 1
+                    configDirecName = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube1';
                     truthFilename = 'Data/Simulation_TOF-Truth_3-3-19_Tube1/config_simulation_template_2_25_Josh_ToF_Calibration_tube1_truth_data.json';
                     manifestFilename = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube1/Manifest_TOFdev.json';
-                    SensorData = jsondecode(fileread('config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube1/Sensors_TOFdev.json'));
+                    SensorData = jsondecode(fileread('config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube1/Sensors.json'));
                 case 6
+                    configDirecName = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube6';
                     truthFilename = 'Data/Simulation_TOF-Truth_3-3-19_Tube6/config_simulation_template_2_25_Josh_ToF_Calibration_tube6_truth_data.json';
                     manifestFilename = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube6/Manifest_TOFdev.json';
-                    SensorData = jsondecode(fileread('config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube6/Sensors_TOFdev.json'));
+                    SensorData = jsondecode(fileread('config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube6/Sensors.json'));
                 otherwise
                     error('unimplemented tube requested')
             end
-            Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename);
+            Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename,configDirecName);
             Deployer = Model.Deployer;
-            TOF = VANTAGE.PostProcessing.TOF(Model,'Config/TOF.json');
+            TOF = Model.TOF;
             [Deployer,naiveCentroidsForDylan] = TOF.TOFProcessing(SensorData,Deployer,'fileLims',[30,35],'presentResults',1,'showDebugPlots',0);
         end
 

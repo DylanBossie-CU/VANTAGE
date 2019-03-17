@@ -1,0 +1,10 @@
+{
+	"OpticalData": "Data/Cropped/",
+	"OpticalFileExtension": "AIAA*",
+	"OpticalVideoInput": "none",
+	"DesiredFPS": 1,
+	"PlotBinarizedImages": false,
+	"PlotCentroids": false,
+	"PlotHist": false
+	
+}
