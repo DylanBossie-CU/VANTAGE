@@ -170,8 +170,7 @@ classdef Test_Optical < matlab.unittest.TestCase
             dataFiles = dir(strcat(OpticalTest.DataDirec,OpticalTest.FileExtension));
             for i = 1:length(dataFiles)
                 if ~dataFiles(i).isdir
-                    [UnitVecsVCF,timestamp,isSystemCentroid] = ...
-                        OpticalTest.OpticalProcessing(dataFiles(i));
+                    Model.ComputeStateOutput()
                 end
             end
 
