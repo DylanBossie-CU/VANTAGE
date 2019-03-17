@@ -23,8 +23,10 @@ classdef Model < handle
 
     methods
         % Class Constructor:
+        %
         % @param      manifestFilename  full filename of manifest JSON file
         % @param      truthFilename     full filename of truth data JSON file
+        % @param      configDirecName   The configuration directory name
         %
         % @return     A reference to an initialized Model object
         %
@@ -32,9 +34,6 @@ classdef Model < handle
             
             % Process truth data
             obj.Truth_VCF = obj.processTruthData(truthFilename);
-
-            %%% NOTE: The following must be run AFTER the Model class has
-            %%% been fully initialized with all of its own properties
             
         	% Import child classes
         	import VANTAGE.PostProcessing.Deployer
@@ -61,7 +60,17 @@ classdef Model < handle
         %
         %
         function obj = ComputeStateOutput(obj)
+        	% Get odirectory of optical frames
+        	[obj,didRead,direc] = readInputFramesFromImages(obj.Optical);
 
+        	% Loop though optical frames
+        	for i = 1:numel(direc)
+        		% Read frame
+        		obj.Optical.Frame = imread(strcat(obj.DataDirec,'/',direc(i).name));
+
+        		% Run optical processing
+        		obj.Optical.OpticalProcessing();
+        	end
         end
         
         % A method for synchronizing timestamps between the TOF and optical

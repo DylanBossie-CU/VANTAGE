@@ -156,6 +156,15 @@ classdef Optical
             obj.Image = image;
         end
     end
+
+    %% Perform optical processing
+    % Process optical frames to find the estimated cubesat positions
+    %
+    % @author       Justin Fay
+    % @date         17-Mar-2019
+    function [pos] = OpticalProcessing(obj)
+        
+    end
     
     %% Perform image processing
     % Execute video frame processing based on provided automated naming
