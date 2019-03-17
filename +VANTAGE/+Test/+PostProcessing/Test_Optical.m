@@ -167,7 +167,7 @@ classdef Test_Optical < matlab.unittest.TestCase
                 if ~dataFiles(i).isdir
                     frameTitle = dataFiles(i).name;
                     frame = imread(strcat(OpticalTest.DataDirec,frameTitle));
-                    [~,centroids,CubeSatBoundaries] = OpticalTest.ImageProcessing(frame);
+                    [centroids] = OpticalTest.ImageProcessing(frame);
                 end
             end
             
