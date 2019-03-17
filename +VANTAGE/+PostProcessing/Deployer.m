@@ -104,10 +104,19 @@ classdef Deployer
         % 
         % @param      obj   The object
         %
-        % @return     pThe expected number of cubesats
+        % @return     The expected number of cubesats
         %
         function [numCubesats] = GetNumCubesats(obj)
             numCubesats = obj.numCubesats;
+        end
+
+        % A method for getting the camera origin
+        % @param      obj   The object
+        %
+        % @return     the camera origin
+        %
+        function [camOrigin] = GetCamOrigin(obj)
+            camOrigin = obj.DeployerGeometry.CAMERA_LOC;
         end
     end
 end
