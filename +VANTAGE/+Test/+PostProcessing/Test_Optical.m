@@ -154,7 +154,9 @@ classdef Test_Optical < matlab.unittest.TestCase
                 CubeSatBoundaries] = OpticalTest.ImageProcessing(frame);
         end
         
-        function testSimulatedData(testCase)
+        function testPipeline(testCase)
+            %This test case operates as the method for
+            %Optical.OpticalProcessing until Optical I/O is satisfactory
             close all
             import VANTAGE.PostProcessing.*
             truthFilename = 'config/Testing/TruthDataTest.json';

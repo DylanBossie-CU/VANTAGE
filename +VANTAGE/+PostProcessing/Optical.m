@@ -249,8 +249,6 @@ classdef Optical
             
             % Perform object association
             obj.objectAssociation(centroids,centerpoint,numOccluded);
-            
-            
 
             %Plot results
             if obj.PlotBinarizedImages
