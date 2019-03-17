@@ -76,7 +76,7 @@ classdef Model < handle
 	        		%pos_TOF = obj.TOF.propogatedShit(camTimestep)
 
 	        		% Run sensor fusion
-	        		[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.DeployerGeometry.GetCamOrigin(), camVecs, pos_TOF, sig_cam, sig_TOF)
+	        		[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.DeployerGeometry.GetCamOriginVCF(), camVecs, pos_TOF, sig_cam, sig_TOF)
 	        	end
 	        else
 	        	error(stract('Unable to read optical data files from ', obj.Optical.DataDirec));
