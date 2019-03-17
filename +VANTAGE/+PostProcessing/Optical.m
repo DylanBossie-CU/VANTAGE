@@ -136,6 +136,36 @@ classdef Optical
         %}
     end
 
+    %% Read input video file
+    % Execute video frame processing based on provided automated naming
+    % convention
+    %
+    % @author       Dylan Bossie
+    % @date         24-Jan-2019
+    function [obj,didRead] = readInputFrameFromVideo(obj)
+        didRead = false;
+        frame = readFrame(obj.Video);
+        %Grab data in intervals of the desired FPS
+        FrameTimeStep = obj.Video.CurrentTime - ...
+            floor(obj.Video.CurrentTime);
+        if any(FrameTimeStep==obj.FrameIntervals)
+            didRead = true;
+            obj.Frame = frame;
+            %Process image
+            image = obj.ImageProcessing(frame);
+            obj.Image = image;
+        end
+    end
+
+    %% Perform optical processing
+    % Process optical frames to find the estimated cubesat positions
+    %
+    % @author       Justin Fay
+    % @date         17-Mar-2019
+    function [pos] = OpticalProcessing(obj)
+        
+    end
+    
     %% Perform image processing
     % Execute video frame processing based on provided automated naming
     % convention
