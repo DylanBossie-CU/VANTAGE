@@ -136,34 +136,13 @@ classdef Optical
         %}
     end
 
-    %% Read input video file
-    % Execute video frame processing based on provided automated naming
-    % convention
-    %
-    % @author       Dylan Bossie
-    % @date         24-Jan-2019
-    function [obj,didRead] = readInputFrameFromVideo(obj)
-        didRead = false;
-        frame = readFrame(obj.Video);
-        %Grab data in intervals of the desired FPS
-        FrameTimeStep = obj.Video.CurrentTime - ...
-            floor(obj.Video.CurrentTime);
-        if any(FrameTimeStep==obj.FrameIntervals)
-            didRead = true;
-            obj.Frame = frame;
-            %Process image
-            image = obj.ImageProcessing(frame);
-            obj.Image = image;
-        end
-    end
-    
     %% Perform image processing
     % Execute video frame processing based on provided automated naming
     % convention
     %
     % @author       Dylan Bossie
     % @date         24-Jan-2019
-    function [I_binarized,centroids,CubeSat_Boundaries_Cut] = ImageProcessing(obj,frame)
+    function [centroids] = ImageProcessing(obj,frame)
         I = frame;
         centerpoint = [ceil(length(frame(:,1)/2)),ceil(length(frame(1,:))/2)];
         if size(I,3) > 1
@@ -242,8 +221,6 @@ classdef Optical
                 obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries_Cut,centroids)
             end
 
-            % Unit vector transform
-            obj.PixelToUnitVec(centroids);
         end
 
     end
@@ -704,7 +681,7 @@ classdef Optical
         numCubeSats = length(CubeSats);
         CubeSatUnitVectors = cell(numCubeSats,1);
         for i = 1:numCubeSats
-            centroid = CubeSats{i}.centroid;
+            centroid = CubeSats{i};
             %Distance from origin in pixels
             p_x = centroid(1) - origin(1);
             p_y = -(centroid(2) - origin(2));
