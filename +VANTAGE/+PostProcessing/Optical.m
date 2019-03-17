@@ -228,7 +228,7 @@ classdef Optical
 
             %
             %Find CubeSat centroids
-            centroids = obj.findCentroids(CubeSat_Boundaries);
+            centroids = obj.findCentroids(CubeSat_polyshapes);
             
             % Perform object association
             obj.objectAssociation(centroids,centerpoint,numOccluded);
