@@ -27,6 +27,12 @@ classdef TOF
         % fps
         fps
         
+        % fov
+        HVfov_deg
+        
+        % showDebugPlots
+        showDebugPlots = 0
+        
     end
     
     %% Methods
@@ -46,9 +52,10 @@ classdef TOF
             configData = jsondecode(fileread(configFilename));
 
             % Initialize confuiguration parameters
-            obj.maxAllowableRange  = configData.maxAllowableRange;
-            obj.ptMaxDistFromPlane = configData.ptMaxDistFromPlane;
+            obj.maxAllowableRange  = configData.maxAllowableRange; % m
+            obj.ptMaxDistFromPlane = configData.ptMaxDistFromPlane; % m
             obj.fps                = configData.fps;
+            obj.HVfov_deg          = configData.HVfov_deg; % deg
             
             % Obtain truth data from Model
             if ~isa(obj.ModelRef,'VANTAGE.PostProcessing.Model')
@@ -123,10 +130,20 @@ classdef TOF
                     if strcmpi(varargin{i},'presentResults')
                         if length(varargin{i+1}) == 1
                             if varargin{i+1}
-                                presentResults = 1;
+                                presentResults = varargin{i+1};
                             end
                         else
                             error('presentResults requires a following 1x1 argument that is convertible to logical')
+                        end
+                    end
+                    % whether or not to plot debugging plots for every file
+                    if strcmpi(varargin{i},'showDebugPlots')
+                        if length(varargin{i+1}) == 1
+                            if varargin{i+1}
+                                obj.showDebugPlots = varargin{i+1};
+                            end
+                        else
+                            error('showDebugPlots requires a following 1x1 argument that is convertible to logical')
                         end
                     end
                 end
@@ -153,7 +170,7 @@ classdef TOF
                         obj.Transform.tf('TCF',obj.Truth_VCF.Cubesat(j).pos(ii,:)','VCF');
                 end
                 % Associate with known cubesats within Deployer
-                %[CubeSats] = obj.associateCentroids(CubeSats_TOF,CubeSats);
+                [CubeSats] = obj.associateCentroids(CubeSats_TOF,CubeSats);
                 % Determine if cubesats have passed out of range (sets
                 % outOfRange)
                 warning('unimplemented')
@@ -279,8 +296,6 @@ classdef TOF
                     for jj = 1:length(CubeSats_TOF)
                         deltaPredPt(ii,jj) = norm(predPt(:,ii) - centroid_VCF(:,jj));
                     end
-                    bla = 1;
-                    
                 else
                     % save data point as a non-outlier
                     CubeSats(ii).centroids_VCF = [CubeSats(ii).centroids_VCF,centroid_VCF];
@@ -304,7 +319,7 @@ classdef TOF
         %
         % @author       Joshua Kirby
         % @date         24-Jan-2019
-        function pc = loadSimFile(~,filename)
+        function pc = loadSimFile(obj,filename)
             ptCloud = pcread(filename);
             
             if nnz(~isnan(ptCloud.Location))==0
@@ -316,7 +331,7 @@ classdef TOF
                 pc = pointCloud(pts(I,:));
             end
             
-            if 0 % useful for debugging
+            if obj.showDebugPlots % useful for debugging
                 figure            
                 pcshow(pc)
                 xlabel('x')
@@ -385,7 +400,7 @@ classdef TOF
               end
             end
             
-            if 0 % useful for debugging
+            if obj.showDebugPlots % useful for debugging
                 figure
                 hold on
                 grid on
@@ -401,20 +416,33 @@ classdef TOF
             nSplit = numel(locs);
 
             % Separate point cloud by split planes
-            if nSplit>0
-                for i = 1:nSplit
-                    if i==1
+            for i = 1:nSplit+1
+                % Find indices of the current cubesat points in the point
+                % cloud
+                if i == 1
+                    if nSplit > 0
                         I = pc.Location(:,3)>=locs(i);
-                        CubeSats_TOF(i).pc = pointCloud(pc.Location(I,:));
                     else
-                        I = (pc.Location(:,3)>=locs(i)) & (pc.Location(:,3)<locs(i-1));
-                        CubeSats_TOF(i).pc = pointCloud(pc.Location(I,:));
+                        I = ~isnan(pc.Location(:,3));
                     end
+                elseif i == nSplit+1
+                    I = pc.Location(:,3)<locs(nSplit);
+                else
+                    I = (pc.Location(:,3)>=locs(i)) & (pc.Location(:,3)<locs(i-1));
                 end
-                I = pc.Location(:,3)<locs(nSplit);
-                CubeSats_TOF(nSplit+1).pc = pointCloud(pc.Location(I,:));
-            else
-                CubeSats_TOF(1).pc = pc;
+                % Skip this CubeSat if it's too close to the edge of the
+                % FOV
+                satPcZDistFromFOV = min(pc.Location(I,3)-abs(pc.Location(I,1))./tand(obj.HVfov_deg(1)/2),...
+                                    pc.Location(I,3)-abs(pc.Location(I,2))./tand(obj.HVfov_deg(2)/2));
+                % skip if first percentile of data is less than two cm from
+                % the FOV --and-- if the 99th percentile of data is less
+                % than 20 cm from the 1st percentile
+                skipThisCubesat = (prctile(satPcZDistFromFOV,1) < 2/100) & ...
+                                   (prctile(satPcZDistFromFOV,99)-prctile(satPcZDistFromFOV,1) < 20/100);
+                if skipThisCubesat
+                    continue
+                end
+                CubeSats_TOF(i).pc = pointCloud(pc.Location(I,:));
             end
         end
         
@@ -430,17 +458,17 @@ classdef TOF
         %
         % @author   Joshua Kirby
         % @date     03-Feb-2019
-        function [CubeSat] = fitPlanesToCubesat(obj,CubeSat)
+        function [CubeSat_TOF] = fitPlanesToCubesat(obj,CubeSat_TOF)
             %%% Allocation
             % Initial value for minimum number of points considered to make up a plane
             minPtsInPlane   = 10;
 
             % Initialize planes structure
             numPlanes = 0;
-            planes = CubeSat.faces;
+            planes = CubeSat_TOF.faces;
             
             % Tracking of points not associated with any plane
-            remainPtCloud = CubeSat.pc;
+            remainPtCloud = CubeSat_TOF.pc;
 
             %%% Find planes until no more planes exist
             while remainPtCloud.Count > minPtsInPlane
@@ -502,19 +530,18 @@ classdef TOF
             end
 
             %%% Check that planes are mutually orthogonal
-            CubeSat.trustedSat = 1;
             for i = 1:numPlanes
                 for j = 1:numPlanes
                     if abs(asind(dot(planes(i).n,planes(j).n))) > 8 && i~=j
-                        CubeSat.trustedSat = 0;
-                        %warning('fitPlanesToCubesat identified planes which are not mutually orthogonal by greater than 4 deg')
+                        %CubeSat_TOF.trustedSat = 0;
+                        warning('fitPlanesToCubesat identified planes which are not mutually orthogonal by greater than 8 deg')
                     end
                 end
             end
             
             %%% Package planes and numPlanes into CubeSat object
-            CubeSat.faces = planes;
-            CubeSat.numVisibleFaces = numPlanes;
+            CubeSat_TOF.faces = planes;
+            CubeSat_TOF.numVisibleFaces = numPlanes;
 
         end
         

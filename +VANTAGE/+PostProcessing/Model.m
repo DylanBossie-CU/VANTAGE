@@ -70,7 +70,13 @@ classdef Model < handle
 	        		obj.Optical.Frame = imread(strcat(obj.Optical.DataDirec,'/',direc(i).name));
 
 	        		% Run optical processing
-	        		obj.Optical.OpticalProcessing();
+	        		[camVecs, camTimestep, isSystemCentroid] = obj.Optical.OpticalProcessing();
+
+	        		% Get propogated TOF positions
+	        		%pos_TOF = obj.TOF.propogatedShit(camTimestep)
+
+	        		% Run sensor fusion
+	        		[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.DeployerGeometry.GetCamOrigin(), camVecs, pos_TOF, sig_cam, sig_TOF)
 	        	end
 	        else
 	        	error(stract('Unable to read optical data files from ', obj.Optical.DataDirec));
