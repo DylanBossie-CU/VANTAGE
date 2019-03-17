@@ -1,6 +1,6 @@
 clearvars;close all;clc
 
-tube = 1;
+tube = 6;
 
 switch tube
     case 1
@@ -19,4 +19,4 @@ end
 Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename);
 Deployer = Model.Deployer;
 TOF = VANTAGE.PostProcessing.TOF(Model,'Config/TOF.json');
-[Deployer,naiveCentroidsForDylan] = TOF.TOFProcessing(SensorData,Deployer,'fileLims',[65,70],'presentResults',1);
+[Deployer,naiveCentroidsForDylan] = TOF.TOFProcessing(SensorData,Deployer,'fileLims',[30,35],'presentResults',1,'showDebugPlots',0);
