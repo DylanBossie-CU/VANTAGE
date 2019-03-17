@@ -162,12 +162,21 @@ classdef Optical
     %
     % @author       Justin Fay
     % @date         17-Mar-2019
-    function [pos] = OpticalProcessing(obj)
-
+    function [UnitVecsVCF,UnitOriginVCF,timestamp,...
+            isSystemCentroid] = OpticalProcessing(obj,image)
+        % Grab image
+        frameTitle = image.name;
+        frame = imread(strcat(obj.DataDirec,frameTitle));
+        
         % Process current frame
-        centroids = obj.ImageProcessing(obj,obj.Frame)
+        [centroids,isSystemCentroid] = obj.ImageProcessing(frame);
 
+        % Transform results to VCF unit vectors
+        UnitVecsVCF = obj.PixelToUnitVec(centroids);
+        UnitOriginVCF = [0 0 0];
 
+        % Get frame timestamp
+        timestamp = image.date;
     end
     
     %% Perform image processing
@@ -247,10 +256,10 @@ classdef Optical
             %Find CubeSat centroids
             centroids = obj.findCentroids(CubeSat_polyshapes);
             
-            % Perform object association
-            obj.objectAssociation(centroids,centerpoint,numOccluded);
-
-            % Check number of found centroids
+            % Check number of found centroids - 
+            % If centroids found are the same as expected, do not use
+            % system centroid - set to false. If different amount is
+            % detected, set use system centroid to true
             if numel(centroids) == numCubeSats
                 isSystemCentroid = false;
             else
@@ -263,9 +272,12 @@ classdef Optical
                 centroids = cell(1);
                 centroids{1} = meanCent;
             end
-
+            
+            % Perform object association
+            obj.objectAssociation(centroids,centerpoint,numOccluded);
+            
             %Plot results
-            if true% obj.PlotBinarizedImages
+            if obj.PlotBinarizedImages
                 obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries_Cut,centroids)
             end
 
