@@ -167,11 +167,13 @@ classdef Test_Optical < matlab.unittest.TestCase
             
             dataFiles = dir(strcat(OpticalTest.DataDirec,OpticalTest.FileExtension));
             for i = 1:length(dataFiles)
-                frameTitle = dataFiles(i).name;
-                frame = imread(strcat(OpticalTest.DataDirec,frameTitle));
-                [~,centroids,CubeSatBoundaries] = OpticalTest.ImageProcessing(frame);
-                OpticalTest.plotObjectBoundaries(frame,...
-                CubeSatBoundaries,centroids)
+                if ~dataFiles(i).isdir
+                    frameTitle = dataFiles(i).name;
+                    frame = imread(strcat(OpticalTest.DataDirec,frameTitle));
+                    [~,centroids,CubeSatBoundaries] = OpticalTest.ImageProcessing(frame);
+                    OpticalTest.plotObjectBoundaries(frame,...
+                    CubeSatBoundaries,centroids)
+                end
             end
             
         end
