@@ -172,7 +172,7 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         24-Jan-2019
-    function [I_binarized,centroids,CubeSat_Boundaries_Cut] = ImageProcessing(obj,frame)
+    function [centroids] = ImageProcessing(obj,frame)
         I = frame;
         centerpoint = [ceil(length(frame(:,1)/2)),ceil(length(frame(1,:))/2)];
         if size(I,3) > 1
@@ -252,9 +252,7 @@ classdef Optical
             end
 
         end
-        
-        %Transform centroid locations for output to sensor fusion
-        % To be input soon :) - method exists
+
     end
     
     %% Plot boundaries
@@ -700,7 +698,7 @@ classdef Optical
     % @author     Dylan Bossie
     % @date       4-Mar-2019
     %
-    function CubeSatUnitVectors = PixelToUnitVec(~,CubeSats)
+    function CubeSatUnitVectors = PixelToUnitVec(obj,CubeSats)
         %Read optical camera parameters
         CameraParameters = jsondecode(fileread('./Config/Sensors.json'));
         focalLength = CameraParameters.OpticalFocalLength;
@@ -713,7 +711,7 @@ classdef Optical
         numCubeSats = length(CubeSats);
         CubeSatUnitVectors = cell(numCubeSats,1);
         for i = 1:numCubeSats
-            centroid = CubeSats{i}.centroid;
+            centroid = CubeSats{i};
             %Distance from origin in pixels
             p_x = centroid(1) - origin(1);
             p_y = -(centroid(2) - origin(2));
