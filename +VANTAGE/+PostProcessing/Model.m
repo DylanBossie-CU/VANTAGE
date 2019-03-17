@@ -90,6 +90,61 @@ classdef Model < handle
             % Propogate position to camera timestamps
             pos_prop = pos_init + t_cam(1).*V_TOF + (t_cam-t_cam(1)).*V_TOF;
         end
+
+        % A method for approximating a cubesat centroid using a weighted
+        % centroiding method
+        %
+        % @param      obj               The object
+        % @param      isSystemCentroid  Indicates if system centroid
+        % @param      camOrigin         camera origin in the VANTAGE Cartesian
+        %                               Frame
+        % @param      camVecs           cell array of vectors pointing from
+        %                               camera origin to estimated centroid in
+        %                               VCF
+        % @param      pos_TOF           VCF position estimates from the TOF
+        %                               sensor suite
+        % @param      sig_cam           uncertainty in camera estimates in the
+        %                               VCF
+        % @param      sig_TOF           uncertainty in the TOF estimates in the
+        %                               VCF
+        %
+        % @return     pos       position estimate of cubesat centroids in the VCF
+        %             frame using both sensor method returns
+        %
+        function [pos] = RunSensorFusion(obj, isSystemCentroid, camOrigin, camVecs, pos_TOF, sig_cam, sig_TOF)
+
+        	% Initialize position cell array
+        	numCubesats = obj.Deployer.GetNumCubesats();
+        	pos = cell{numCubesats,1};
+
+        	% Perform sensor fusion
+        	if isSystemCentroid
+
+        		% Find system centroid from TOF estimates
+        		meanTOF = zeros(1,3);
+        		for i = 1:numCubesats
+        			meanTOF = meanTOF + pos_TOF{i};
+        		end
+        		meanTOF = meanTOF./numCubesats;
+
+        		% Run sensor fusion on system centroid estimates
+        		tmp = SensorFusion(obj, camOrigin, camVecs{1}, meanTOF, sig_cam, sig_TOF)
+
+        		% Calculate adjustment vector
+        		sensorFusionDiff = tmp-mean_TOF;
+
+        		% Adjust TOF vectors to find new centroids
+        		for i = 1:numCubesats
+        			pos{i} = pos_TOF{i} + sensorFusionDiff;
+        		end
+        	else
+        		% Loop through estimates individually and perform sensor fusion
+        		for i = 1:numCubesats
+        			pos{i} = SensorFusion(obj, camOrigin, camVecs{i}, pos_TOF{i}, sig_cam, sig_TOF)
+        		end
+    		end
+
+        end
         
         % A method for approximating a cubesat centroid using a weighted
         % centroiding method
