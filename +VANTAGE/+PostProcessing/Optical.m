@@ -121,9 +121,10 @@ classdef Optical
         
         % Check read status
         numFile = numel(direc);
-        if numFile<0
-            didRead = false;
+        if numFile<=0
             return;
+        else
+            didRead = true;
         end
         
         % Process frames

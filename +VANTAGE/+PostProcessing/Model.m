@@ -79,7 +79,7 @@ classdef Model < handle
 	        		[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.DeployerGeometry.GetCamOriginVCF(), camVecs, pos_TOF, sig_cam, sig_TOF)
 	        	end
 	        else
-	        	error(stract('Unable to read optical data files from ', obj.Optical.DataDirec));
+	        	error(strcat('Unable to read optical data files from ', obj.Optical.DataDirec));
         	end
         end
         
