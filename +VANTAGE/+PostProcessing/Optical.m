@@ -163,7 +163,11 @@ classdef Optical
     % @author       Justin Fay
     % @date         17-Mar-2019
     function [pos] = OpticalProcessing(obj)
-        
+
+        % Process current frame
+        centroids = obj.ImageProcessing(obj,obj.Frame)
+
+
     end
     
     %% Perform image processing

@@ -63,13 +63,17 @@ classdef Model < handle
         	% Get odirectory of optical frames
         	[obj,didRead,direc] = readInputFramesFromImages(obj.Optical);
 
-        	% Loop though optical frames
-        	for i = 1:numel(direc)
-        		% Read frame
-        		obj.Optical.Frame = imread(strcat(obj.DataDirec,'/',direc(i).name));
+        	if didRead
+	        	% Loop though optical frames
+	        	for i = 1:numel(direc)
+	        		% Read frame
+	        		obj.Optical.Frame = imread(strcat(obj.Optical.DataDirec,'/',direc(i).name));
 
-        		% Run optical processing
-        		obj.Optical.OpticalProcessing();
+	        		% Run optical processing
+	        		obj.Optical.OpticalProcessing();
+	        	end
+	        else
+	        	error(stract('Unable to read optical data files from ', obj.Optical.DataDirec));
         	end
         end
         
