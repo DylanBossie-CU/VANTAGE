@@ -164,13 +164,17 @@ classdef Test_Optical < matlab.unittest.TestCase
             Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename,'./Config');
             OpticalTest = Model.Optical;
             
+            % Unit vector to VCF origin from CCF
+            UnitOriginVCF = Model.Deployer.GetCamOriginVCF;
+            
             dataFiles = dir(strcat(OpticalTest.DataDirec,OpticalTest.FileExtension));
             for i = 1:length(dataFiles)
                 if ~dataFiles(i).isdir
-                    [UnitVecsVCF,UnitOriginVCF,timestamp,isSystemCentroid] = ...
+                    [UnitVecsVCF,timestamp,isSystemCentroid] = ...
                         OpticalTest.OpticalProcessing(dataFiles(i));
                 end
             end
+
             
         end
         
