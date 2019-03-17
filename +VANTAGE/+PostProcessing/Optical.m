@@ -463,7 +463,7 @@ classdef Optical
         r = zeros(numel(x),1);
         for i = 1:numel(x)
             r(i) = D(y(i),x(i));
-            if r(i) <= 3
+            if r(i) <= 5
                 r(i) = 0;
             end
         end
