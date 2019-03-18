@@ -11,9 +11,7 @@ import matplotlib.animation as animation
 import pypcd
 import pdb
 import datetime
-#ourstanding issue: being able to set image dimensions to that of the O3D313
-#How to format this data
-#This is not quite working yet.
+
 
 imageWidth = 352
 imageHeight = 264
@@ -28,7 +26,7 @@ class GrabO3D300():
         self.Z = np.zeros(num)
         self.Amplitude = np.zeros((imageHeight,imageWidth))
         self.Distance = np.zeros((imageHeight,imageWidth))
-        print(len(self.Z))
+
 
     def readNextFrame(self):
         result = self.data.readNextFrame()
@@ -42,34 +40,22 @@ class GrabO3D300():
         # page 23 of manual, 
         # xyz data is 16-bit signed ints
         # [mm]
-        self.X = np.frombuffer(result['x'], dtype='int16') #Gives a Key to a library to pull the appropriate data
+        self.X = np.frombuffer(result['x'], dtype='int16')
         self.Y = np.frombuffer(result['y'], dtype='int16')
         self.Z = np.frombuffer(result['z'], dtype='int16')
-        #self.L=np.concatenate([self.X,self.Y,self.Z])
-        #for i in range(len(self.X)):
-        #	self.L[i] = (self.X[i],self.Y[i],self.Z[i])
         self.L = [self.X,self.Y,self.Z]
         self.L = np.transpose(self.L)
 
-        #self.L = self.L.astype(np.float32)
-    	#self.pc_data = self.L.view(np.dtype([('x', np.int16), ('y', np.int16),('z', np.int16)]))
-    	# print(self.pc_data)
-    	# print(len(self.pc_data))
         self.pc=pypcd.make_xyz_point_cloud(self.L)
-       #print(self.pc.pc_data[:,:]) #This indicates that somewhere something is only taking the first column of a thing
-        currentDT = datetime.datetime.now()
-        timestamp = str(currentDT.hour) + "_" + str(currentDT.minute) + "_" + str(currentDT.second) + "_" + str(currentDT.microsecond)
-        #Convert micro_sec to sec
+       
+        # IF YOU HAVE SET UP NTP SYNCING ON THE ToF camera, then the
+        # framegrabber will return the synced unix epoch time. so convert it
+        # back to UTC and bamarooni you got time
         timestampTOF = result['diagnostic']['timeStamp']
         print(result['diagnostic'])
 
-        ### Storing in memory instead
-        #pypcd.save_point_cloud(self.pc, "../examples/TOF_PointClouds/testframe_" + timestamp + ".pcd")
-
         return self.pc, timestampTOF
-        # print(len(self.pc.pc_data[:,:]))
-        # print(num)
-        # self.pc.save("apcd.pcd")
+
 
 def updatefig(*args):
     g = args[1]
@@ -89,7 +75,6 @@ def updatefig(*args):
 def main():
     address = '169.254.145.24'
 
-    
     camData = o3d3xx.ImageClient(address, 50010)
     grabber = GrabO3D300(camData)
 
@@ -101,14 +86,7 @@ def main():
     	pointCloudStorage.append(pc)
         timeStamps.append(timeStamp)
         print(timeStamp)
-		#fig = plt.figure()
-		#ax1 = fig.add_subplot(1, 2, 1)
-		#ax2 = fig.add_subplot(1, 2, 2)
-		#imAmplitude = ax1.imshow(np.random.rand(imageHeight,imageWidth))
-		#imDistance = ax2.imshow(np.random.rand(imageHeight,imageWidth))
-		#ani = animation.FuncAnimation(fig, updatefig, blit=True, fargs = [grabber,imAmplitude,imDistance,x])
-		#plt.show()
-		#plt.close()
+
     #This format of directory is necessary to communicate with MATLAB
     fileDirectory = '/home/vantage/Documents/githere/VANTAGE/Automation/TOF_Automation/examples/TOF_PointClouds/pointcloud_'
     for pc, timeStamp in zip(pointCloudStorage, timeStamps):
