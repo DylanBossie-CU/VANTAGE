@@ -1,3 +1,5 @@
+#! /usr/bin/python
+
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 from builtins import *
 import o3d3xx
@@ -30,6 +32,7 @@ class GrabO3D300():
 
     def readNextFrame(self):
         result = self.data.readNextFrame()
+
         self.Amplitude = np.frombuffer(result['amplitude'],dtype='uint16')
         self.Amplitude = self.Amplitude.reshape(imageHeight,imageWidth)
         self.Distance = np.frombuffer(result['distance'],dtype='uint16')
@@ -57,7 +60,8 @@ class GrabO3D300():
         currentDT = datetime.datetime.now()
         timestamp = str(currentDT.hour) + "_" + str(currentDT.minute) + "_" + str(currentDT.second) + "_" + str(currentDT.microsecond)
         #Convert micro_sec to sec
-        timestampTOF = result['diagnostic']['timeStamp']/1e6
+        timestampTOF = result['diagnostic']['timeStamp']
+        print(result['diagnostic'])
 
         ### Storing in memory instead
         #pypcd.save_point_cloud(self.pc, "../examples/TOF_PointClouds/testframe_" + timestamp + ".pcd")
@@ -85,12 +89,9 @@ def updatefig(*args):
 def main():
     address = '169.254.145.24'
 
+    
     camData = o3d3xx.ImageClient(address, 50010)
-    
     grabber = GrabO3D300(camData)
-    
-    # grabber.readNextFrame()
-
 
     frameCount = 50
     pointCloudStorage = []
@@ -112,6 +113,8 @@ def main():
     fileDirectory = '/home/vantage/Documents/githere/VANTAGE/Automation/TOF_Automation/examples/TOF_PointClouds/pointcloud_'
     for pc, timeStamp in zip(pointCloudStorage, timeStamps):
         pypcd.save_point_cloud(pc, fileDirectory + str(timeStamp) + ".pcd")
+
+
 if __name__ == '__main__':
     main()
 
