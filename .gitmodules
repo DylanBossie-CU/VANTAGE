@@ -1,3 +1,6 @@
 [submodule "Automation/ToF_Automation_Cpp/ifm3d"]
 	path = Automation/ToF_Automation_Cpp/ifm3d
 	url = https://github.com/ifm/ifm3d.git
+[submodule "Automation/ToF_Automation_Cpp/ifm3d-examples"]
+	path = Automation/ToF_Automation_Cpp/ifm3d-examples
+	url = https://github.com/ifm/ifm3d-examples.git
