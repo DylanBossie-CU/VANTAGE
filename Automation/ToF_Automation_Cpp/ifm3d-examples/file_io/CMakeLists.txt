@@ -24,11 +24,12 @@ find_package(ifm3d 0.11.0 CONFIG
   REQUIRED COMPONENTS camera framegrabber image
   )
 
-add_executable(ex-file_io ex-file_io.cpp)
-target_link_libraries(ex-file_io
+add_executable(single_image_save single_image_save.cpp)
+target_link_libraries(single_image_save
                       ifm3d::camera
                       ifm3d::framegrabber
                       ifm3d::image
+                      ${PCL_IO_LIBRARIES}
                       ${OpenCV_LIBRARIES}
                       )
 
