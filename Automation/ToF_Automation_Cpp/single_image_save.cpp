@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2016 Love Park Robotics, LLC
- * Copyright (C) 2017 ifm syntron gmbh
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distribted on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 //
 // ex-file_io.cpp
 //
@@ -43,7 +26,7 @@ std::string formatTimestamp(ifm3d::TimePointT timestamp)
           timestamp.time_since_epoch() - duration_cast<seconds>(
             timestamp.time_since_epoch()));
 
-    std::ostringstream s;
+    std::ostringstrea/m s;
     s << std::put_time(std::localtime(&time), "%Y-%m-%d %H:%M:%S")
       << ":" << std::setw(3) << std::setfill('0') << milli.count();
 
@@ -67,16 +50,13 @@ int main(int argc, const char **argv)
     }
 
     ifm3d::TimePointT timestamp = img->TimeStamp();
-	stringstream filename
-	
+  stringstream filename
+  
     filename << "filename_"
               << formatTimestamp(timestamp)
               << ".pcd";
-	
-	pcl::io::savePCDFileASCII(filename, *(img->Cloud()));
-	
- // imwrite("amplitude.png", img->AmplitudeImage());
- // imwrite("radial_distance.png", img->DistanceImage());
+  
+  pcl::io::savePCDFileASCII(filename, *(img->Cloud()));
 
   return 0;
 }
