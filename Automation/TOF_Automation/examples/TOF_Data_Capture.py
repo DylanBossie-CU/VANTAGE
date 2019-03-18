@@ -10,13 +10,15 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import pypcd
 import pdb
-import datetime
+from datetime import datetime
+import tzlocal
 
 
 imageWidth = 352
 imageHeight = 264
 
-num=imageWidth*imageHeight
+num = imageWidth * imageHeight
+
 
 class GrabO3D300():
     def __init__(self,data):
@@ -46,13 +48,22 @@ class GrabO3D300():
         self.L = [self.X,self.Y,self.Z]
         self.L = np.transpose(self.L)
 
-        self.pc=pypcd.make_xyz_point_cloud(self.L)
+        self.pc = pypcd.make_xyz_point_cloud(self.L)
        
         # IF YOU HAVE SET UP NTP SYNCING ON THE ToF camera, then the
         # framegrabber will return the synced unix epoch time. so convert it
         # back to UTC and bamarooni you got time
-        timestampTOF = result['diagnostic']['timeStamp']
-        print(result['diagnostic'])
+        #
+        # if you encounter a "year is out of range" error the timestamp
+        # may be in milliseconds, try `ts /= 1000` in that case
+        unix_timestamp = result['timeStamp']
+        
+        # get the local timezone
+        local_timezone = tzlocal.get_localzone()
+        local_time = datetime.fromtimestamp(unix_timestamp, local_timezone)
+
+        fmt = '%Y-%m-%d-%H_%M_%S.%f'
+        timestampTOF = local_time.strftime(fmt)
 
         return self.pc, timestampTOF
 

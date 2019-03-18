@@ -39,6 +39,11 @@ class ImageClient(PCICV3Client):
 
 			chunkCounter = 1
 
+			# have to initialize this as -inf so that you can take the max timeStamp, as
+			# the last chunk always seems to be timeStamp = 0 :(((
+			timeStampSec = float(-1)
+			result['timeStamp'] = timeStampSec
+
 			while True:
 				# read next 4 bytes
 				data = answer[answerIndex:answerIndex+4]
@@ -105,6 +110,19 @@ class ImageClient(PCICV3Client):
 				else:
 					image = None
 
+				# the last chunk is always 0 because this api is garbage
+				#
+				# timeStamp is given by timeStampSec, which is really the
+				# unix epoch time once you pop that NTP syncro on itttt
+				if timeStampSec > result['timeStamp']:
+
+					# this variable holds the nanoseconds dawg
+					fractional_secs = timeStampNsec / 1e9
+
+					# timeStampSec holds the unix time, but only to second
+					# accuracy
+					result['timeStamp'] = timeStampSec + fractional_secs
+
 				# distance image
 				if chunkType == 100:
 					result['distance'] = image
@@ -151,12 +169,9 @@ class ImageClient(PCICV3Client):
 					payloadSize = chunkSize - headerSize
 					# the diagnostic data blob contains at least four temperatures plus the
 					# evaluation time 
-
-					# timeStamp is given by timeStampSec, which is really the
-					# unix epoch time once you pop that NTP syncro on itttt
 					if payloadSize >= 20:
 						illuTemp, frontendTemp1, frontendTemp2, imx6Temp, evalTime = struct.unpack('=iiiiI', bytes(data[0:20]))
-						diagnosticData = dict([('illuTemp', illuTemp/10.0), ('frontendTemp1', frontendTemp1/10.0), ('frontendTemp2', frontendTemp2/10.0), ('imx6Temp', imx6Temp/10.0), ('evalTime', evalTime), ('timeStamp',timeStampSec)])
+						diagnosticData = dict([('illuTemp', illuTemp/10.0), ('frontendTemp1', frontendTemp1/10.0), ('frontendTemp2', frontendTemp2/10.0), ('imx6Temp', imx6Temp/10.0), ('evalTime', evalTime)])
 					# check whether framerate is also provided
 					if payloadSize == 24:
 						diagnosticData['frameRate'] = struct.unpack('=I', bytes(data[20:24]))[0]
