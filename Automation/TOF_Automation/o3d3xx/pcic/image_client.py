@@ -21,6 +21,7 @@ class ImageClient(PCICV3Client):
 
 	def readNextFrame(self):
 		result = {}
+
 		# look for asynchronous output
 		ticket, answer = self.readNextAnswer()
 		if ticket == b"0000":
@@ -62,6 +63,7 @@ class ImageClient(PCICV3Client):
 
 				if headerVersion == 1:
 					chunkType, chunkSize, headerSize, headerVersion, imageWidth, imageHeight, pixelFormat, timeStamp, frameCount = struct.unpack('IIIIIIIII', bytes(data))
+					timeStampSec = float('nan')
 				elif headerVersion == 2:
 					chunkType, chunkSize, headerSize, headerVersion, imageWidth, imageHeight, pixelFormat, timeStamp, frameCount, statusCode, timeStampSec, timeStampNsec = struct.unpack('IIIIIIIIIIII', bytes(data))
 				else:
@@ -120,6 +122,8 @@ class ImageClient(PCICV3Client):
 					result['rawAmplitude'] = image
 
 				# X image
+				# int16
+				# [mm]
 				elif chunkType == 200:
 					result['x'] = image
 
@@ -143,14 +147,16 @@ class ImageClient(PCICV3Client):
 
 				# diagnostic data
 				elif chunkType == 302:
-					pdb.set_trace()
 					diagnosticData = {}
 					payloadSize = chunkSize - headerSize
-					# the diagnostic data blob contains at least four temperatures plus the evaluation time
-					pdb.set_trace()
+					# the diagnostic data blob contains at least four temperatures plus the
+					# evaluation time 
+
+					# timeStamp is given by timeStampSec, which is really the
+					# unix epoch time once you pop that NTP syncro on itttt
 					if payloadSize >= 20:
 						illuTemp, frontendTemp1, frontendTemp2, imx6Temp, evalTime = struct.unpack('=iiiiI', bytes(data[0:20]))
-						diagnosticData = dict([('illuTemp', illuTemp/10.0), ('frontendTemp1', frontendTemp1/10.0), ('frontendTemp2', frontendTemp2/10.0), ('imx6Temp', imx6Temp/10.0), ('evalTime', evalTime), ('timeStamp', timeStamp)])
+						diagnosticData = dict([('illuTemp', illuTemp/10.0), ('frontendTemp1', frontendTemp1/10.0), ('frontendTemp2', frontendTemp2/10.0), ('imx6Temp', imx6Temp/10.0), ('evalTime', evalTime), ('timeStamp',timeStampSec)])
 					# check whether framerate is also provided
 					if payloadSize == 24:
 						diagnosticData['frameRate'] = struct.unpack('=I', bytes(data[20:24]))[0]
