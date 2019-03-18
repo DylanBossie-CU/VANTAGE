@@ -62,7 +62,7 @@ class GrabO3D300():
         local_timezone = tzlocal.get_localzone()
         local_time = datetime.fromtimestamp(unix_timestamp, local_timezone)
 
-        fmt = '%Y-%m-%d-%H_%M_%S.%f'
+        fmt = '%Y_%m_%d_%H_%M_%S.%f'
         timestampTOF = local_time.strftime(fmt)
 
         return self.pc, timestampTOF
