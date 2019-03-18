@@ -11,7 +11,7 @@ macro_ensure_out_of_source_build(
   "Please build ${PROJECT_NAME} out-of-source")
 
 # Conditionally turn on/off parts of the build (global-level)
-option(BUILD_MODULE_SIMPLEIMAGE "Build the simpleimage module and example" OFF)
+option(BUILD_MODULE_SIMPLEIMAGE "Build the simpleimage module and example" ON)
 option(BUILD_EXAMPLE_EXPOSURE_TIMES "Build ex-exposure-times example" OFF)
 option(BUILD_EXAMPLE_FAST_APP_SWITCH "Build fast-app-switch example" OFF)
 option(BUILD_EXAMPLE_FILE_IO "Build opencv based file-io example" ON)
@@ -24,25 +24,15 @@ option(BUILD_EXAMPLE_TIMESTAMP "Build timestamp example" OFF)
 ################################################
 ## Bring in dependent projects
 ################################################
-find_package(ifm3d 0.11.0 CONFIG
+find_package(ifm3d 0.12.0 CONFIG
     REQUIRED COMPONENTS camera framegrabber
     OPTIONAL_COMPONENTS image pcicclient
     )
 
-find_package(PCL 1.7.1 REQUIRED COMPONENTS common io)
+find_package(PCL 1.8 REQUIRED COMPONENTS common io)
 find_package(Boost REQUIRED COMPONENTS system)
 
 find_library(LIB_boost_system NAMES boost_system)
-
-
-# Fix this: https://bugs.launchpad.net/ubuntu/+source/vtk6/+bug/1573234
-list(FIND PCL_IO_LIBRARIES "vtkproj4" VTKPROJ4_REQUIRED)
-if(NOT VTKPROJ4_REQUIRED EQUAL -1)
-    find_library(LIBVTKPROJ4_LIBRARY NAMES vtkproj4)
-    if(NOT ${LIBVTKPROJ4_LIBRARY})
-        list(REMOVE_ITEM PCL_IO_LIBRARIES "vtkproj4")
-    endif()
-endif()
 
 link_directories(
   ${PCL_LIBRARY_DIRS}
