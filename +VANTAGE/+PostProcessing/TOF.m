@@ -40,7 +40,7 @@ classdef TOF
         % centroid measurements for each CubeSat, the value
         % (outlierMultiplier*stdOfAllPreviousMeas) is used as the threshold for
         % separating outliers from valid data points
-        outlierMultiplier = 4;
+        outlierMultiplier = 3;
         
     end
     
@@ -56,13 +56,14 @@ classdef TOF
         function obj = TOF(ModelRef,configFilename)
             % Clear persistents
             clear obj.associateCentroids
+            
             % Store Model class reference
             obj.ModelRef = ModelRef;
 
             % Read data from configuration file
             configData = jsondecode(fileread(configFilename));
 
-            % Initialize confuiguration parameters
+            % Initialize configuration parameters
             obj.maxAllowableRange  = configData.maxAllowableRange; % m
             obj.ptMaxDistFromPlane = configData.ptMaxDistFromPlane; % m
             obj.fps                = configData.fps;
@@ -198,7 +199,6 @@ classdef TOF
             
             % Update Deployer CubesatArray
             Deployer.CubesatArray = CubeSats;
-            
         end
         
         %% Calculate centroids from file
