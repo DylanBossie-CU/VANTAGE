@@ -155,14 +155,14 @@ classdef Test_Optical < matlab.unittest.TestCase
         end
         
         function testPipeline(testCase)
-            %This test case operates as the method for
-            %Optical.OpticalProcessing until Optical I/O is satisfactory
             close all
             import VANTAGE.PostProcessing.*
             truthFilename = 'config/Testing/TruthDataTest.json';
             manifestFilename = 'Config/Manifest.json';
             Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename,'./Config');
             OpticalTest = Model.Optical;
+            
+            Model.ComputeStateOutput;
             
             % Unit vector to VCF origin from CCF
             UnitOriginVCF = Model.Deployer.GetCamOriginVCF;

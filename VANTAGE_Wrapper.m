@@ -9,42 +9,47 @@ close all
 clear
 
 %% Process Deployment Manifest and Truth data
+truthFilename = 'config/Testing/TruthDataTest.json';
 manifestFilename = 'Config/Manifest.json';
-truthFilename    = '<truthFilename>';
-Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename,'./Config');
 
 %% Send Sensor Ready Signal to RBP
-% pleaseAvionicsTeamSaveMe(wat);
+% TBD when rest of software is complete
 
 %% Receive Launch Signal from RBP
-% iDontKnowHowToDoThis(yay);
+% TBD when rest of software is complete
 
 %% Initialize Automated Sensor Data Collection
-% SeanAutomationCodeHere(yeet);
+% To be added once post-processing is complete
 
 %% Data Post-Processing
+% Import the VANTAGE post-processing software suite
+import VANTAGE.PostProcessing.*
+% Initialize the post-processing objects within Model class
+Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename,'./Config');
+OpticalCam = Model.Optical;
 
-% TOF Post-Processing
-%{
-TOFData = dir(strcat(SensorData.TOFData,'*.pcd'));
-try
-    TOF.naiveFindCentroids(TOFData,Deployer,SensorData);
-    %CubeSats_TOF = TOF.Processing(TOFData,Deployer,SensorData);
-catch
-    disp('TOF not fully implemented yet. Continuing...')
-end
-%}
+% Unit vector to VCF origin from CCF
+UnitOriginVCF = Model.Deployer.GetCamOriginVCF;
 
+dataFiles = dir(strcat(OpticalCam.DataDirec,OpticalCam.FileExtension));
+
+% Compute position and velocity states for the input data
+Model.ComputeStateOutput()
+disp('Completed Post-processing :^)')
 % At this point, TOF data has been processed up to its predefined desired
 % range 
 %% Compare Results against Deployment Predictions
-
-
+import VANTAGE.Validate.*
+Validate.validateOptical();
+Validate.validateTOF();
+Validate.validateVantage();
+disp('Completed deployment comparison (^:')
 %% Generate Output Report
 
-
+disp('Generated output report :")')
 %% Send Output Report to RBP
 
-
+disp('Output report transmitted to deployer')
 %% Cleanup & Shutdown
 
+disp('Cleanup complete. Shutting down...')
