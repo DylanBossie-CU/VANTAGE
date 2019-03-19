@@ -16,7 +16,7 @@ rectAOI = ueye.IS_RECT()
 pitch = ueye.INT()
 nBitsPerPixel = ueye.INT(8)    #24: bits per pixel for color mode; take 8 bits per pixel for monochrome
 channels = 1                    #3: channels for color mode(RGB); take 1 channel for monochrome
-m_nColorMode = ueye.INT()		# Y8/RGB16/RGB24/REG32
+m_nColorMode = ueye.INT()       # Y8/RGB16/RGB24/REG32
 bytes_per_pixel = int(nBitsPerPixel / 8)
 #---------------------------------------------------------------------------------------------------------------------------------------
 print("START")
@@ -113,19 +113,18 @@ while(nRet == ueye.IS_SUCCESS):
     # In order to display the image in an OpenCV window we need to...
     # ...extract the data of our image memory
   
-
-	nRet = ueye.is_FreezeVideo(hCam, ueye.IS_WAIT)
-	array = ueye.get_data(pcImageMemory, width, height, nBitsPerPixel, pitch, copy=False)
-	nRet1= ueye.is_GetImageInfo(hCam,MemID, Iinfo, ueye.sizeof(Iinfo) )
-	frame = np.reshape(array,(height.value, width.value, bytes_per_pixel))
-	#print(Iinfo.TimestampSystem)
-	TitleString="/home/vantage/Documents/githere/VANTAGE/Automation/OpticalCam_Automation/TestImages_Automated/VANTAGEOp"+str(Iinfo.TimestampSystem.wMonth.value)+"_"+str(Iinfo.TimestampSystem.wDay.value)+"_"+str(Iinfo.TimestampSystem.wHour.value)+"_"+str(Iinfo.TimestampSystem.wMinute.value)+"_"+str(Iinfo.TimestampSystem.wSecond.value)+"_"+str(Iinfo.TimestampSystem.wMilliseconds.value)+".jpg"
-	cv2.imwrite(TitleString, frame)
-	#print("Wrote Image")
-	count+=1
-	time.sleep(0.25)
-	if count>100:
-		break
+    TitleString="/home/vantage/Documents/githere/VANTAGE/Automation/OpticalCam_Automation/TestImages_Automated/VANTAGEOp"+str(Iinfo.TimestampSystem.wYear.value)+str(Iinfo.TimestampSystem.wMonth.value)+"_"+str(Iinfo.TimestampSystem.wDay.value)+"_"+str(Iinfo.TimestampSystem.wHour.value)+"_"+str(Iinfo.TimestampSystem.wMinute.value)+"_"+str(Iinfo.TimestampSystem.wSecond.value)+"_"+str(Iinfo.TimestampSystem.wMilliseconds.value)+".png"
+    nRet = ueye.is_FreezeVideo(hCam, ueye.IS_WAIT)
+    array = ueye.get_data(pcImageMemory, width, height, nBitsPerPixel, pitch, copy=False)
+    nRet1= ueye.is_GetImageInfo(hCam,MemID, Iinfo, ueye.sizeof(Iinfo) )
+    frame = np.reshape(array,(height.value, width.value, bytes_per_pixel))
+    #print(Iinfo.TimestampSystem)   
+    cv2.imwrite(TitleString, frame)
+    #print("Wrote Image")
+    count+=1
+    time.sleep(0.25)
+    if count>100:
+        break
 
 
 

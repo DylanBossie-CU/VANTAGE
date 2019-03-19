@@ -103,7 +103,7 @@ classdef Optical
     % @author     Justin Fay
     % @date       10-Mar-2019
     %
-    function [obj,didRead,direc] = readInputFramesFromImages(obj)
+    function [didRead,direc] = readInputFramesFromImages(obj)
         
         % Initialize read status
         didRead = false;
@@ -121,9 +121,10 @@ classdef Optical
         
         % Check read status
         numFile = numel(direc);
-        if numFile<0
-            didRead = false;
+        if numFile<=0
             return;
+        else
+            didRead = true;
         end
         
         % Process frames
