@@ -8,5 +8,9 @@
 %
 % @author   Joshua Kirby
 % @date     19-Mar-2019
-function presentErrorsVsReqs(Model,SensorData)
-%% 
+function TOFpresentErrorsVsReqs(Model,SensorData,truthFileName)
+%% TOF Processing
+Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
+    Model.Deployer,'presentResults',0,'fileLims',fileLims,'showDebugPlots',0);
+
+%% Truth Data processing
