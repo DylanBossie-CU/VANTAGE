@@ -23,6 +23,10 @@ manifestFilename = 'Config/Manifest.json';
 % To be added once post-processing is complete
 
 
+%% Perform Test Data Cleaning
+% Must perform background subtraction before data can be processed
+
+
 %% Data Post-Processing
 % Import the VANTAGE post-processing software suite
 import VANTAGE.PostProcessing.*

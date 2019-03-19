@@ -27,6 +27,9 @@ classdef Deployer
 
         % Number of expected cubesats
         numCubesats
+        
+        % Type of test performed
+        testScenario
     end
 
     methods
@@ -50,6 +53,8 @@ classdef Deployer
             % Read data from manifest
             manifestData = jsondecode(fileread(manifestFilename));
 
+            % Define test type
+            obj.testScenario = manifestData.testScenario;
             % Read deployer dimensions from config file
 
             % Initialize Deployer instance with tube positions and expected release time

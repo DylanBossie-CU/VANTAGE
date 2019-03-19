@@ -19,6 +19,7 @@ classdef Model < handle
         
         % Truth data
         Truth_VCF
+        
     end
 
     methods
