@@ -1,1 +1,0 @@
-%% Script which executes validation for Optical
