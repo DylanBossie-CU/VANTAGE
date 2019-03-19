@@ -19,18 +19,7 @@ classdef Validate
         % @author   Joshua Kirby
         % @date     19-Mar-2019
         function obj = Validate()
-            if nargin == 1
-                % Obtain data from json file
-                config = jsondecode(fileread(configFilename));
-
-                % Set transforms between TCF and VCF
-                obj = obj.setTdata('VCF',config.VT_DCM,config.V_TCF2VCF,'TCF');
-
-                % Set transforms between CCF and VCF
-                obj = obj.setTdata('VCF',config.VC_DCM,config.V_CCF2VCF,'CCF');
-            else
-                error('Incorrect number of input arguments for initialization of Transform Class instance')
-            end
+            
         end
         
         %% Validate TOF
@@ -57,7 +46,7 @@ classdef Validate
         %
         % @author   Joshua Kirby
         % @date     19-Mar-2019
-        function validateTOF()
+        function validateOptical()
             
         end
         
@@ -71,7 +60,7 @@ classdef Validate
         %
         % @author   Joshua Kirby
         % @date     19-Mar-2019
-        function validateTOF()
+        function validateVantage()
             
         end
     end
