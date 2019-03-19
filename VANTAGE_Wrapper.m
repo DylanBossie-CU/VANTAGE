@@ -4,7 +4,6 @@
 % at the appropriate times.
 % @author   Dylan Bosie
 % @date     17-Feb-2019
-clc
 close all
 clear
 
@@ -15,11 +14,14 @@ manifestFilename = 'Config/Manifest.json';
 %% Send Sensor Ready Signal to RBP
 % TBD when rest of software is complete
 
+
 %% Receive Launch Signal from RBP
 % TBD when rest of software is complete
 
+
 %% Initialize Automated Sensor Data Collection
 % To be added once post-processing is complete
+
 
 %% Data Post-Processing
 % Import the VANTAGE post-processing software suite
@@ -38,6 +40,7 @@ Model.ComputeStateOutput()
 disp('Completed Post-processing :^)')
 % At this point, TOF data has been processed up to its predefined desired
 % range 
+
 %% Compare Results against Deployment Predictions
 import VANTAGE.Validate.*
 Validate.validateOptical();
