@@ -274,8 +274,10 @@ classdef Optical
                 centroids{1} = meanCent;
             end
             
-            % Perform object association
-            obj.objectAssociation(centroids,centerpoint,numOccluded);
+            if ~isSystemCentroid
+                % Perform object association
+                obj.objectAssociation(centroids,centerpoint,numOccluded);
+            end
             
             %Plot results
             if obj.PlotBinarizedImages

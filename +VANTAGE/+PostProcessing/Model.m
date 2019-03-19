@@ -19,6 +19,7 @@ classdef Model < handle
         
         % Truth data
         Truth_VCF
+        
     end
 
     methods
@@ -70,14 +71,15 @@ classdef Model < handle
 	        		obj.Optical.Frame = direc(i);
 
 	        		% Run optical processing
-	        		[CamUnitVecsVCF, CamTimestep, isSystemCentroid] =...
+	        		[CamUnitVecsVCF,CamOriginVCF, CamTimestamp, isSystemCentroid] =...
                         obj.Optical.OpticalProcessing(obj.Optical.Frame);
 
 	        		% Get propogated TOF positions
+                    %lol
 	        		%pos_TOF = obj.TOF.propogatedShit(camTimestep)
 
 	        		% Run sensor fusion
-	        		[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF, sig_cam, sig_TOF);
+	        		%[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF, sig_cam, sig_TOF);
 	        	end
 	        else
 	        	error(strcat('Unable to read optical data files from ', obj.Optical.DataDirec));
@@ -158,7 +160,7 @@ classdef Model < handle
         		meanTOF = meanTOF./numCubesats;
 
         		% Run sensor fusion on system centroid estimates
-        		tmp = SensorFusion(obj, camOrigin, camVecs{1}, meanTOF, sig_cam, sig_TOF)
+        		tmp = SensorFusion(obj, camOrigin, camVecs{1}, meanTOF, sig_cam, sig_TOF);
 
         		% Calculate adjustment vector
         		sensorFusionDiff = tmp-mean_TOF;
@@ -170,7 +172,7 @@ classdef Model < handle
         	else
         		% Loop through estimates individually and perform sensor fusion
         		for i = 1:numCubesats
-        			pos{i} = SensorFusion(obj, camOrigin, camVecs{i}, pos_TOF{i}, sig_cam, sig_TOF)
+        			pos{i} = SensorFusion(obj, camOrigin, camVecs{i}, pos_TOF{i}, sig_cam, sig_TOF);
         		end
     		end
 
