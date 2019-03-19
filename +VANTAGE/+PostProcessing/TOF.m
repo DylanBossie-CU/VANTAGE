@@ -30,8 +30,17 @@ classdef TOF
         % fov
         HVfov_deg
         
-        % showDebugPlots
+        % showDebugPlots, default to 0
         showDebugPlots = 0
+        
+        % max number of consecutive outliers for a CubeSat
+        maxConsOutliers = 3;
+        
+        % scalar by which to multiply the standard deviation of all previous
+        % centroid measurements for each CubeSat, the value
+        % (outlierMultiplier*stdOfAllPreviousMeas) is used as the threshold for
+        % separating outliers from valid data points
+        outlierMultiplier = 4;
         
     end
     
@@ -45,6 +54,8 @@ classdef TOF
         % @return     A reference to an initialized TOF object
         %
         function obj = TOF(ModelRef,configFilename)
+            % Clear persistents
+            clear obj.associateCentroids
             % Store Model class reference
             obj.ModelRef = ModelRef;
 
@@ -85,12 +96,10 @@ classdef TOF
         % @return   Deployer class instance, containing
         %           Cubesats populated with TOF centroid 
         %           results
-        % @return   length-n struct of CubeSats_TOF with naive centroids in
-        %           TCF
         %
         % @author   Joshua Kirby
         % @date     01-Mar-2019
-        function [Deployer,naiveCentroids] = TOFProcessing(obj,SensorData,Deployer,varargin)
+        function [Deployer] = TOFProcessing(obj,SensorData,Deployer,varargin)
             % Extract relevant data from inputs
             CubeSats = Deployer.CubesatArray;
             
@@ -117,10 +126,8 @@ classdef TOF
                     % limiting which files to process from the directory
                     if strcmpi(varargin{i},'fileLims')
                         if size(varargin{i+1},1) == 1 && size(varargin{i+1},2) == 2
-                            fileLims = varargin{i+1};
-                            if fileLims(1) < 1 || fileLims(2)>length(ls)
-                                error('fileLims arguments are out of range for the files in SensorData.TOFData')
-                            end
+                            fileLims(1) = max(fileLims(1),varargin{i+1}(1));
+                            fileLims(2) = min(fileLims(2),varargin{i+1}(2));
                         else
                             error('fileLims requires a following [minFileIndex maxFileIndex] argument')
                         end
@@ -149,31 +156,34 @@ classdef TOF
                 end
             end
             
-            % Initialize CubeSats_TOF
-            for i = 1:length(CubeSats)
-                CubeSats_TOF(i) = VANTAGE.PostProcessing.CubeSat_TOF(CubeSats(i));
-            end
-            
             % Loop over files for as long as there are files or until the
             % Cubesats leave the maxAllowableRange of the TOF camera
             stopProcessing = 0;
             outOfRange = 0;
+            centroidingDevolved = 0;
+            numConsOutliers = zeros(1,length(CubeSats));
             ii = fileLims(1);
-            warning('TOFProcessing currently processes all files, set a stopping condition based on maxAllowableRange as well')
             while ~stopProcessing
+                % Initialize (disposable) CubeSats_TOF
+                for i = 1:length(CubeSats)
+                    CubeSats_TOF(i) = VANTAGE.PostProcessing.CubeSat_TOF(CubeSats(i));
+                end
                 % Naively identify centroids in image
                 [CubeSats_TOF,pc] = obj.naiveFindCentroids(ls(ii).name,ls(ii).time,SensorData,CubeSats_TOF);
-                % Save naive centroids for Dylan 3-13-19
-                naiveCentroids(ii-fileLims(1)+1).CubeSats_TOF = CubeSats_TOF;
-                for j = 1:obj.Truth_VCF.numCubeSats
-                    naiveCentroids(ii-fileLims(1)+1).Truth_TCF_colvecs(:,j) = ...
-                        obj.Transform.tf('TCF',obj.Truth_VCF.Cubesat(j).pos(ii,:)','VCF');
+                % Determine if CubeSats are passing out of range
+                if mean(pc.Location(:,3)) > obj.maxAllowableRange
+                    disp(['Mean of the analyzed point cloud passed out of the ',...
+                        'maxAllowableRange for the TOF, this will be the last file',...
+                        ' analyzed...']);
+                    outOfRange = 1;
                 end
                 % Associate with known cubesats within Deployer
-                [CubeSats] = obj.associateCentroids(CubeSats_TOF,CubeSats);
-                % Determine if cubesats have passed out of range (sets
-                % outOfRange)
-                warning('unimplemented')
+                [CubeSats,numConsOutliers] = obj.associateCentroids(CubeSats_TOF,CubeSats,numConsOutliers);
+                % Determine if all of the CubeSats have too many
+                % consecutive outliers
+                if ~any(numConsOutliers < obj.maxConsOutliers)
+                    centroidingDevolved = 1;
+                end
                 % Present Results
                 if presentResults
                     obj.plotResults(CubeSats_TOF,pc,obj.Truth_VCF.t(ii));
@@ -181,7 +191,7 @@ classdef TOF
                 % Iterate counter
                 ii = ii + 1;
                 % Stop processing?
-                if (ii > fileLims(2)) || outOfRange
+                if (ii > fileLims(2)) || outOfRange || centroidingDevolved
                     stopProcessing = 1;
                 end
             end
@@ -238,8 +248,6 @@ classdef TOF
                         end
                     end
                 end
-            else
-                CubeSats_TOF = VANTAGE.PostProcessing.CubeSat_TOF.empty;
             end
         end
         
@@ -251,13 +259,23 @@ classdef TOF
         %                           centroids in TCF
         % @param    CubeSats        CubeSat object with all previous
         %                           centroids in VCF
+        % @param    numConsOutliers a 1xlength(CubeSats) vector of the
+        %                           number of consecutive outliers for each CubeSat 
+        %                           identified thus far
         %
         % @return   CubeSats object with a new set of centroids from
         %           CubeSats_TOF
+        % @return   updated numConsOutliers vector
         %
         % @author   Joshua Kirby
         % @date     10-Mar-2019
-        function [CubeSats] = associateCentroids(obj,CubeSats_TOF,CubeSats)
+        function [CubeSats,numConsOutliers] = associateCentroids(obj,CubeSats_TOF,CubeSats,numConsOutliers)
+            % Define persistent variable to save whether the last file
+            % contained outliers for each CubeSat
+            persistent hadOutlier
+            if isempty(hadOutlier)
+                hadOutlier = zeros(1,length(CubeSats));
+            end
             
             % Determine populated indices of CubeSats_TOF
             I = find(~cellfun(@isempty,{CubeSats_TOF.centroid_TCF}));
@@ -273,10 +291,10 @@ classdef TOF
                 
             for ii = I
                 % Determine if at least 10 previous centroids exist
-                if length(CubeSats(ii).time) > 5
+                if length(CubeSats(ii).time) >= 10
                     % remove outliers from data
-                    prevCentroids_VCF = CubeSats(ii).centroids_VCF(:,~CubeSats(ii).isOutlier);
-                    prevTimes = CubeSats(ii).time(~CubeSats(ii).isOutlier);
+                    prevCentroids_VCF = CubeSats(ii).centroids_VCF;
+                    prevTimes = CubeSats(ii).time;
                     % Fit to x, y, z data and determine standard deviations
                     [pX,SX] = polyfit(prevTimes,prevCentroids_VCF(1,:),1);
                     [~,stdX] = polyval(pX,prevTimes,SX);
@@ -289,26 +307,42 @@ classdef TOF
                     stdZ = mean(stdZ);
                     % Determine if current point is near a prediction or is
                     % an outlier
-                    stdAll(ii) = norm([stdX stdY stdZ]);
-                    predPt(:,ii) = [polyval(pX,CubeSats_TOF(ii).time),...
+                    stdAll = norm([stdX stdY stdZ]);
+                    outlierThreshold = obj.outlierMultiplier*stdAll;
+                    predPt = [polyval(pX,CubeSats_TOF(ii).time),...
                               polyval(pY,CubeSats_TOF(ii).time),...
                               polyval(pZ,CubeSats_TOF(ii).time)]';
-                    for jj = 1:length(CubeSats_TOF)
-                        deltaPredPt(ii,jj) = norm(predPt(:,ii) - centroid_VCF(:,jj));
+                    deltaPredPt = ones(3,1).*inf; % inf because inf > outlierThreshold always
+                    for jj = I
+                        deltaPredPt(jj) = norm(predPt - centroid_VCF(:,jj));
+                    end
+                    lessThanOutlierThreshold = deltaPredPt < outlierThreshold;
+                    isOutlier = sum(lessThanOutlierThreshold) ~= 1;
+                    % Save current point if not an outlier
+                    hasOutlier = ones(1,length(CubeSats));
+                    csIndex = find(lessThanOutlierThreshold);
+                    if ~isOutlier
+                        CubeSats(csIndex).centroids_VCF = [CubeSats(csIndex).centroids_VCF,centroid_VCF(:,ii)];
+                        CubeSats(csIndex).time = [CubeSats(csIndex).time,CubeSats_TOF(ii).time];
+                        hasOutlier(csIndex) = 0;
                     end
                 else
-                    % save data point as a non-outlier
-                    CubeSats(ii).centroids_VCF = [CubeSats(ii).centroids_VCF,centroid_VCF];
+                    CubeSats(ii).centroids_VCF = [CubeSats(ii).centroids_VCF,centroid_VCF(:,ii)];
                     CubeSats(ii).time = [CubeSats(ii).time,CubeSats_TOF(ii).time];
-                    CubeSats(ii).isOutlier = [CubeSats(ii).isOutlier,0];
+                    hasOutlier = zeros(1,length(CubeSats));
                 end
+            end
+            % Update numOutliers
+            if ~isempty(I)
+                numConsOutliers = hadOutlier.*numConsOutliers + hasOutlier;
+                hadOutlier = hasOutlier;
             end
         end
         
     end
     
     %% Private Methods
-    methods  (Access = private)
+    methods  (Access = public)
         %% Loading point clouds from files
         %
         % Loads data from a simulation file
@@ -396,7 +430,11 @@ classdef TOF
               % give up if too many tries
               counter = counter + 1;
               if counter > 30
-                error('Bandwidth for point splitting ksdensity function did not converge in 10 tries, implement a better bw update')
+                %warning('Bandwidth for point splitting ksdensity function did not converge in 30 tries')
+                nsplit = 0;
+                NPeaks = [];
+                locs = [];
+                break
               end
             end
             
@@ -432,13 +470,18 @@ classdef TOF
                 end
                 % Skip this CubeSat if it's too close to the edge of the
                 % FOV
+                maxZfov = max(...
+                    max(abs(pc.Location(I,1)))/tand(obj.HVfov_deg(1)/2),...
+                    max(abs(pc.Location(I,2)))/tand(obj.HVfov_deg(2)/2)...
+                    );
                 satPcZDistFromFOV = min(pc.Location(I,3)-abs(pc.Location(I,1))./tand(obj.HVfov_deg(1)/2),...
                                     pc.Location(I,3)-abs(pc.Location(I,2))./tand(obj.HVfov_deg(2)/2));
                 % skip if first percentile of data is less than two cm from
                 % the FOV --and-- if the 99th percentile of data is less
-                % than 20 cm from the 1st percentile
+                % than 20 cm from the highest point of the FOV directly
+                % below (-t3) the cubesat
                 skipThisCubesat = (prctile(satPcZDistFromFOV,1) < 2/100) & ...
-                                   (prctile(satPcZDistFromFOV,99)-prctile(satPcZDistFromFOV,1) < 20/100);
+                                   (prctile(pc.Location(I,3),99)-maxZfov < 15/100);
                 if skipThisCubesat
                     continue
                 end
@@ -462,6 +505,7 @@ classdef TOF
             %%% Allocation
             % Initial value for minimum number of points considered to make up a plane
             minPtsInPlane   = 10;
+            minPtsUnset     = 1;
 
             % Initialize planes structure
             numPlanes = 0;
@@ -505,13 +549,15 @@ classdef TOF
                         if planes(numPlanes).planeCloud.Count <= planes(i).planeCloud.Count
                             % delete this plane
                             planes(numPlanes) = [];
-                            numPlanes = numPlanes -1;
+                            numPlanes = numPlanes-1;
+                            break
                             % if the previous plane is smaller than this plane
                         else
                             % replace previous plane with this plane and delete this plane
                             planes(i) = planes(numPlanes);
                             planes(numPlanes) = [];
                             numPlanes = numPlanes-1;
+                            break
                         end
                     end
                 end
@@ -519,8 +565,9 @@ classdef TOF
                 %%% Update minimum number points required to make a plane
                 % Take minPoints to be one-twentieth the number of points found in the first
                 % plane
-                if numPlanes == 1
+                if numPlanes == 1 && minPtsUnset
                     minPtsInPlane = round(planes(numPlanes).planeCloud.Count/20);
+                    minPtsUnset   = 0;
                 end
             end
 
@@ -767,7 +814,7 @@ classdef TOF
                 boundaryPtsRaw = [inPlane(I_bound,1)';inPlane(I_bound,2)'];
                 order = 2;
                 frameLen = obj.roundToNearestOdd(size(boundaryPtsRaw,2)/5);
-                if frameLen == 1
+                if frameLen <= 1
                     boundaryPts = boundaryPtsRaw;
                 else
                     boundaryPts = sgolayfilt(boundaryPtsRaw,order,frameLen,[],2);

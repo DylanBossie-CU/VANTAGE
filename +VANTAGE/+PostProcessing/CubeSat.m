@@ -4,7 +4,7 @@ classdef CubeSat
     %
     %% Properties
     properties
-        %% Pre-defined Properties
+        %%% Pre-defined Properties
         %
         % string containing cubesat name
         name
@@ -21,23 +21,13 @@ classdef CubeSat
         % dimensions of cubesat in meters
         actualDims
 
-        %% Calculated Properties
+        %%% Calculated Properties
         %
         % all centroids over time nx3
         centroids_VCF
         
         % time vector, length-n
         time
-        
-        % boolean vector for whether each centroid point is an outlier,
-        % length-n
-        isOutlier
-        
-        
-        %% True Properties
-        %
-        
-        
         
     end
     
