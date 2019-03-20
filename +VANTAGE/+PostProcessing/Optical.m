@@ -268,6 +268,7 @@ classdef Optical
             if numel(centroids) == numCubeSats
                 % Use centroids of individual CubeSats
                 isSystemCentroid = false;
+                
                 % Assign the system centroid for this image to [0 0]
                 obj.CubeSats{end}.centroid = [0 0];
             else
@@ -341,11 +342,6 @@ classdef Optical
         for i = 1:length(CubeSats)
             [y,x] = centroid(CubeSats{i});
             centroids{i} = [x,y];
-            %{
-            centroids{i} = zeros(1,2);
-            centroids{i}(1) = mean(CubeSats{i}(:,2));
-            centroids{i}(2) = mean(CubeSats{i}(:,1));
-            %}
         end
     end
     
