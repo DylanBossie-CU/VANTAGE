@@ -31,7 +31,7 @@ manifestFilename = 'Config/Manifest.json';
 % Import the VANTAGE post-processing software suite
 import VANTAGE.PostProcessing.*
 % Initialize the post-processing objects within Model class
-Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename,'./Config');
+Model = VANTAGE.PostProcessing.Model(manifestFilename,'./Config');
 OpticalCam = Model.Optical;
 
 % Unit vector to VCF origin from CCF

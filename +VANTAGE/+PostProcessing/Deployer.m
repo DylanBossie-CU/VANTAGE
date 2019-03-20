@@ -84,6 +84,8 @@ classdef Deployer
             % Read data from deployer configuration file
             obj.DeployerGeometry = jsondecode(fileread(configFilename));
             
+            % Assign CubeSat number
+            obj.numCubesats = length(obj.CubesatArray);
         end
 
         % A method for getting the initial states of all cubesats.
