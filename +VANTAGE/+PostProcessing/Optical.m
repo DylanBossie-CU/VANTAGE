@@ -242,7 +242,7 @@ classdef Optical
             CubeSat_polyshapes = cell(0);
             n = 1;
             for i = 1:numel(CubeSat_Boundaries)
-                cutPoly = obj.occlusionCut(CubeSat_Boundaries{i}(:,1),CubeSat_Boundaries{i}(:,2),'h',6);
+                cutPoly = obj.occlusionCut(CubeSat_Boundaries{i}(:,1),CubeSat_Boundaries{i}(:,2),obj.ModelRef.Deployer.GetNumCubesats());
                 for j = 1:numel(cutPoly)
                     CubeSat_Boundaries_Cut{n} = cutPoly{j}.Vertices;
                     CubeSat_polyshapes{n} = cutPoly{j};
@@ -479,7 +479,7 @@ classdef Optical
     % @author     Justin Fay
     % @date       21-Feb-2019
     %
-    function cutPoly = occlusionCut(obj,x,y,posCase,numCubesats)
+    function cutPoly = occlusionCut(obj,x,y,numCubesats)
         
         method1Success = true;
 
@@ -579,6 +579,20 @@ classdef Optical
 
         %% Associating Concavity Points
         if method1Success
+
+            % Determine the position case for the launch
+            oMat = zeros(8,1);
+            oMat(obj.ModelRef.Deployer.GetVantageTube()) = 1;
+            oMat(obj.ModelRef.Deployer.GetDeploymentTube()) = 1;
+            oMat = reshape(oMat,[4,2])';
+
+            if max(sum(oMat,1)) == 2
+                posCase = 'v';
+            elseif max(sum(oMat,2)) == 2
+                posCase = 'h';
+            else
+                posCase = 'd';
+            end
             posCase = lower(posCase);
             numSets = size(fitPks,1)/2;
 
