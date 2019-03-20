@@ -504,14 +504,6 @@ classdef Optical
         convHullOuterBin = ~isinterior(convHull_poly,xMesh(:),yMesh(:));
         convHullOuterBin = reshape(convHullOuterBin,[max(y)+2,max(x)+2]);
         D = bwdist(convHullOuterBin);
-        %{
-        tmp = polyshape(x,y);
-        for i = 1:size(xMesh,1)
-            i
-            [I,J] = isinterior(tmp,[xMesh(i,:)',yMesh(i,:)']);
-            D(i,:) = D(i,:).*J';
-        end
-        %}
         r = zeros(numel(x),1);
         for i = 1:numel(x)
             r(i) = D(y(i),x(i));
@@ -605,6 +597,18 @@ classdef Optical
             posCase = lower(posCase);
             numSets = size(fitPks,1)/2;
 
+            % Experimental method for associating points
+            %{
+            if numSets > 1
+                tmp = nchoosek(1:numPts,numSets);
+                tmp = [tmp,numPts-tmp];
+                for i = 1:size(tmp,1)
+                    intersectionPts = zeros(factorial(numSets),2);
+                end
+            end
+            %}
+
+            % Current working method for associating points
             if numSets > 1
                 ptSets = zeros(numSets,2);
                 switch posCase
