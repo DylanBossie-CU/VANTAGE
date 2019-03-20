@@ -40,7 +40,7 @@ classdef TOF
         % centroid measurements for each CubeSat, the value
         % (outlierMultiplier*stdOfAllPreviousMeas) is used as the threshold for
         % separating outliers from valid data points
-        outlierMultiplier = 3;
+        outlierMultiplier = 2;
         
     end
     
@@ -187,7 +187,8 @@ classdef TOF
                 end
                 % Present Results
                 if presentResults
-                    obj.plotResults(CubeSats_TOF,pc,obj.Truth_VCF.t(ii));
+                    obj.plotResults(CubeSats,CubeSats_TOF,...
+                        pc,obj.Truth_VCF.t(ii),numConsOutliers);
                 end
                 % Iterate counter
                 ii = ii + 1;
@@ -887,6 +888,8 @@ classdef TOF
                 if face.fullFace
                     % trusted side lengths are visible side lengths
                     face.trustedLen = len;
+                    % trusted corners are identified corners
+                    face.trustedCorners = corners;
                 else
                     % NOTE: this assumes that the CubeSat has not tumbled much
                     %   since launching, which is very valid for the TOF camera
@@ -899,41 +902,45 @@ classdef TOF
                     else
                         face.trustedLen(2) = min(CubeSat_TOF.actualDims);
                     end
-                end
+                    %%% Determine trusted corners
+                    % project to centroid from two most distant (downrange) corners
+                    % Obtain distant two corners and their midPt     
+                    if mean(corners(3,:)) < 3
+                        sortDirection = 'descend';
+                    else
+                        sortDirection = 'ascend';
+                    end
+                    [~,I] = sort(face.corners(3,:),'descend');
+                    farCorners = face.corners(:,I(1:2));
+                    nearBadCornersUnordered = face.corners(:,I(3:4));
 
-                %%% Determine trusted corners
-                % project to centroid from two most distant (downrange) corners
-                % Obtain distant two corners and their midPt                
-                [~,I] = sort(face.corners(3,:),'descend');
-                farCorners = face.corners(:,I(1:2));
-                nearBadCornersUnordered = face.corners(:,I(3:4));
+                    % Determine which trustedLen corresponds to the side that
+                    % is orthogonal to corners
+                    [~,I] = min(abs(face.trustedLen-norm(farCorners(:,1)-farCorners(:,2))));
+                    projLength = face.trustedLen([1:I-1,I+1:end]);
 
-                % Determine which trustedLen corresponds to the side that
-                % is orthogonal to corners
-                [~,I] = min(abs(face.trustedLen-norm(farCorners(:,1)-farCorners(:,2))));
-                projLength = face.trustedLen([1:I-1,I+1:end]);
-
-                % Determine near bad corners which correspond to far corners
-                nearBadCorners = zeros(3,2);
-                for i = 1:size(farCorners,2)
-                    for j = 1:size(nearBadCornersUnordered,2)
-                        v1 = farCorners(:,[1:i-1,i+1:end]) - farCorners(:,i);
-                        v2 = nearBadCornersUnordered(:,j) - farCorners(:,i);
-                        if abs(dot(v1,v2)) < 1e-06
-                            nearBadCorners(:,i) = nearBadCornersUnordered(:,j);
+                    % Determine near bad corners which correspond to far corners
+                    nearBadCorners = zeros(3,2);
+                    for i = 1:size(farCorners,2)
+                        for j = 1:size(nearBadCornersUnordered,2)
+                            v1 = farCorners(:,[1:i-1,i+1:end]) - farCorners(:,i);
+                            v2 = nearBadCornersUnordered(:,j) - farCorners(:,i);
+                            if abs(dot(v1,v2)) < 1e-06
+                                nearBadCorners(:,i) = nearBadCornersUnordered(:,j);
+                            end
                         end
                     end
-                end
 
-                % Project through near bad corners to near corners
-                nearCorners = zeros(3,2);
-                for i = 1:2
-                    u = obj.unitvec(nearBadCorners(:,i) - farCorners(:,i));
-                    nearCorners(:,i) = farCorners(:,i) + projLength*u;
-                end
+                    % Project through near bad corners to near corners
+                    nearCorners = zeros(3,2);
+                    for i = 1:2
+                        u = obj.unitvec(nearBadCorners(:,i) - farCorners(:,i));
+                        nearCorners(:,i) = farCorners(:,i) + projLength*u;
+                    end
 
-                % Assemble corners in circular order
-                face.trustedCorners = [fliplr(nearCorners),farCorners];
+                    % Assemble corners in circular order
+                    face.trustedCorners = [fliplr(nearCorners),farCorners];
+                end
 
                 %%% Determine faceIndex
                 % Dimensions to choose from, corresponding to indices of
@@ -1033,19 +1040,25 @@ classdef TOF
         %
         % @author   Joshua Kirby
         % @date     04-Mar-2019
-        function plotResults(obj,CubeSats_TOF,pc,truthTime)
+        function plotResults(obj,CubeSats,CubeSats_TOF,pc,truthTime,numConsOutliers)
             
             % Define indexing for use in looping over cubesats
-            CubesatIndexing = 1:length(CubeSats_TOF);
+            CubesatIndexing = 1:length(CubeSats);
             
-            % Extract true centroids from truth data for this file
             I = find(obj.Truth_VCF.t == truthTime,1);
             for i = 1:obj.Truth_VCF.numCubeSats
+                % Extract true centroids from truth data for this file
                 trueCentroids_VCF(i,:) = obj.Truth_VCF.Cubesat(i).pos(I,:);
             end
             
             % Transform true centroids from VCF to TCF
             trueCentroids_TCF = [obj.Transform.tf('TCF',trueCentroids_VCF','VCF')]';
+            calcCentroids_TCF = nan(length(CubeSats),3);
+            for i = 1:length(CubeSats) 
+                if ~numConsOutliers(i) && ~isempty(CubeSats(i).centroids_VCF)
+                    calcCentroids_TCF(i,:) = [obj.Transform.tf('TCF',CubeSats(i).centroids_VCF(:,end),'VCF')]';
+                end
+            end
             
             % Fit line to trueCentroids to use as plotting centerline for
             % reference
@@ -1120,13 +1133,15 @@ classdef TOF
             legendstrings = [];
             legendcounter = 1;
             colorcounter = 1;
+            centrColCounter = 1;
             for i = CubesatIndexing
-                if ~isempty(CubeSats_TOF(i).centroid_TCF)
-                    plot3(CubeSats_TOF(i).centroid_TCF(1),CubeSats_TOF(i).centroid_TCF(2),CubeSats_TOF(i).centroid_TCF(3),'r.','markersize',25)
+                if ~any(isnan(calcCentroids_TCF(i,:)))
+                    plot3(calcCentroids_TCF(i,1),calcCentroids_TCF(i,2),calcCentroids_TCF(i,3),'.','color',c(centrColCounter,:),'markersize',25)
                     plot3(trueCentroids_TCF(i,1),trueCentroids_TCF(i,2),trueCentroids_TCF(i,3),'b.','markersize',25)
                     legendstrings{legendcounter} = ['Calc.Centr',num2str(i)];
                     legendstrings{legendcounter+1} = ['True.Centr',num2str(i)];
                     legendcounter = legendcounter+2;
+                    centrColCounter=centrColCounter + 1;
                     for j = 1:CubeSats_TOF(i).numVisibleFaces
                         CubeSats_TOF(i).faces(j).planeCloud.Color = uint8(c(colorcounter,:).*255.*ones(CubeSats_TOF(i).faces(j).planeCloud.Count,3));
                         pcshow(CubeSats_TOF(i).faces(j).planeCloud,'markersize',markersize)

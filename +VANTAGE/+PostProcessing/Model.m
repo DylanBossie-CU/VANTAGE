@@ -26,15 +26,11 @@ classdef Model < handle
         % Class Constructor:
         %
         % @param      manifestFilename  full filename of manifest JSON file
-        % @param      truthFilename     full filename of truth data JSON file
         % @param      configDirecName   The configuration directory name
         %
         % @return     A reference to an initialized Model object
         %
-        function obj = Model(manifestFilename,truthFilename,configDirecName)
-            
-            % Process truth data
-            obj.Truth_VCF = obj.processTruthData(truthFilename);
+        function obj = Model(manifestFilename,configDirecName)
             
         	% Import child classes
         	import VANTAGE.PostProcessing.Deployer
@@ -42,8 +38,9 @@ classdef Model < handle
         	import VANTAGE.PostProcessing.Optical
         	import VANTAGE.PostProcessing.TOF
 
-        	% Construct child classes
+        	% Construct child classes and process truth data
             obj.Deployer = Deployer(manifestFilename, strcat(configDirecName,'/Deployer.json'),obj);
+            obj.Truth_VCF = obj.processTruthData(obj.Deployer.TruthFileName);
             obj.Transform = Transform(strcat(configDirecName,'/Transform.json'));
             obj.Optical = Optical(obj,strcat(configDirecName,'/Optical.json'), obj.Deployer.GetNumCubesats());
             obj.TOF = TOF(obj,strcat(configDirecName,'/TOF.json'));
