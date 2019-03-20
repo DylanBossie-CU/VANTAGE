@@ -72,12 +72,16 @@ classdef Optical
         import VANTAGE.PostProcessing.CubeSat_Optical
         obj.ModelRef = ModelRef;
         SensorData = jsondecode(fileread(configFilename));
-        obj.CubeSats = cell(numCubesats,1);
+        obj.CubeSats = cell(numCubesats+1,1);
         for i = 1:numCubesats
             obj.CubeSats{i} = CubeSat_Optical;
             obj.CubeSats{i}.tag = i;
             obj.CubeSats{i}.centroid = [0,0];
         end
+        obj.CubeSats{end} = CubeSat_Optical;
+        obj.CubeSats{end}.tag = 'systemCentroid';
+        obj.CubeSats{end}.centroid = [0,0];
+        
         filename = strcat(SensorData.OpticalData,...
             SensorData.OpticalVideoInput);
         FrameIntervals = linspace(0,1,SensorData.DesiredFPS+1);
@@ -262,19 +266,24 @@ classdef Optical
             % system centroid - set to false. If different amount is
             % detected, set use system centroid to true
             if numel(centroids) == numCubeSats
+                % Use centroids of individual CubeSats
                 isSystemCentroid = false;
+                % Assign the system centroid for this image to [0 0]
+                obj.CubeSats{end}.centroid = [0 0];
             else
+                % Use system centroid 
                 isSystemCentroid = true;
                 meanCent = zeros(1,2);
                 for i = 1:numel(centroids)
                     meanCent = meanCent + centroids{i};
                 end
                 meanCent = meanCent./numel(centroids);
-                centroids = cell(1);
-                centroids{1} = meanCent;
+                
+                %Assign the mean centroid to the system centroid CubeSat
+                obj.CubeSats{end}.centroid = meanCent;
             end
             
-            if ~isSystemCentroid
+            if true%~isSystemCentroid
                 % Perform object association
                 obj.objectAssociation(centroids,centerpoint,numOccluded);
             end
