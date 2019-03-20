@@ -54,6 +54,12 @@ classdef Optical
 
     % Data filenames
     FileExtension
+    
+    % Pixel location of system centroid at 100m
+    PixelLocation100m
+    
+    % Check if performing search for 100m pixel
+    is100mSearch
   end
   
   
@@ -93,6 +99,7 @@ classdef Optical
         obj.FrameIntervals = FrameIntervals;
         obj.FileExtension = SensorData.OpticalFileExtension;
         obj.PlotHist = SensorData.PlotHist;
+        
     end
 
     %% Read data directory
@@ -174,10 +181,10 @@ classdef Optical
         frame = imread(strcat(obj.DataDirec,frameTitle));
         
         % Process current frame
-        [centroids,isSystemCentroid] = obj.ImageProcessing(frame);
+        [obj,isSystemCentroid] = obj.ImageProcessing(frame);
 
         % Transform results to VCF unit vectors
-        UnitVecsVCF = obj.PixelToUnitVec(centroids);
+        UnitVecsVCF = obj.PixelToUnitVec(isSystemCentroid);
         UnitOriginVCF = [0 0 0];
 
         % Get frame timestamp
@@ -190,7 +197,7 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         24-Jan-2019
-    function [centroids, isSystemCentroid] = ImageProcessing(obj,frame)
+    function [obj,isSystemCentroid] = ImageProcessing(obj,frame)
         I = frame;
         centerpoint = [ceil(length(frame(:,1)/2)),ceil(length(frame(1,:))/2)];
         if size(I,3) > 1
@@ -253,24 +260,31 @@ classdef Optical
                     n = n+1;
                 end
             end
-            
-            % Check for occlusion
-            numOccluded = numCubeSats-length(CubeSat_Boundaries_Cut);
 
             %
             %Find CubeSat centroids
             centroids = obj.findCentroids(CubeSat_polyshapes);
             
+            if obj.is100mSearch
+                meanCent = zeros(1,2);
+                for i = 1:numel(centroids)
+                    meanCent = meanCent + centroids{i};
+                end
+                meanCent = meanCent./numel(centroids);
+                obj.PixelLocation100m = meanCent;
+                isSystemCentroid = true;
+            end
+
             % Check number of found centroids - 
             % If centroids found are the same as expected, do not use
             % system centroid - set to false. If different amount is
             % detected, set use system centroid to true
-            if numel(centroids) == numCubeSats
+            if numel(centroids) == numCubeSats && ~obj.is100mSearch
                 % Use centroids of individual CubeSats
                 isSystemCentroid = false;
                 % Assign the system centroid for this image to [0 0]
                 obj.CubeSats{end}.centroid = [0 0];
-            else
+            elseif ~obj.is100mSearch
                 % Use system centroid 
                 isSystemCentroid = true;
                 meanCent = zeros(1,2);
@@ -283,9 +297,9 @@ classdef Optical
                 obj.CubeSats{end}.centroid = meanCent;
             end
             
-            if true%~isSystemCentroid
+            if ~obj.is100mSearch && ~isSystemCentroid
                 % Perform object association
-                obj.objectAssociation(centroids,centerpoint,numOccluded);
+                obj.objectAssociation(centroids);
             end
             
             %Plot results
@@ -363,23 +377,45 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         14-Feb-2019
-    function obj = objectAssociation(obj,centroids,centerpoint,occlusion)
-        %Get distance from centerpoint for all objects
+    function obj = objectAssociation(obj,centroids)
+        %Get distance from final pixel location for all objects
         distance = zeros(length(centroids),1);
         for i=1:length(centroids)
-            distance(i) = norm(abs(centerpoint-centroids{i}));
+            distance(i) = norm(abs(obj.PixelLocation100m-centroids{i}));
         end
+
+        %Relative positioning from the final pixel location should remain
+        %ordered for the CubeSat launch positions. Therefore, centroids can
+        %be associated based on their relative distance from the final
+        %location.
         
-        j = 1;
-        for i=1:length(occlusion)
-            if occlusion(i) == false
-                obj.CubeSats{i}.centroid = centroids{j};
-                j = j + 1;
-            else
-                % Current CubeSat is occluded
-                obj.CubeSats{i}.centroid = [0 0];%obj.linearExtrapolation(obj.CubeSats{i})
-            end
-        end
+    end
+    
+    %% Detect 100m Pixel Location
+    % Object association requires knowledge of the final pixel location of
+    % the system at 100m. This method will analyze the last image and
+    % detect this point
+    % @param        centroids     Pixel location of centroid in image
+    %
+    % @param        centerpoint   Pixel location of image center
+    %
+    % @param        occlusion     Boolean array of tags descripting whether
+    %                             or not the respective centroid contains 
+    %                             occluded bodies
+    %
+    % @author       Dylan Bossie
+    % @date         14-Feb-2019
+    function obj = find100mPixel(obj,imageFile)
+         % Grab image
+        frameTitle = imageFile.name;
+        frame = imread(strcat(obj.DataDirec,frameTitle));
+        
+        % Process current frame
+        obj.is100mSearch = true;
+        [obj,~] = obj.ImageProcessing(frame);
+        
+        % Disable 100m pixel search
+        obj.is100mSearch = false;
     end
     
     %% Linear Extrapolation
@@ -741,7 +777,7 @@ classdef Optical
     % @author     Dylan Bossie
     % @date       4-Mar-2019
     %
-    function CubeSatUnitVectors = PixelToUnitVec(obj,CubeSats)
+    function CubeSatUnitVectors = PixelToUnitVec(obj,isSystemCentroid)
         %Read optical camera parameters
         CameraParameters = jsondecode(fileread('./Config/Sensors.json'));
         focalLength = CameraParameters.OpticalFocalLength;
@@ -751,10 +787,24 @@ classdef Optical
         pixelSizeX = pixelSize;%m
         pixelSizeY = pixelSize;%m
 
-        numCubeSats = length(CubeSats);
-        CubeSatUnitVectors = cell(numCubeSats,1);
-        for i = 1:numCubeSats
-            Centroid = CubeSats{i};
+        if ~isSystemCentroid
+            numCubeSats = length(obj.CubeSats);
+            CubeSatUnitVectors = cell(numCubeSats,1);
+            for i = 1:numCubeSats
+                Centroid = obj.CubeSats{i}.centroid;
+                %Distance from origin in pixels
+                p_x = Centroid(1) - origin(1);
+                p_y = -(Centroid(2) - origin(2));
+                f = -focalLength;
+
+                x = p_x*pixelSizeX;
+                y = p_y*pixelSizeY;
+                S = [x y f];
+
+                CubeSatUnitVectors{i} = S/norm(S);
+            end
+        else
+            Centroid = obj.CubeSats{end}.centroid;
             %Distance from origin in pixels
             p_x = Centroid(1) - origin(1);
             p_y = -(Centroid(2) - origin(2));
@@ -764,8 +814,9 @@ classdef Optical
             y = p_y*pixelSizeY;
             S = [x y f];
 
-            CubeSatUnitVectors{i} = S/norm(S);
+            CubeSatUnitVectors = S/norm(S);
         end
+        
     end
     
     % Convert pixel location to VCF unit vector
