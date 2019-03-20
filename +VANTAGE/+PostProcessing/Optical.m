@@ -253,7 +253,7 @@ classdef Optical
             CubeSat_polyshapes = cell(0);
             n = 1;
             for i = 1:numel(CubeSat_Boundaries)
-                cutPoly = obj.occlusionCut(CubeSat_Boundaries{i}(:,1),CubeSat_Boundaries{i}(:,2),'h',6);
+                cutPoly = obj.occlusionCut(CubeSat_Boundaries{i}(:,1),CubeSat_Boundaries{i}(:,2),obj.ModelRef.Deployer.GetNumCubesats());
                 for j = 1:numel(cutPoly)
                     CubeSat_Boundaries_Cut{n} = cutPoly{j}.Vertices;
                     CubeSat_polyshapes{n} = cutPoly{j};
@@ -282,6 +282,7 @@ classdef Optical
             if numel(centroids) == numCubeSats && ~obj.is100mSearch
                 % Use centroids of individual CubeSats
                 isSystemCentroid = false;
+                
                 % Assign the system centroid for this image to [0 0]
                 obj.CubeSats{end}.centroid = [0 0];
             elseif ~obj.is100mSearch
@@ -355,11 +356,6 @@ classdef Optical
         for i = 1:length(CubeSats)
             [y,x] = centroid(CubeSats{i});
             centroids{i} = [x,y];
-            %{
-            centroids{i} = zeros(1,2);
-            centroids{i}(1) = mean(CubeSats{i}(:,2));
-            centroids{i}(2) = mean(CubeSats{i}(:,1));
-            %}
         end
     end
     
@@ -524,7 +520,7 @@ classdef Optical
     % @author     Justin Fay
     % @date       21-Feb-2019
     %
-    function cutPoly = occlusionCut(obj,x,y,posCase,numCubesats)
+    function cutPoly = occlusionCut(obj,x,y,numCubesats)
         
         method1Success = true;
 
@@ -540,14 +536,6 @@ classdef Optical
         convHullOuterBin = ~isinterior(convHull_poly,xMesh(:),yMesh(:));
         convHullOuterBin = reshape(convHullOuterBin,[max(y)+2,max(x)+2]);
         D = bwdist(convHullOuterBin);
-        %{
-        tmp = polyshape(x,y);
-        for i = 1:size(xMesh,1)
-            i
-            [I,J] = isinterior(tmp,[xMesh(i,:)',yMesh(i,:)']);
-            D(i,:) = D(i,:).*J';
-        end
-        %}
         r = zeros(numel(x),1);
         for i = 1:numel(x)
             r(i) = D(y(i),x(i));
@@ -624,9 +612,35 @@ classdef Optical
 
         %% Associating Concavity Points
         if method1Success
+
+            % Determine the position case for the launch
+            oMat = zeros(8,1);
+            oMat(obj.ModelRef.Deployer.GetVantageTube()) = 1;
+            oMat(obj.ModelRef.Deployer.GetDeploymentTube()) = 1;
+            oMat = reshape(oMat,[4,2])';
+
+            if max(sum(oMat,1)) == 2
+                posCase = 'v';
+            elseif max(sum(oMat,2)) == 2
+                posCase = 'h';
+            else
+                posCase = 'd';
+            end
             posCase = lower(posCase);
             numSets = size(fitPks,1)/2;
 
+            % Experimental method for associating points
+            %{
+            if numSets > 1
+                tmp = nchoosek(1:numPts,numSets);
+                tmp = [tmp,numPts-tmp];
+                for i = 1:size(tmp,1)
+                    intersectionPts = zeros(factorial(numSets),2);
+                end
+            end
+            %}
+
+            % Current working method for associating points
             if numSets > 1
                 ptSets = zeros(numSets,2);
                 switch posCase
