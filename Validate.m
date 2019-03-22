@@ -37,7 +37,6 @@ classdef Validate
             close all;
             rng(99);
             tube = 6;
-            fileLims = [19 40];
 
             %%% Filenames and Configurables
             switch tube
@@ -103,7 +102,7 @@ classdef Validate
             % TOF Processing
             fileLims = [1 inf];
             Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
-                Model.Deployer,'presentResults',1,'fileLims',fileLims,'showDebugPlots',0);
+                Model.Deployer,'presentResults',0,'fileLims',fileLims,'showDebugPlots',0);
             % Truth Data processing
             Truth = obj.processTruthData(truthFileName);
             % Loop over cubesats
@@ -120,6 +119,7 @@ classdef Validate
                 hold on
                 grid on
                 grid minor
+                title(['CubeSat ',num2str(i),' TOF Absolute Error Vs Range'])
                 plot(vecnorm(Truth.Cubesat(i).posInterp,2,2),Error.Cubesat(i).err.*100);
                 xlabel('Range, m')
                 ylabel('Error, cm')

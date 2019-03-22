@@ -40,7 +40,7 @@ classdef TOF
         % centroid measurements for each CubeSat, the value
         % (outlierMultiplier*stdOfAllPreviousMeas) is used as the threshold for
         % separating outliers from valid data points
-        outlierMultiplier = 2;
+        outlierMultiplier = 10;
         
     end
     
@@ -277,20 +277,310 @@ classdef TOF
             if isempty(hadOutlier)
                 hadOutlier = zeros(1,length(CubeSats));
             end
-            
+            hasOutlier = false(1,length(CubeSats));
+            firstNmeas = 10;
             % Determine populated indices of CubeSats_TOF
-            I = find(~cellfun(@isempty,{CubeSats_TOF.centroid_TCF}));
-            
+            ItofFoundCentroids = find(~cellfun(@isempty,{CubeSats_TOF.centroid_TCF}));
             % Transform naive centroids to VCF
-            for ii = I
+            centroid_VCF = zeros(3,length(CubeSats_TOF));
+            for ii = ItofFoundCentroids
                 centroid_VCF(:,ii) = obj.Transform.tf('VCF',CubeSats_TOF(ii).centroid_TCF,'TCF');
             end
+            % Only proceed if some centroids were found
+            if any(ItofFoundCentroids)
+                % Ensure range ordering (first-out to last-out) of newly identified centroids
+                tmp = [CubeSats_TOF(ItofFoundCentroids).centroid_TCF];
+                [~,Irngorder] = sort(tmp(3,:),'descend');
+                centroid_VCF = centroid_VCF(:,Irngorder);
+                % Determine which CubeSats already have firstNmeas measurements
+                IsatsWithEnoughMeas = find(cellfun(@length,{CubeSats.time})>=firstNmeas);
+                % Save centroids directly for CubeSats which do not yet
+                % have firstNmeas measurements
+                ItofUsedCentroids = [];
+                if numel(IsatsWithEnoughMeas) < length(CubeSats)
+                    ItofUsedCentroids = setdiff(ItofFoundCentroids,IsatsWithEnoughMeas);
+                    for ii = ItofUsedCentroids
+                        CubeSats(ii).centroids_VCF = [CubeSats(ii).centroids_VCF,centroid_VCF(:,ii)];
+                        CubeSats(ii).time = [CubeSats(ii).time,CubeSats_TOF(ii).time];
+                    end
+                end
+                % Obtain predicted point and outlierThresholds for each
+                % CubeSat with greater than or equal to firstNmeas measurements
+                outlierThreshold = zeros(3,length(CubeSats));
+                predPt = ones(3,length(CubeSats)).*inf;
+                pX = zeros(length(CubeSats),2);
+                pY = zeros(length(CubeSats),2);
+                pZ = zeros(length(CubeSats),2);
+                stdXYZ = zeros(3,length(CubeSats));
+                for ii = IsatsWithEnoughMeas
+                    [pX(ii,:),pY(ii,:),pZ(ii,:),stdXYZ(:,ii)] = ...
+                        obj.fitLineToCentroids(CubeSats(ii),firstNmeas);
+                    outlierThreshold(:,ii) = obj.outlierMultiplier*stdXYZ(:,ii);
+                    warning('outlierThreshold hardcoded')
+                    outlierThreshold(outlierThreshold > 0.1) = 0.1;
+                    predPt(:,ii) = [polyval(pX(ii,:),CubeSats_TOF(1).time),...
+                              polyval(pY(ii,:),CubeSats_TOF(1).time),...
+                              polyval(pZ(ii,:),CubeSats_TOF(1).time)]';
+                    % Remove any outliers from CubeSats which just reached
+                    % firstNmeas
+                    if length(CubeSats(ii).time)==firstNmeas
+                        isRecursiveOutlier = false(1,firstNmeas);
+                        for jj = 1:firstNmeas
+                            recursivePredPt = [polyval(pX(ii,:),CubeSats(ii).time(jj)),...
+                              polyval(pY(ii,:),CubeSats(ii).time(jj)),...
+                              polyval(pZ(ii,:),CubeSats(ii).time(jj))]';
+                            recursiveResidual = abs(recursivePredPt-CubeSats(ii).centroids_VCF(:,jj));
+                            isRecursiveOutlier(jj) = ...
+                                (recursiveResidual(1) > 2*stdXYZ(1,ii)) || ...
+                                (recursiveResidual(2) > 2*stdXYZ(2,ii)) || ...
+                                (recursiveResidual(3) > 2*stdXYZ(3,ii));
+                        end
+                        CubeSats(ii).centroids_VCF(:,isRecursiveOutlier) = [];
+                        CubeSats(ii).time(isRecursiveOutlier) = [];
+                        % Update IsatsWithEnoughMeas to not include the sat
+                        % with removed points
+                        if any(isRecursiveOutlier)
+                            IsatsWithEnoughMeas(IsatsWithEnoughMeas==ii) = [];
+                        end
+                    end
+                end
+                % Update ItofUsedCentroids
+                ItofUsedCentroids = setdiff(ItofFoundCentroids,IsatsWithEnoughMeas);
+                % Find number of unused new centroids
+                IunusedNewCentroids = setdiff(ItofFoundCentroids,ItofUsedCentroids);
+                numUnusedNewCentroids = length(IunusedNewCentroids);
+                % Get all combinations of numUnusedNewCentroids CubeSats
+                % with more than firstNmeas measurements
+                if any(IsatsWithEnoughMeas) && numUnusedNewCentroids~=0
+                    allCombsSats = combnk(IsatsWithEnoughMeas,numUnusedNewCentroids);
+                else % no centroids remain to be associated
+                    % Update the consecutive number of outliers and return
+                    numConsOutliers = hadOutlier.*numConsOutliers + hasOutlier;
+                    hadOutlier = hasOutlier;
+                    return
+                end
+                % Loop over all possible combinations of satellites with
+                % which the new centroids could be associated, since
+                % CubeSats are ordered (first-out to last-out) and combnk
+                % ensures that allCombsSats rows are increasing, each set
+                % of possible CubeSats (i.e. each row in allCombsSats) is
+                % range ordered
+                possibleCubesats(size(allCombsSats,1),size(allCombsSats,2)) = ...
+                    struct('centroid_VCF',[],'resFromPredPt',[],'isOutlier',[]);
+                for ii = 1:size(allCombsSats,1) % possible combination sets
+                    for jj = 1:size(allCombsSats,2) % cubesats in the possible combination
+                        currSat = allCombsSats(ii,jj);
+                        % directly associate unused new centroids with the
+                        % current combination of CubeSats in range ordered
+                        % fashion
+                        possibleCubesats(ii,jj).centroid_VCF = ...
+                            centroid_VCF(:,jj);
+                        % Obtain residual between this possible point and
+                        % the predicted point for this CubeSat
+                        possibleCubesats(ii,jj).resFromPredPt = ...
+                            abs(...
+                            possibleCubesats(ii,jj).centroid_VCF - ...
+                            predPt(:,currSat)...
+                            );
+                        % Check if any of the coordinates of the residual
+                        % are greater than the outlierThreshold for that
+                        % coordinate, if so then this point is an outlier
+                        possibleCubesats(ii,jj).isOutlier = ...
+                            (possibleCubesats(ii,jj).resFromPredPt(1) > outlierThreshold(1,currSat)) || ...
+                            (possibleCubesats(ii,jj).resFromPredPt(2) > outlierThreshold(2,currSat)) || ...
+                            (possibleCubesats(ii,jj).resFromPredPt(3) > outlierThreshold(3,currSat));
+                    end
+                end
+                % determine non-outlier combinations sets
+                possCombsSats = true(size(possibleCubesats,1),1);
+                for ii = 1:size(possibleCubesats,2)
+                    possCombsSats = possCombsSats & ~[possibleCubesats(:,ii).isOutlier]';
+                end
+                % associate with cubesats
+                if any(possCombsSats) % if any valid combinations were identified
+                    if sum(possCombsSats)==1 % if exactly one was identified
+                        % save that combination
+                        for ii = 1:length(allCombsSats(possCombsSats,:))
+                            CubeSats(allCombsSats(possCombsSats,ii)).centroids_VCF = ...
+                                [CubeSats(allCombsSats(possCombsSats,ii)).centroids_VCF,...
+                                centroid_VCF(:,ii)];
+                            CubeSats(allCombsSats(possCombsSats,ii)).time = ...
+                                [CubeSats(allCombsSats(possCombsSats,ii)).time,...
+                                CubeSats_TOF(ii).time];
+                        end
+                    else % if more than one was identified
+                        % save the combination with minimum residual from
+                        % predicted points
+                        extractedPossibleSats = possibleCubesats(possCombsSats,:);
+                        extractedCombsSats    = allCombsSats(possCombsSats,:);
+                        for ii = 1:size(extractedPossibleSats,1)
+                            meanResNorm(ii) = mean(vecnorm([extractedPossibleSats(ii,:).resFromPredPt],2,1));
+                        end
+                        [~,Imin] = min(meanResNorm);
+                        % save the minimum mean norm residual
+                        for ii = 1:length(extractedCombsSats(Imin,:))
+                            CubeSats(extractedCombsSats(Imin,ii)).centroids_VCF = ...
+                                [CubeSats(extractedCombsSats(Imin,ii)).centroids_VCF,...
+                                centroid_VCF(:,ii)];
+                            CubeSats(extractedCombsSats(Imin,ii)).time = ...
+                                [CubeSats(extractedCombsSats(Imin,ii)).time,...
+                                CubeSats_TOF(Imin).time];
+                        end
+                    end
+                else % if no valid combinations were identified
+                    % save the combination of non-outliers which have minimum
+                    % mean residual from predicted points
+                    resNorm = nan(size(possibleCubesats));
+                    meanResNorm = nan(size(possibleCubesats,1),1);
+                    for ii = 1:size(possibleCubesats,1)
+                        for jj = 1:size(possibleCubesats,2)
+                            if ~possibleCubesats(ii,jj).isOutlier
+                                resNorm(ii,jj) = norm(possibleCubesats(ii,jj).resFromPredPt);
+                            end
+                        end
+                        meanResNorm(ii) = nanmean(resNorm(ii,:));
+                    end
+                    [~,Imin] = nanmin(meanResNorm);
+                    satsSaved = [];
+                    for ii = 1:size(possibleCubesats,2)
+                        if ~possibleCubesats(Imin,ii).isOutlier
+                            CubeSats(allCombsSats(Imin,ii)).centroids_VCF = ...
+                                [CubeSats(allCombsSats(Imin,ii)).centroids_VCF,...
+                                centroid_VCF(:,ii)];
+                            CubeSats(allCombsSats(Imin,ii)).time = ...
+                                [CubeSats(allCombsSats(Imin,ii)).time,...
+                                CubeSats_TOF(ii).time];
+                            satsSaved = [satsSaved allCombsSats(Imin,ii)];
+                        end
+                    end
+                    hasOutlier(IsatsWithEnoughMeas) = 1;
+                    hasOutlier(satsSaved) = 0;
+                end
+                % Update the consecutive number of outliers
+                numConsOutliers = hadOutlier.*numConsOutliers + hasOutlier;
+                hadOutlier = hasOutlier;
+            end
             
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            if 0
+            hasOutlier = zeros(1,length(CubeSats));
+            % Determine populated indices of CubeSats_TOF
+            Itof = find(~cellfun(@isempty,{CubeSats_TOF.centroid_TCF}));
+            % Transform naive centroids to VCF
+            centroid_VCF = zeros(3,length(CubeSats_TOF));
+            for ii = Itof
+                centroid_VCF(:,ii) = obj.Transform.tf('VCF',CubeSats_TOF(ii).centroid_TCF,'TCF');
+            end
+            % Only proceed if some centroids were found
+            if any(Itof)
+                % Determine which CubeSats already have 10 measurements
+                I = find(cellfun(@length,{CubeSats.time})>=10);
+                % Save centroids directly for CubeSats which do not yet have 10
+                % measurements
+                counter = 1;
+                ItofUsed = [];
+                if numel(I) < length(CubeSats)
+                    for ii = setdiff(Itof,I)
+                        CubeSats(ii).centroids_VCF = [CubeSats(ii).centroids_VCF,centroid_VCF(:,ii)];
+                        CubeSats(ii).time = [CubeSats(ii).time,CubeSats_TOF(ii).time];
+                        ItofUsed(counter) = ii;
+                        counter = counter + 1;
+                    end
+                end
+                % Construct {linear fits, outlierThresholds, and predicted positions
+                % of each CubeSat at the CubeSat_TOF time} for each CubeSat
+                % which has at least 10 measurements
+                outlierThreshold = zeros(1,length(CubeSats));
+                predPt = ones(3,length(CubeSats)).*inf;
+                pX = zeros(length(CubeSats),2);
+                pY = zeros(length(CubeSats),2);
+                pZ = zeros(length(CubeSats),2);
+                for ii = I
+                    prevCentroids_VCF = CubeSats(ii).centroids_VCF(:,1:10);
+                    prevTimes = CubeSats(ii).time(1:10);
+                    % Fit to x, y, z data and determine standard deviations
+                    [pX(ii,:),SX] = polyfit(prevTimes,prevCentroids_VCF(1,:),1);
+                    [~,stdX] = polyval(pX(ii,:),prevTimes,SX);
+                    stdX = mean(stdX);
+                    [pY(ii,:),SY] = polyfit(prevTimes,prevCentroids_VCF(2,:),1);
+                    [~,stdY] = polyval(pY(ii,:),prevTimes,SY);
+                    stdY = mean(stdY);
+                    [pZ(ii,:),SZ] = polyfit(prevTimes,prevCentroids_VCF(3,:),1);
+                    [~,stdZ] = polyval(pZ(ii,:),prevTimes,SZ);
+                    stdZ = mean(stdZ);
+                    % Determine if current point is near a prediction or is
+                    % an outlier
+                    stdAll = norm([stdX stdY stdZ]);
+                    outlierThreshold(ii) = obj.outlierMultiplier*stdAll;
+                    predPt(:,ii) = [polyval(pX(ii,:),CubeSats_TOF(1).time),...
+                              polyval(pY(ii,:),CubeSats_TOF(1).time),...
+                              polyval(pZ(ii,:),CubeSats_TOF(1).time)]';
+                end
+                % Compare Calculated positions of each CubeSat_TOF to the
+                % predicted positions of CubeSats with more than 10
+                % measurements, save centroids which lie within
+                % outlierThresholds of each CubeSat
+                for ii = setdiff(Itof,ItofUsed)
+                    deltaPredPt = ones(length(CubeSats),1).*inf; % inf because inf > outlierThreshold always
+                    for jj = I
+                        deltaPredPt(jj) = norm(predPt(:,jj) - centroid_VCF(:,ii));
+                    end
+                    lessThanOutlierThreshold = deltaPredPt < outlierThreshold(ii);
+                    isOutlier = sum(lessThanOutlierThreshold) ~= 1;
+                    % Save current point if not an outlier
+                    csIndex = find(lessThanOutlierThreshold);
+                    if ~isOutlier
+                        CubeSats(csIndex).centroids_VCF = [CubeSats(csIndex).centroids_VCF,centroid_VCF(:,ii)];
+                        CubeSats(csIndex).time = [CubeSats(csIndex).time,CubeSats_TOF(ii).time];
+                    else
+                        hasOutlier(csIndex) = 1;
+                    end
+                end
+                % Update numOutliers
+                if ~isempty(Itof)
+                    numConsOutliers = hadOutlier.*numConsOutliers + hasOutlier;
+                    hadOutlier = hasOutlier;
+                end
+            end
+            end
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            if 0
             %%% NOTE: The issue in the following loop is that it loops over
             %%% CubeSats_TOF and indexes CubeSats, need to split up the
             %%% loops since they are independent objects
-                
-            for ii = I
+            for ii = 1:length(CubeSats)
                 % Determine if at least 10 previous centroids exist
                 if length(CubeSats(ii).time) >= 10
                     % remove outliers from data
@@ -309,41 +599,46 @@ classdef TOF
                     % Determine if current point is near a prediction or is
                     % an outlier
                     stdAll = norm([stdX stdY stdZ]);
-                    outlierThreshold = obj.outlierMultiplier*stdAll;
-                    predPt = [polyval(pX,CubeSats_TOF(ii).time),...
+                    outlierThreshold(ii) = obj.outlierMultiplier*stdAll;
+                    predPt(:,ii) = [polyval(pX,CubeSats_TOF(ii).time),...
                               polyval(pY,CubeSats_TOF(ii).time),...
                               polyval(pZ,CubeSats_TOF(ii).time)]';
-                    deltaPredPt = ones(3,1).*inf; % inf because inf > outlierThreshold always
-                    for jj = I
-                        deltaPredPt(jj) = norm(predPt - centroid_VCF(:,jj));
-                    end
-                    lessThanOutlierThreshold = deltaPredPt < outlierThreshold;
-                    isOutlier = sum(lessThanOutlierThreshold) ~= 1;
-                    % Save current point if not an outlier
-                    hasOutlier = ones(1,length(CubeSats));
-                    csIndex = find(lessThanOutlierThreshold);
-                    if ~isOutlier
-                        CubeSats(csIndex).centroids_VCF = [CubeSats(csIndex).centroids_VCF,centroid_VCF(:,ii)];
-                        CubeSats(csIndex).time = [CubeSats(csIndex).time,CubeSats_TOF(ii).time];
-                        hasOutlier(csIndex) = 0;
-                    end
                 else
                     CubeSats(ii).centroids_VCF = [CubeSats(ii).centroids_VCF,centroid_VCF(:,ii)];
                     CubeSats(ii).time = [CubeSats(ii).time,CubeSats_TOF(ii).time];
                     hasOutlier = zeros(1,length(CubeSats));
                 end
             end
+            for ii = Itof
+                deltaPredPt = ones(3,1).*inf; % inf because inf > outlierThreshold always
+                for jj = 1:length(CubeSats)
+                    if length(CubeSats(ii).time) >= 10
+                        deltaPredPt(jj) = norm(predPt(:,jj) - centroid_VCF(:,ii));
+                    end
+                end
+                lessThanOutlierThreshold = deltaPredPt < outlierThreshold;
+                isOutlier = sum(lessThanOutlierThreshold) ~= 1;
+                % Save current point if not an outlier
+                hasOutlier = ones(1,length(CubeSats));
+                csIndex = find(lessThanOutlierThreshold);
+                if ~isOutlier
+                    CubeSats(csIndex).centroids_VCF = [CubeSats(csIndex).centroids_VCF,centroid_VCF(:,ii)];
+                    CubeSats(csIndex).time = [CubeSats(csIndex).time,CubeSats_TOF(ii).time];
+                    hasOutlier(csIndex) = 0;
+                end
+            end
             % Update numOutliers
-            if ~isempty(I)
+            if ~isempty(Itof)
                 numConsOutliers = hadOutlier.*numConsOutliers + hasOutlier;
                 hadOutlier = hasOutlier;
+            end
             end
         end
         
     end
     
     %% Private Methods
-    methods  (Access = public)
+    methods  (Access = {?VANTAGE.Test.PostProcessing.Test_TOF})
         %% Loading point clouds from files
         %
         % Loads data from a simulation file
@@ -356,7 +651,6 @@ classdef TOF
         % @date         24-Jan-2019
         function pc = loadSimFile(obj,filename)
             ptCloud = pcread(filename);
-            
             if nnz(~isnan(ptCloud.Location))==0
                 pc = pointCloud(nan(1,3));
             else
@@ -365,7 +659,6 @@ classdef TOF
                 I = logical(prod(~isnan(pts),2));
                 pc = pointCloud(pts(I,:));
             end
-            
             if obj.showDebugPlots % useful for debugging
                 figure            
                 pcshow(pc)
@@ -373,7 +666,6 @@ classdef TOF
                 ylabel('y')
                 zlabel('z')
             end
-            
         end
         
         %
@@ -416,18 +708,15 @@ classdef TOF
             while NPeaks > length(CubeSats_TOF)-1
               % Calculate k-squares density
               [zDense,zBin] = ksdensity(z,'bandwidth',bw,'function','pdf');
-
               % Identify split locations
               c = 0.3;
               h = -1.5;
               warning('off','signal:findpeaks:largeMinPeakHeight')
               [pks,locs] = findpeaks(-zDense,zBin,'MinPeakProminence',c,'MinPeakHeight',h);
               warning('on','signal:findpeaks:largeMinPeakHeight')
-              
               % Update bandwidth
               NPeaks = length(locs);
               bw = 1.05*bw;
-
               % give up if too many tries
               counter = counter + 1;
               if counter > 30
@@ -438,7 +727,6 @@ classdef TOF
                 break
               end
             end
-            
             if obj.showDebugPlots % useful for debugging
                 figure
                 hold on
@@ -450,10 +738,8 @@ classdef TOF
                 ylabel('Percent point density')
                 hold off
             end
-
             locs = flip(locs);
             nSplit = numel(locs);
-
             % Separate point cloud by split planes
             for i = 1:nSplit+1
                 % Find indices of the current cubesat points in the point
@@ -857,10 +1143,8 @@ classdef TOF
                 % Extract data
                 face = CubeSat_TOF.faces(ii);
                 corners = face.corners;
-
                 % Initialize boolean
                 face.fullFace = 1;
-
                 %%% Decide if full face is present or not
                 % Determine if bounding box is near cubesat size
                 len = zeros(1,2);
@@ -905,10 +1189,10 @@ classdef TOF
                     %%% Determine trusted corners
                     % project to centroid from two most distant (downrange) corners
                     % Obtain distant two corners and their midPt     
-                    if mean(corners(3,:)) < 3
-                        sortDirection = 'descend';
-                    else
+                    if (mean(corners(3,:)) > 3) || (CubeSat_TOF.rangeOrder == 1)
                         sortDirection = 'ascend';
+                    else
+                        sortDirection = 'descend';
                     end
                     [~,I] = sort(face.corners(3,:),'descend');
                     farCorners = face.corners(:,I(1:2));
@@ -1259,6 +1543,56 @@ classdef TOF
                 bSign = 1;
             end
         end
+        
+        %
+        % Calculate polynomial fit coefficients and outlierThresholds along
+        % each axis for a given CubeSat object for the first N measurements
+        % in the CubeSat
+        %
+        % @param    CubeSat     CubeSat class instance containing
+        %                       centroids_VCF
+        % @param    N           number of measurements to use
+        %                       (centroids_VCF(:,1:N), inf is allowed
+        %
+        % @return   polynomial fit coefficients along x, size 1x2
+        % @return   polynomial fit coefficients along y, size 1x2
+        % @return   polynomial fit coefficients along z, size 1x2
+        % @return   standard deviations along [x,y,z]'
+        %
+        % @author   Joshua Kirby
+        % @date     21-Mar-2019
+        function [pX,pY,pZ,stdXYZ] = fitLineToCentroids(obj,CubeSat,N)
+            % Evaluate N
+            if N < inf
+                if N > length(CubeSat.time)
+                    error('More data points requested than are present')
+                end
+            elseif N <=0
+                error('Invalid N requested')
+            elseif isinf(N)
+                N = length(CubeSat.time);
+            else
+                error('unhandled value for N received')
+            end
+            % Extract first N datapoints
+            prevCentroids_VCF = CubeSat.centroids_VCF(:,1:N);
+            prevTimes = CubeSat.time(1:N);
+            % Fit to x, y, z data and determine standard deviations
+            [pX,SX] = polyfit(prevTimes,prevCentroids_VCF(1,:),1);
+            [~,stdX] = polyval(pX,prevTimes,SX);
+            stdX = mean(stdX);
+            [pY,SY] = polyfit(prevTimes,prevCentroids_VCF(2,:),1);
+            [~,stdY] = polyval(pY,prevTimes,SY);
+            stdY = mean(stdY);
+            [pZ,SZ] = polyfit(prevTimes,prevCentroids_VCF(3,:),1);
+            [~,stdZ] = polyval(pZ,prevTimes,SZ);
+            stdZ = mean(stdZ);
+            % Determine if current point is near a prediction or is
+            % an outlier
+            stdXYZ = [stdX stdY stdZ]';
+        end
+        
+        
         
     end
     
