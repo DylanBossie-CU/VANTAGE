@@ -31,7 +31,7 @@ manifestFilename = 'Config/Manifest.json';
 % Import the VANTAGE post-processing software suite
 import VANTAGE.PostProcessing.*
 % Initialize the post-processing objects within Model class
-Model = VANTAGE.PostProcessing.Model(manifestFilename,truthFilename,'./Config');
+Model = VANTAGE.PostProcessing.Model(manifestFilename,'./Config');
 OpticalCam = Model.Optical;
 
 % Unit vector to VCF origin from CCF
@@ -45,6 +45,7 @@ disp('Completed Post-processing :^)')
 % At this point, TOF data has been processed up to its predefined desired
 % range 
 
+%{
 %% Compare Results against Deployment Predictions
 import VANTAGE.Validate.*
 Validate.validateOptical();
@@ -60,3 +61,4 @@ disp('Output report transmitted to deployer')
 %% Cleanup & Shutdown
 
 disp('Cleanup complete. Shutting down...')
+%}

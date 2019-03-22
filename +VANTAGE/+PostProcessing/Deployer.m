@@ -84,6 +84,8 @@ classdef Deployer
             % Read data from deployer configuration file
             obj.DeployerGeometry = jsondecode(fileread(configFilename));
             
+            % Assign CubeSat number
+            obj.numCubesats = length(obj.CubesatArray);
         end
 
         % A method for getting the initial states of all cubesats.
@@ -116,6 +118,24 @@ classdef Deployer
         %
         function [camOrigin] = GetCamOriginVCF(obj)
             camOrigin = obj.DeployerGeometry.CAMERA_LOC;
+        end
+
+        % A method for getting the VANTAGE tube number
+        % @param      obj   The object
+        %
+        % @return     the VANTAGE tube number
+        %
+        function [VantageTube] = GetVantageTube(obj)
+            VantageTube = obj.VantageTube;
+        end
+
+        % A method for getting the expected deployment tube
+        % @param      obj   The object
+        %
+        % @return     the expected deployment tube
+        %
+        function [DeploymentTube] = GetDeploymentTube(obj)
+            DeploymentTube = obj.DeploymentTube;
         end
     end
 end
