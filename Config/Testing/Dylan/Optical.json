@@ -1,10 +1,10 @@
 {
-	"OpticalData": "Data/Cropped/",
-	"OpticalFileExtension": "AIAA*",
+	"OpticalData": "Data/100mTestMar19_2019/",
+	"OpticalFileExtension": "VANTAGEOp*",
 	"OpticalVideoInput": "none",
 	"DesiredFPS": 1,
-	"PlotBinarizedImages": false,
-	"PlotCentroids": false,
-	"PlotHist": false
-	
+	"PlotBinarizedImages": true,
+	"PlotCentroids": true,
+	"PlotHist": false,
+	"PlotAny": true
 }

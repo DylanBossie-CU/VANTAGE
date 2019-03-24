@@ -12,13 +12,8 @@ classdef Optical
   end
   
   properties(Access = public)
-    % Container for the input video
-    Video
     
-    % General description of the input video
-    VideoType
-    
-    % Current frame of input video
+    % Current frame of data folder
     CurrentFrameCount
     
     % Desired FPS
@@ -35,10 +30,7 @@ classdef Optical
     
     % CubeSat centroid data containers
     CubeSats
-    
-    % Video file
-    VideoFilename
-    
+
     % Daat directory
     DataDirec
     
@@ -90,8 +82,6 @@ classdef Optical
         obj.CubeSats{end}.tag = 'systemCentroid';
         obj.CubeSats{end}.centroid = [0,0];
         
-        filename = strcat(SensorData.OpticalData,...
-            SensorData.OpticalVideoInput);
         FrameIntervals = linspace(0,1,SensorData.DesiredFPS+1);
         
         obj.DesiredFPS = SensorData.DesiredFPS;
@@ -106,8 +96,7 @@ classdef Optical
     end
 
     %% Read data directory
-    % Read and process input from directory of images Execute image frame processing from
-    % directory of images
+    % Read and process input from directory of images
     %
     % @param      obj   The object
     %
@@ -151,26 +140,6 @@ classdef Optical
         %}
     end
 
-    %% Read input video file
-    % Execute video frame processing based on provided automated naming
-    % convention
-    %
-    % @author       Dylan Bossie
-    % @date         24-Jan-2019
-    function [obj,didRead] = readInputFrameFromVideo(obj)
-        didRead = false;
-        frame = readFrame(obj.Video);
-        %Grab data in intervals of the desired FPS
-        FrameTimeStep = obj.Video.CurrentTime - ...
-            floor(obj.Video.CurrentTime);
-        if any(FrameTimeStep==obj.FrameIntervals)
-            didRead = true;
-            obj.Frame = frame;
-            %Process image
-            image = obj.ImageProcessing(frame);
-            obj.Image = image;
-        end
-    end
 
     %% Perform optical processing
     % Process optical frames to find the estimated cubesat positions
@@ -195,7 +164,7 @@ classdef Optical
     end
     
     %% Perform image processing
-    % Execute video frame processing based on provided automated naming
+    % Execute frame processing based on provided automated naming
     % convention
     %
     % @author       Dylan Bossie
