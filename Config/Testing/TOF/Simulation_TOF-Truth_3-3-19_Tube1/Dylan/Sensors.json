@@ -1,8 +1,0 @@
-{
-	"OpticalData": "Data/OpticalData/",
-	"OpticalVideoInput": "TwoObjectsRender.mp4",
-	"TOFData": "Data/TOFData/",
-	"OpticalFocalLength": 1,
-	"OpticalPixelSize": 1,
-	"OpticalResolution": [100,100]
-}
