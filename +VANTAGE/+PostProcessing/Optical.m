@@ -112,7 +112,7 @@ classdef Optical
         didRead = false;
         
         % Read data directory
-        direc = dir(obj.DataDirec);
+        direc = dir(strcat(obj.DataDirec,obj.FileExtension));
         numFile = numel(direc);
         
         % Exclude files that aren't data
