@@ -42,7 +42,7 @@ classdef Model < handle
             obj.Deployer = Deployer(manifestFilename, strcat(configDirecName,'/Deployer.json'),obj);
             obj.Truth_VCF = obj.processTruthData(obj.Deployer.TruthFileName);
             obj.Transform = Transform(strcat(configDirecName,'/Transform.json'));
-            obj.Optical = Optical(obj,strcat(configDirecName,'/Optical.json'), obj.Deployer.GetNumCubesats());
+            obj.Optical = Optical(obj,strcat(configDirecName,'/Testing/Dylan/Optical.json'), obj.Deployer.GetNumCubesats());
             obj.TOF = TOF(obj,strcat(configDirecName,'/TOF.json'));
             
             % Error catching
