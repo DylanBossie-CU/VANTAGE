@@ -24,6 +24,7 @@ classdef Test_Optical < matlab.unittest.TestCase
         end
         
         function testPipeline(testCase)
+            return
             close all
             import VANTAGE.PostProcessing.*
             truthFilename = 'config/Testing/TruthDataTest.json';
@@ -42,7 +43,7 @@ classdef Test_Optical < matlab.unittest.TestCase
             import VANTAGE.PostProcessing.*
             truthFilename = 'config/Testing/TruthDataTest.json';
             manifestFilename = 'Config/Manifest.json';
-            Model = VANTAGE.PostProcessing.Model(manifestFilename,'./Config');
+            Model = VANTAGE.PostProcessing.Model(manifestFilename,'./Config/Testing/Dylan');
             OpticalTest = Model.Optical;
             
             Model.ComputeStateOutput;

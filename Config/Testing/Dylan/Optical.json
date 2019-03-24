@@ -1,7 +1,6 @@
 {
-	"OpticalData": "Data/100mTestMar19_2019/",
+	"OpticalData": "Data/100m_Tube8_Test1_Optical/",
 	"OpticalFileExtension": "VANTAGEOp*",
-	"OpticalVideoInput": "none",
 	"DesiredFPS": 1,
 	"PlotBinarizedImages": true,
 	"PlotCentroids": true,
