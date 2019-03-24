@@ -20,11 +20,17 @@ classdef CubeSat
 
         %%% Calculated Properties
         %
-        % all centroids over time nx3
+        % all centroids over time 3xn
         centroids_VCF
         
         % time vector, length-n
         time
+        
+        % number of points (time(i), centroids_VCF(:,i))
+        numTOFpoints
+        
+        % Final 3D model fit to the TOF centroids, used for propagation
+        TOFfit
         
     end
     
@@ -40,6 +46,9 @@ classdef CubeSat
         % @return     A reference to an initialized CubeSat object
         %
         function obj = CubeSat(name, rangeOrder, expectedU, actualDims)
+            
+            TOFfit{1,3} = cfit;
+            
             if nargin == 4
                 obj.name = name;
                 obj.rangeOrder = rangeOrder;

@@ -97,31 +97,24 @@ classdef Model < handle
             
         end
         
-        % A method for propogating TOF predictions beyond the range of the TOF
-        % sensor for a single cubesat
         %
-        % @param      obj       The object
-        % @param      pos_init  The expected initial position of the cubesat at
-        %                       the time of deployment in the VCF frame
-        % @param      pos_TOF   A Nx3 matrix of VCF position data from the TOF
-        %                       sensor
-        % @param      t_TOF     The timestamps that correspond to the TOF
-        %                       position data
-        % @param      t_cam     The timestamps that correspond to the camera
-        %                       position data
+        % Evaluate a given CubeSats TOFfit at a certain timestamp
         %
-        % @return     A cell array of propogated positions
+        % @param	CubeSat     an instance of the CubeSat class containing
+        %                       a populated 1x3 TOFfit cell array
+        % @param    predTime    time at which to predict the CubeSats
+        %                       location, must be in same timeframe as
+        %                       CubeSat.time
         %
-        function [pos_prop] = TOFPropagate(obj, pos_init, pos_TOF, t_TOF, t_cam)
-
-            % Calculate mean TOF velocity from captured data
-            V_TOF = mean(diff(pos_TOF)./diff(t_TOF),1);
-
-            % Estimate position of cubesat centroid prior ro propogation
-            pos_preProp = pos_init + t_TOF.*V_TOF;
-
-            % Propogate position to camera timestamps
-            pos_prop = pos_init + t_cam(1).*V_TOF + (t_cam-t_cam(1)).*V_TOF;
+        % @return   1x3 predicted CubeSat location
+        %
+        % @author   Joshua Kirby
+        % @date     24-Mar-2019
+        function [predPos] = PredictPositionFromTOF(~,CubeSat,time)
+            predPos = zeros(3,1);
+            for i = 1:3
+                predPos(i) = CubeSat.TOFfit{i}(time);
+            end
         end
 
         % A method for approximating a cubesat centroid using a weighted
