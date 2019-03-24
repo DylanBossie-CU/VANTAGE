@@ -194,6 +194,14 @@ classdef TOF
                 ii = ii + 1;
                 % Stop processing?
                 if (ii > fileLims(2)) || outOfRange || centroidingDevolved
+                    for ii = 1:length(CubeSats)
+                        % Save the number of centroids that came from TOF
+                        % direct calculation
+                        CubeSats(ii).numTOFpoints = length(CubeSats(ii).time);
+                        % Determine the final 3D fit model to the TOF data,
+                        % used for propagation
+                        CubeSats(ii).TOFfit = obj.produceFinalTOFfit(CubeSats(ii));
+                    end
                     stopProcessing = 1;
                 end
             end
@@ -316,8 +324,6 @@ classdef TOF
                     [pX(ii,:),pY(ii,:),pZ(ii,:),stdXYZ(:,ii)] = ...
                         obj.fitLineToCentroids(CubeSats(ii),firstNmeas);
                     outlierThreshold(:,ii) = obj.outlierMultiplier*stdXYZ(:,ii);
-                    warning('outlierThreshold hardcoded')
-                    outlierThreshold(outlierThreshold > 0.1) = 0.1;
                     predPt(:,ii) = [polyval(pX(ii,:),CubeSats_TOF(1).time),...
                               polyval(pY(ii,:),CubeSats_TOF(1).time),...
                               polyval(pZ(ii,:),CubeSats_TOF(1).time)]';
@@ -459,179 +465,6 @@ classdef TOF
                 % Update the consecutive number of outliers
                 numConsOutliers = hadOutlier.*numConsOutliers + hasOutlier;
                 hadOutlier = hasOutlier;
-            end
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            if 0
-            hasOutlier = zeros(1,length(CubeSats));
-            % Determine populated indices of CubeSats_TOF
-            Itof = find(~cellfun(@isempty,{CubeSats_TOF.centroid_TCF}));
-            % Transform naive centroids to VCF
-            centroid_VCF = zeros(3,length(CubeSats_TOF));
-            for ii = Itof
-                centroid_VCF(:,ii) = obj.Transform.tf('VCF',CubeSats_TOF(ii).centroid_TCF,'TCF');
-            end
-            % Only proceed if some centroids were found
-            if any(Itof)
-                % Determine which CubeSats already have 10 measurements
-                I = find(cellfun(@length,{CubeSats.time})>=10);
-                % Save centroids directly for CubeSats which do not yet have 10
-                % measurements
-                counter = 1;
-                ItofUsed = [];
-                if numel(I) < length(CubeSats)
-                    for ii = setdiff(Itof,I)
-                        CubeSats(ii).centroids_VCF = [CubeSats(ii).centroids_VCF,centroid_VCF(:,ii)];
-                        CubeSats(ii).time = [CubeSats(ii).time,CubeSats_TOF(ii).time];
-                        ItofUsed(counter) = ii;
-                        counter = counter + 1;
-                    end
-                end
-                % Construct {linear fits, outlierThresholds, and predicted positions
-                % of each CubeSat at the CubeSat_TOF time} for each CubeSat
-                % which has at least 10 measurements
-                outlierThreshold = zeros(1,length(CubeSats));
-                predPt = ones(3,length(CubeSats)).*inf;
-                pX = zeros(length(CubeSats),2);
-                pY = zeros(length(CubeSats),2);
-                pZ = zeros(length(CubeSats),2);
-                for ii = I
-                    prevCentroids_VCF = CubeSats(ii).centroids_VCF(:,1:10);
-                    prevTimes = CubeSats(ii).time(1:10);
-                    % Fit to x, y, z data and determine standard deviations
-                    [pX(ii,:),SX] = polyfit(prevTimes,prevCentroids_VCF(1,:),1);
-                    [~,stdX] = polyval(pX(ii,:),prevTimes,SX);
-                    stdX = mean(stdX);
-                    [pY(ii,:),SY] = polyfit(prevTimes,prevCentroids_VCF(2,:),1);
-                    [~,stdY] = polyval(pY(ii,:),prevTimes,SY);
-                    stdY = mean(stdY);
-                    [pZ(ii,:),SZ] = polyfit(prevTimes,prevCentroids_VCF(3,:),1);
-                    [~,stdZ] = polyval(pZ(ii,:),prevTimes,SZ);
-                    stdZ = mean(stdZ);
-                    % Determine if current point is near a prediction or is
-                    % an outlier
-                    stdAll = norm([stdX stdY stdZ]);
-                    outlierThreshold(ii) = obj.outlierMultiplier*stdAll;
-                    predPt(:,ii) = [polyval(pX(ii,:),CubeSats_TOF(1).time),...
-                              polyval(pY(ii,:),CubeSats_TOF(1).time),...
-                              polyval(pZ(ii,:),CubeSats_TOF(1).time)]';
-                end
-                % Compare Calculated positions of each CubeSat_TOF to the
-                % predicted positions of CubeSats with more than 10
-                % measurements, save centroids which lie within
-                % outlierThresholds of each CubeSat
-                for ii = setdiff(Itof,ItofUsed)
-                    deltaPredPt = ones(length(CubeSats),1).*inf; % inf because inf > outlierThreshold always
-                    for jj = I
-                        deltaPredPt(jj) = norm(predPt(:,jj) - centroid_VCF(:,ii));
-                    end
-                    lessThanOutlierThreshold = deltaPredPt < outlierThreshold(ii);
-                    isOutlier = sum(lessThanOutlierThreshold) ~= 1;
-                    % Save current point if not an outlier
-                    csIndex = find(lessThanOutlierThreshold);
-                    if ~isOutlier
-                        CubeSats(csIndex).centroids_VCF = [CubeSats(csIndex).centroids_VCF,centroid_VCF(:,ii)];
-                        CubeSats(csIndex).time = [CubeSats(csIndex).time,CubeSats_TOF(ii).time];
-                    else
-                        hasOutlier(csIndex) = 1;
-                    end
-                end
-                % Update numOutliers
-                if ~isempty(Itof)
-                    numConsOutliers = hadOutlier.*numConsOutliers + hasOutlier;
-                    hadOutlier = hasOutlier;
-                end
-            end
-            end
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            if 0
-            %%% NOTE: The issue in the following loop is that it loops over
-            %%% CubeSats_TOF and indexes CubeSats, need to split up the
-            %%% loops since they are independent objects
-            for ii = 1:length(CubeSats)
-                % Determine if at least 10 previous centroids exist
-                if length(CubeSats(ii).time) >= 10
-                    % remove outliers from data
-                    prevCentroids_VCF = CubeSats(ii).centroids_VCF;
-                    prevTimes = CubeSats(ii).time;
-                    % Fit to x, y, z data and determine standard deviations
-                    [pX,SX] = polyfit(prevTimes,prevCentroids_VCF(1,:),1);
-                    [~,stdX] = polyval(pX,prevTimes,SX);
-                    stdX = mean(stdX);
-                    [pY,SY] = polyfit(prevTimes,prevCentroids_VCF(2,:),1);
-                    [~,stdY] = polyval(pY,prevTimes,SY);
-                    stdY = mean(stdY);
-                    [pZ,SZ] = polyfit(prevTimes,prevCentroids_VCF(3,:),1);
-                    [~,stdZ] = polyval(pZ,prevTimes,SZ);
-                    stdZ = mean(stdZ);
-                    % Determine if current point is near a prediction or is
-                    % an outlier
-                    stdAll = norm([stdX stdY stdZ]);
-                    outlierThreshold(ii) = obj.outlierMultiplier*stdAll;
-                    predPt(:,ii) = [polyval(pX,CubeSats_TOF(ii).time),...
-                              polyval(pY,CubeSats_TOF(ii).time),...
-                              polyval(pZ,CubeSats_TOF(ii).time)]';
-                else
-                    CubeSats(ii).centroids_VCF = [CubeSats(ii).centroids_VCF,centroid_VCF(:,ii)];
-                    CubeSats(ii).time = [CubeSats(ii).time,CubeSats_TOF(ii).time];
-                    hasOutlier = zeros(1,length(CubeSats));
-                end
-            end
-            for ii = Itof
-                deltaPredPt = ones(3,1).*inf; % inf because inf > outlierThreshold always
-                for jj = 1:length(CubeSats)
-                    if length(CubeSats(ii).time) >= 10
-                        deltaPredPt(jj) = norm(predPt(:,jj) - centroid_VCF(:,ii));
-                    end
-                end
-                lessThanOutlierThreshold = deltaPredPt < outlierThreshold;
-                isOutlier = sum(lessThanOutlierThreshold) ~= 1;
-                % Save current point if not an outlier
-                hasOutlier = ones(1,length(CubeSats));
-                csIndex = find(lessThanOutlierThreshold);
-                if ~isOutlier
-                    CubeSats(csIndex).centroids_VCF = [CubeSats(csIndex).centroids_VCF,centroid_VCF(:,ii)];
-                    CubeSats(csIndex).time = [CubeSats(csIndex).time,CubeSats_TOF(ii).time];
-                    hasOutlier(csIndex) = 0;
-                end
-            end
-            % Update numOutliers
-            if ~isempty(Itof)
-                numConsOutliers = hadOutlier.*numConsOutliers + hasOutlier;
-                hadOutlier = hasOutlier;
-            end
             end
         end
         
@@ -1374,9 +1207,9 @@ classdef TOF
             ax = gca;
             zlimits = ax.ZLim;
             ylimits = ax.YLim;
-            xlabel('x')
-            ylabel('y')
-            zlabel('z')
+            xlabel('x [m]','fontsize',legendfontsize)
+            ylabel('y [m]','fontsize',legendfontsize)
+            zlabel('z [m]','fontsize',legendfontsize)
             hold off
             
             
@@ -1404,9 +1237,9 @@ classdef TOF
                 l=legend(legendstrings,'location','eastoutside');
                 l.FontSize = legendfontsize;
             end
-            xlabel('x')
-            ylabel('y')
-            zlabel('z')
+            xlabel('x [m]','fontsize',legendfontsize)
+            ylabel('y [m]','fontsize',legendfontsize)
+            zlabel('z [m]','fontsize',legendfontsize)
             hold off
             
             subplot(1,3,3)
@@ -1421,18 +1254,19 @@ classdef TOF
             for i = CubesatIndexing
                 if ~any(isnan(calcCentroids_TCF(i,:)))
                     plot3(calcCentroids_TCF(i,1),calcCentroids_TCF(i,2),calcCentroids_TCF(i,3),'.','color',c(centrColCounter,:),'markersize',25)
-                    plot3(trueCentroids_TCF(i,1),trueCentroids_TCF(i,2),trueCentroids_TCF(i,3),'b.','markersize',25)
                     legendstrings{legendcounter} = ['Calc.Centr',num2str(i)];
-                    legendstrings{legendcounter+1} = ['True.Centr',num2str(i)];
-                    legendcounter = legendcounter+2;
-                    centrColCounter=centrColCounter + 1;
-                    for j = 1:CubeSats_TOF(i).numVisibleFaces
-                        CubeSats_TOF(i).faces(j).planeCloud.Color = uint8(c(colorcounter,:).*255.*ones(CubeSats_TOF(i).faces(j).planeCloud.Count,3));
-                        pcshow(CubeSats_TOF(i).faces(j).planeCloud,'markersize',markersize)
-                        legendstrings{legendcounter} = ['Sat',num2str(i),'-Face',num2str(j)];
-                        colorcounter = colorcounter+1;
-                        legendcounter = legendcounter+1;
-                    end
+                    legendcounter = legendcounter+1;
+                end
+                plot3(trueCentroids_TCF(i,1),trueCentroids_TCF(i,2),trueCentroids_TCF(i,3),'b.','markersize',25)
+                legendstrings{legendcounter} = ['True.Centr',num2str(i)];
+                legendcounter = legendcounter+1;
+                centrColCounter=centrColCounter + 1;
+                for j = 1:CubeSats_TOF(i).numVisibleFaces
+                    CubeSats_TOF(i).faces(j).planeCloud.Color = uint8(c(colorcounter,:).*255.*ones(CubeSats_TOF(i).faces(j).planeCloud.Count,3));
+                    pcshow(CubeSats_TOF(i).faces(j).planeCloud,'markersize',markersize)
+                    legendstrings{legendcounter} = ['Sat',num2str(i),'-Face',num2str(j)];
+                    colorcounter = colorcounter+1;
+                    legendcounter = legendcounter+1;
                 end
             end
             plot3(xCenterline,yCenterline,zCenterline,'k--','linewidth',2)
@@ -1442,9 +1276,9 @@ classdef TOF
                 l=legend(legendstrings,'location','eastoutside');
                 l.FontSize = legendfontsize;
             end
-            xlabel('x')
-            ylabel('y')
-            zlabel('z')
+            xlabel('x [m]','fontsize',legendfontsize)
+            ylabel('y [m]','fontsize',legendfontsize)
+            zlabel('z [m]','fontsize',legendfontsize)
             hold off
         end
         
@@ -1561,7 +1395,7 @@ classdef TOF
         %
         % @author   Joshua Kirby
         % @date     21-Mar-2019
-        function [pX,pY,pZ,stdXYZ] = fitLineToCentroids(obj,CubeSat,N)
+        function [pX,pY,pZ,stdXYZ] = fitLineToCentroids(~,CubeSat,N)
             % Evaluate N
             if N < inf
                 if N > length(CubeSat.time)
@@ -1590,6 +1424,24 @@ classdef TOF
             % Determine if current point is near a prediction or is
             % an outlier
             stdXYZ = [stdX stdY stdZ]';
+        end
+        
+        %
+        % Produces final 3D fit model to all TOF centroids calculated for a
+        % given CubeSats
+        %
+        % @param    CubeSat     CubeSat class instance containing
+        %                       time and centroids_VCF
+        %
+        % @return   1x3 (x y z) cell array of fit objects, each of which is a
+        %           function of time
+        %
+        % @author   Joshua Kirby
+        % @date     24-Mar-2019
+        function TOFfit = produceFinalTOFfit(~,CubeSat)
+            TOFfit{1} = fit(CubeSat.time',CubeSat.centroids_VCF(1,:)','poly1');
+            TOFfit{2} = fit(CubeSat.time',CubeSat.centroids_VCF(2,:)','poly1');
+            TOFfit{3} = fit(CubeSat.time',CubeSat.centroids_VCF(3,:)','poly1');
         end
         
         

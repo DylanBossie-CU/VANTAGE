@@ -57,6 +57,7 @@ classdef Validate
 
             %%% Present Errors
             obj.TOFpresentErrorsVsReqs(Model,SensorData,Model.Deployer.TruthFileName);
+            bla = 1;
         end
         
         %% Validate Optical
@@ -67,8 +68,8 @@ classdef Validate
         %
         % @return 
         %
-        % @author   Joshua Kirby
-        % @date     19-Mar-2019
+        % @author  
+        % @date     
         function validateOptical(obj)
             
         end
@@ -81,8 +82,8 @@ classdef Validate
         %
         % @return 
         %
-        % @author   Joshua Kirby
-        % @date     19-Mar-2019
+        % @author   
+        % @date     
         function validateVantage(obj)
             
         end
@@ -106,6 +107,16 @@ classdef Validate
             % Truth Data processing
             Truth = obj.processTruthData(truthFileName);
             % Loop over cubesats
+            titlefontsize = 20;
+            labelfontsize = 16;
+            figure
+            hold on
+            grid on
+            grid minor
+            xlabel('Range, m','fontsize',labelfontsize)
+            ylabel('Error, cm','fontsize',labelfontsize)
+            title(['TOF Absolute Centroid Error Vs Range'],'fontsize',titlefontsize)
+            linewidth = 2;
             for i = 1:Truth.numCubeSats
                 % Truth Data interpolation
                 Truth.Cubesat(i).timeInterp = Model.Deployer.CubesatArray(i).time;
@@ -115,16 +126,11 @@ classdef Validate
                 Error.Cubesat(i).time = Truth.Cubesat(i).timeInterp;
                 Error.Cubesat(i).err  = vecnorm(Truth.Cubesat(i).posInterp-Model.Deployer.CubesatArray(i).centroids_VCF',2,2);
                 % Plot
-                figure
-                hold on
-                grid on
-                grid minor
-                title(['CubeSat ',num2str(i),' TOF Absolute Error Vs Range'])
-                plot(vecnorm(Truth.Cubesat(i).posInterp,2,2),Error.Cubesat(i).err.*100);
-                xlabel('Range, m')
-                ylabel('Error, cm')
-                hold off
+                plot(vecnorm(Truth.Cubesat(i).posInterp,2,2),Error.Cubesat(i).err.*100,'linewidth',linewidth);
+                legendstrings{i} = ['Cubesat ',num2str(i)];
             end
+            legend(legendstrings,'location','eastoutside')
+            hold off
         end
         
         %
