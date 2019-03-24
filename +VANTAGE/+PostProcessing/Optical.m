@@ -48,6 +48,8 @@ classdef Optical
     PlotCentroids
     
     PlotHist
+    
+    PlotAny
 
     % Model handle class
     ModelRef
@@ -99,6 +101,7 @@ classdef Optical
         obj.FrameIntervals = FrameIntervals;
         obj.FileExtension = SensorData.OpticalFileExtension;
         obj.PlotHist = SensorData.PlotHist;
+        obj.PlotAny = SensorData.PlotAny;
         
     end
 
@@ -304,8 +307,10 @@ classdef Optical
             end
             
             %Plot results
-            if obj.PlotBinarizedImages
-                obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries_Cut,centroids)
+            if obj.PlotBinarizedImages && obj.PlotAny && ~obj.is100mSearch && ~isSystemCentroid
+                obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries_Cut,centroids,isSystemCentroid)
+            elseif obj.PlotBinarizedImages && obj.PlotAny && ~obj.is100mSearch && isSystemCentroid
+                obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries_Cut,meanCent,isSystemCentroid)
             end
 
         end
@@ -323,23 +328,29 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         26-Jan-2019
-    function plotObjectBoundaries(~,grayImage,boundaries,centroids)
+    function plotObjectBoundaries(~,grayImage,boundaries,centroids,isSystemCentroid)
         figure
         imshow(grayImage)
         hold on
-        for i = 1:length(boundaries)
-            %bwboundaries has an odd convention for placing X in col. 2 and
-            %Y in col. 1
-            X = boundaries{i}(:,2);
-            Y = boundaries{i}(:,1);
-            %Plot boundary for obj{i}
-            plot(X,Y)
-        end
-        for i = 1:numel(centroids)
-            %Plot centroids for obj{i}
-            scatter(centroids{i}(1),centroids{i}(2),'r','+','LineWidth',30)
-            text(centroids{i}(1)+centroids{i}(1)*.05,centroids{i}(2)+...
-                centroids{i}(2)*.05,'Calculated Centroid','Color','r')
+        if ~isSystemCentroid
+            for i = 1:length(boundaries)
+                %bwboundaries has an odd convention for placing X in col. 2 and
+                %Y in col. 1
+                X = boundaries{i}(:,2);
+                Y = boundaries{i}(:,1);
+                %Plot boundary for obj{i}
+                plot(X,Y)
+            end
+            for i = 1:numel(centroids)
+                %Plot centroids for obj{i}
+                scatter(centroids{i}(1),centroids{i}(2),'r','+','LineWidth',30)
+                text(centroids{i}(1)+centroids{i}(1)*.05,centroids{i}(2)+...
+                    centroids{i}(2)*.05,['Calculated Centroid ' num2str(i)],'Color','r')
+            end
+        else
+            scatter(centroids(1),centroids(2),'r','+','LineWidth',30)
+            text(centroids(1)+centroids(1)*.05,centroids(2)+...
+                    centroids(2)*.05,'Calculated System Centroid','Color','r')
         end
     end
     
@@ -474,37 +485,8 @@ classdef Optical
             end
         end
     end
-    
-    %% Set desired initial properties of the class
-    %
-    % Records transform matrices and translation vectors between specific
-    % frames in TDATA
-    %
-    % @param        DesiredFPS      Sets timesteps for video frames to be 
-    %                               processed (FPS)
-    % @param        PlotBinarizedImages     Set if user desires for plots
-    %                               to be generated
-    %
-    % @author       Dylan Bossie
-    % @date         24-Jan-2019
-    function obj = setOpticalData(obj,DesiredFPS,PlotBinarizedImages,...
-            PlotCentroids,VideoType,FrameIntervals,amount)
-        import VANTAGE.PostProcessing.CubeSat_Optical
-        obj.CubeSats = cell(amount,1);
-        for i = 1:amount
-            obj.CubeSats{i} = CubeSat_Optical;
-            obj.CubeSats{i}.tag = i;
-            obj.CubeSats{i}.centroid = [0,0];
-        end
-        
-        obj.DesiredFPS = DesiredFPS;
-        obj.PlotBinarizedImages = PlotBinarizedImages;
-        obj.PlotCentroids = PlotCentroids;
-        obj.VideoType = VideoType;
-        obj.FrameIntervals = FrameIntervals;
-    end
 
-    % obfuscation identification for cubesat boundaries
+    %% obfuscation identification for cubesat boundaries
     %
     % This function takes boundary points found after binarization and separates
     % it into multiple cubesats that are obfuscated
