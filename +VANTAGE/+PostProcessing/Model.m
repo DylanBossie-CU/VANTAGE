@@ -66,6 +66,8 @@ classdef Model < handle
             [~,finalImageIndex] = max(timestamps);
             obj.Optical = obj.Optical.find100mPixel(direc(finalImageIndex));
             
+            CamUnitVecsVCF = cell(length(direc),1);
+            tic
         	if didRead
 	        	% Loop though optical frames
 	        	for i = 1:numel(direc)
@@ -73,16 +75,20 @@ classdef Model < handle
 	        		obj.Optical.Frame = direc(i);
 
 	        		% Run optical processing
-	        		[CamUnitVecsVCF,CamOriginVCF, CamTimestamp, isSystemCentroid] =...
+	        		[CamUnitVecsVCF{i},CamOriginVCF, CamTimestamp, isSystemCentroid] =...
                         obj.Optical.OpticalProcessing(obj.Optical.Frame);
 
+                    if isSystemCentroid == 'invalid'
+                        continue
+                    end
 	        		% Get propogated TOF positions
                     %lol
 	        		%pos_TOF = obj.TOF.propogatedShit(camTimestep)
 
 	        		% Run sensor fusion
 	        		%[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF, sig_cam, sig_TOF);
-	        	end
+                end
+            toc
 	        else
 	        	error(strcat('Unable to read optical data files from ', obj.Optical.DataDirec));
         	end
