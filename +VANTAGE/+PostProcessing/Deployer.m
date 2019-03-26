@@ -17,6 +17,9 @@ classdef Deployer
 
         % Array of expected release time for each cubesat
         ExpectedRelease
+        
+        % Truth data file location
+        TruthFileName
     end
     properties (SetAccess = private)
         % Structure of deployer geometry
@@ -27,6 +30,9 @@ classdef Deployer
 
         % Number of expected cubesats
         numCubesats
+        
+        % Type of test performed
+        testScenario
     end
 
     methods
@@ -44,12 +50,13 @@ classdef Deployer
             % should also create instances of the CubeSat class for every
             % expected cubesat that will be deployed.
             
-            % Import required classes
-            import VANTAGE.PostProcessing.CubeSat
-            
             % Read data from manifest
             manifestData = jsondecode(fileread(manifestFilename));
 
+            % Define test type
+            obj.testScenario = manifestData.testScenario;
+            % Extract truth file name
+            obj.TruthFileName = manifestData.TruthDataFile;
             % Read deployer dimensions from config file
 
             % Initialize Deployer instance with tube positions and expected release time
@@ -64,20 +71,12 @@ classdef Deployer
                 manifestData.expectedRelease(6),...
                 manifestData.expectedRelease(7));
 
-            % Calculate cubesat true initial positions
-            obj.numCubesats = numel(manifestData.CubesatArray);
             I = [manifestData.CubesatArray.rangeOrder];
-            pos_init = zeros(obj.numCubesats,3);
-            for i = I
-                pos_init(i,:) = Model.Truth_VCF.Cubesat(i).pos(1,:);
-            end
-
             % Initialize cubesat array
             for i = I
-                obj.CubesatArray(1,i) = CubeSat(...
+                obj.CubesatArray(1,i) = VANTAGE.PostProcessing.CubeSat(...
                     manifestData.CubesatArray(i).name,...
                     manifestData.CubesatArray(i).rangeOrder,...
-                    pos_init(i,:),...
                     manifestData.CubesatArray(i).expectedU,...
                     manifestData.CubesatArray(i).actualDims);
             end
@@ -85,6 +84,8 @@ classdef Deployer
             % Read data from deployer configuration file
             obj.DeployerGeometry = jsondecode(fileread(configFilename));
             
+            % Assign CubeSat number
+            obj.numCubesats = length(obj.CubesatArray);
         end
 
         % A method for getting the initial states of all cubesats.
@@ -117,6 +118,24 @@ classdef Deployer
         %
         function [camOrigin] = GetCamOriginVCF(obj)
             camOrigin = obj.DeployerGeometry.CAMERA_LOC;
+        end
+
+        % A method for getting the VANTAGE tube number
+        % @param      obj   The object
+        %
+        % @return     the VANTAGE tube number
+        %
+        function [VantageTube] = GetVantageTube(obj)
+            VantageTube = obj.VantageTube;
+        end
+
+        % A method for getting the expected deployment tube
+        % @param      obj   The object
+        %
+        % @return     the expected deployment tube
+        %
+        function [DeploymentTube] = GetDeploymentTube(obj)
+            DeploymentTube = obj.DeploymentTube;
         end
     end
 end

@@ -22,5 +22,7 @@
 				"expectedU": 1,
 				"actualDims": [0.1,0.1,0.1225]
 			}
-		]
+		],
+    "TruthDataFile": "Data/Simulation_TOF-Truth_3-3-19_Tube6/config_simulation_template_2_25_Josh_ToF_Calibration_tube6_truth_data.json",
+	"testScenario": "simulation"
 }

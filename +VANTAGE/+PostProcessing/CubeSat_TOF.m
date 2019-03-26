@@ -87,9 +87,13 @@ classdef CubeSat_TOF
             if ~isa(CubeSat,'VANTAGE.PostProcessing.CubeSat')
                 error('Input to CubeSat_TOF constructor must be a VANTAGE.PostProcessing.CubeSat')
             end
+            % The following properties are used prospectively and not taken
+            % as true since CubeSat_TOF will not necessarily contain the
+            % same point cloud as the CubeSat with which it is initialized
             obj.name = CubeSat.name;
             obj.expectedU = CubeSat.expectedU;
             obj.actualDims = CubeSat.actualDims;
+            obj.rangeOrder = CubeSat.rangeOrder;
         end
     end
     

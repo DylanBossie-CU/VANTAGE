@@ -19,21 +19,18 @@ classdef Model < handle
         
         % Truth data
         Truth_VCF
+        
     end
 
     methods
         % Class Constructor:
         %
         % @param      manifestFilename  full filename of manifest JSON file
-        % @param      truthFilename     full filename of truth data JSON file
         % @param      configDirecName   The configuration directory name
         %
         % @return     A reference to an initialized Model object
         %
-        function obj = Model(manifestFilename,truthFilename,configDirecName)
-            
-            % Process truth data
-            obj.Truth_VCF = obj.processTruthData(truthFilename);
+        function obj = Model(manifestFilename,configDirecName)
             
         	% Import child classes
         	import VANTAGE.PostProcessing.Deployer
@@ -41,8 +38,9 @@ classdef Model < handle
         	import VANTAGE.PostProcessing.Optical
         	import VANTAGE.PostProcessing.TOF
 
-        	% Construct child classes
+        	% Construct child classes and process truth data
             obj.Deployer = Deployer(manifestFilename, strcat(configDirecName,'/Deployer.json'),obj);
+            obj.Truth_VCF = obj.processTruthData(obj.Deployer.TruthFileName);
             obj.Transform = Transform(strcat(configDirecName,'/Transform.json'));
             obj.Optical = Optical(obj,strcat(configDirecName,'/Optical.json'), obj.Deployer.GetNumCubesats());
             obj.TOF = TOF(obj,strcat(configDirecName,'/TOF.json'));
@@ -60,9 +58,14 @@ classdef Model < handle
         %
         %
         function obj = ComputeStateOutput(obj)
-        	% Get odirectory of optical frames
-        	[didRead,direc] = readInputFramesFromImages(obj.Optical);
+        	% Get directory of optical frames
+        	[didRead,direc,OpticalIndices] = readInputFramesFromImages(obj.Optical);
 
+            % Process last frame of optical data to find 100m pixel
+            % location
+            [~,finalImageIndex] = max(OpticalIndices);
+            obj.Optical = obj.Optical.find100mPixel(direc(finalImageIndex));
+            
         	if didRead
 	        	% Loop though optical frames
 	        	for i = 1:numel(direc)
@@ -70,14 +73,15 @@ classdef Model < handle
 	        		obj.Optical.Frame = direc(i);
 
 	        		% Run optical processing
-	        		[CamUnitVecsVCF, CamTimestep, isSystemCentroid] =...
+	        		[CamUnitVecsVCF,CamOriginVCF, CamTimestamp, isSystemCentroid] =...
                         obj.Optical.OpticalProcessing(obj.Optical.Frame);
 
 	        		% Get propogated TOF positions
+                    %lol
 	        		%pos_TOF = obj.TOF.propogatedShit(camTimestep)
 
 	        		% Run sensor fusion
-	        		[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.DeployerGeometry.GetCamOriginVCF(), camVecs, pos_TOF, sig_cam, sig_TOF);
+	        		%[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF, sig_cam, sig_TOF);
 	        	end
 	        else
 	        	error(strcat('Unable to read optical data files from ', obj.Optical.DataDirec));
@@ -94,31 +98,24 @@ classdef Model < handle
             
         end
         
-        % A method for propogating TOF predictions beyond the range of the TOF
-        % sensor for a single cubesat
         %
-        % @param      obj       The object
-        % @param      pos_init  The expected initial position of the cubesat at
-        %                       the time of deployment in the VCF frame
-        % @param      pos_TOF   A Nx3 matrix of VCF position data from the TOF
-        %                       sensor
-        % @param      t_TOF     The timestamps that correspond to the TOF
-        %                       position data
-        % @param      t_cam     The timestamps that correspond to the camera
-        %                       position data
+        % Evaluate a given CubeSats TOFfit at a certain timestamp
         %
-        % @return     A cell array of propogated positions
+        % @param	CubeSat     an instance of the CubeSat class containing
+        %                       a populated 1x3 TOFfit cell array
+        % @param    predTime    time at which to predict the CubeSats
+        %                       location, must be in same timeframe as
+        %                       CubeSat.time
         %
-        function [pos_prop] = TOFPropagate(obj, pos_init, pos_TOF, t_TOF, t_cam)
-
-            % Calculate mean TOF velocity from captured data
-            V_TOF = mean(diff(pos_TOF)./diff(t_TOF),1);
-
-            % Estimate position of cubesat centroid prior ro propogation
-            pos_preProp = pos_init + t_TOF.*V_TOF;
-
-            % Propogate position to camera timestamps
-            pos_prop = pos_init + t_cam(1).*V_TOF + (t_cam-t_cam(1)).*V_TOF;
+        % @return   1x3 predicted CubeSat location
+        %
+        % @author   Joshua Kirby
+        % @date     24-Mar-2019
+        function [predPos] = PredictPositionFromTOF(~,CubeSat,time)
+            predPos = zeros(3,1);
+            for i = 1:3
+                predPos(i) = CubeSat.TOFfit{i}(time);
+            end
         end
 
         % A method for approximating a cubesat centroid using a weighted
@@ -158,7 +155,7 @@ classdef Model < handle
         		meanTOF = meanTOF./numCubesats;
 
         		% Run sensor fusion on system centroid estimates
-        		tmp = SensorFusion(obj, camOrigin, camVecs{1}, meanTOF, sig_cam, sig_TOF)
+        		tmp = SensorFusion(obj, camOrigin, camVecs{1}, meanTOF, sig_cam, sig_TOF);
 
         		% Calculate adjustment vector
         		sensorFusionDiff = tmp-mean_TOF;
@@ -170,7 +167,7 @@ classdef Model < handle
         	else
         		% Loop through estimates individually and perform sensor fusion
         		for i = 1:numCubesats
-        			pos{i} = SensorFusion(obj, camOrigin, camVecs{i}, pos_TOF{i}, sig_cam, sig_TOF)
+        			pos{i} = SensorFusion(obj, camOrigin, camVecs{i}, pos_TOF{i}, sig_cam, sig_TOF);
         		end
     		end
 

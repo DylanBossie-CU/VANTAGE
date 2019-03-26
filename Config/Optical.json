@@ -1,10 +1,9 @@
 {
 	"OpticalData": "Data/Cropped/",
 	"OpticalFileExtension": "AIAA*",
-	"OpticalVideoInput": "none",
 	"DesiredFPS": 1,
-	"PlotBinarizedImages": false,
-	"PlotCentroids": false,
-	"PlotHist": false
-	
+	"PlotBinarizedImages": true,
+	"PlotCentroids": true,
+	"PlotHist": false,
+	"PlotAny": true	
 }
