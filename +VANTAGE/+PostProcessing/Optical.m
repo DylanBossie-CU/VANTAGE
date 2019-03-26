@@ -106,7 +106,7 @@ classdef Optical
     % @author     Justin Fay
     % @date       10-Mar-2019
     %
-    function [didRead,direc,indices] = readInputFramesFromImages(obj)
+    function [didRead,direc,timing] = readInputFramesFromImages(obj)
 
         
         % Read data directory
@@ -123,17 +123,15 @@ classdef Optical
         for i = 1:numFile
             filename = direc(i).name;
             splitname = strsplit(filename,'_');
-            year = str2num(splitname{1}(10:13))*365*24*60*60;
-            month = str2num(splitname{1}(14:end))*30*24*60*60;
             day = str2num(splitname{2})*24*60*60;
             hour = str2num(splitname{3})*60*60;
             minute = str2num(splitname{4})*60;
-            second = str2num(splitname{5})*60;
+            second = str2num(splitname{5});
             
             fileSuffix = strsplit(splitname{6},'.');
-            milli = str2num(['.',fileSuffix{1}]);
+            milli = str2num(strcat(['.',fileSuffix{1}]));
             
-            timing(i) = year+month+day+hour+minute+second+milli;
+            timing(i) = day+hour+minute+second+milli;
         end
         
         [~,indices] = sort(timing);
@@ -852,7 +850,7 @@ classdef Optical
     % @date       16-Mar-2019
     %
     function I_binarized = Binarization(obj,I_gray)
-        baseThreshold = 0.05;
+        baseThreshold = 0.165;
         I_basebinarized = imbinarize(I_gray,baseThreshold);
         
         %Update I_gray with [0 0 0] for values below base threshold
@@ -873,6 +871,7 @@ classdef Optical
             figure
             plot(histEdges(1:end-1),histValues)
         end
+
         [~,maxIndex] = max(histValues);
         
         %Set adaptive threshold based 10% of the maximum bin count
