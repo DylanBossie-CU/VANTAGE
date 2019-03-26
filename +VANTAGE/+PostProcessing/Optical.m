@@ -106,16 +106,40 @@ classdef Optical
     % @author     Justin Fay
     % @date       10-Mar-2019
     %
-    function [didRead,direc] = readInputFramesFromImages(obj)
-        
-        % Initialize read status
-        didRead = false;
+    function [didRead,direc,indices] = readInputFramesFromImages(obj)
+
         
         % Read data directory
         direc = dir(strcat(obj.DataDirec,obj.FileExtension));
-        numFile = numel(direc);
+        numFile = numel(direc);        
+        
+        didRead = false;
+        if numFile ~= 0
+            didRead = true;
+        end
+        
+        % Convert filenames into seconds for ordered processing
+        timing = zeros(numFile,1);
+        for i = 1:numFile
+            filename = direc(i).name;
+            splitname = strsplit(filename,'_');
+            year = str2num(splitname{1}(10:13))*365*24*60*60;
+            month = str2num(splitname{1}(14:end))*30*24*60*60;
+            day = str2num(splitname{2})*24*60*60;
+            hour = str2num(splitname{3})*60*60;
+            minute = str2num(splitname{4})*60;
+            second = str2num(splitname{5})*60;
+            
+            fileSuffix = strsplit(splitname{6},'.');
+            milli = str2num(['.',fileSuffix{1}]);
+            
+            timing(i) = year+month+day+hour+minute+second+milli;
+        end
+        
+        [~,indices] = sort(timing);
         
         % Exclude files that aren't data
+        %{
         tmp = false(numFile,1);
         for i = 1:numFile
             tmp(i) = contains(direc(i).name,'.jpg') && ~direc(i).isdir;
@@ -129,14 +153,6 @@ classdef Optical
         else
             didRead = true;
         end
-        
-        % Process frames
-        %{
-        for i = 1:numFile
-            obj.Frame = imread(strcat(obj.DataDirec,'/',direc(i).name));           
-            image = obj.ImageProcessing(obj.Frame);
-            obj.Image = image;
-        end
         %}
     end
 
@@ -144,7 +160,7 @@ classdef Optical
     %% Perform optical processing
     % Process optical frames to find the estimated cubesat positions
     %
-    % @author       Justin Fay
+    %               Dylan Bossie
     % @date         17-Mar-2019
     function [UnitVecsVCF,UnitOriginVCF,timestamp,...
             isSystemCentroid] = OpticalProcessing(obj,image)
@@ -161,6 +177,16 @@ classdef Optical
 
         % Get frame timestamp
         timestamp = image.date;
+    end
+    
+    %% Perform 100m data cleanup (3/19)
+    % Take data from 100m test and clean regions with background noise not
+    % relevant to the test
+    %
+    %               Dylan Bossie
+    % @date         17-Mar-2019
+    function [frame] = TestCleanup100m(~,frame)
+        
     end
     
     %% Perform image processing

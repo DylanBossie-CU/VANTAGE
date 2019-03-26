@@ -59,11 +59,12 @@ classdef Model < handle
         %
         function obj = ComputeStateOutput(obj)
         	% Get directory of optical frames
-        	[didRead,direc] = readInputFramesFromImages(obj.Optical);
+        	[didRead,direc,OpticalIndices] = readInputFramesFromImages(obj.Optical);
 
             % Process last frame of optical data to find 100m pixel
             % location
-            obj.Optical = obj.Optical.find100mPixel(direc(end));
+            [~,finalImageIndex] = max(OpticalIndices);
+            obj.Optical = obj.Optical.find100mPixel(direc(finalImageIndex));
             
         	if didRead
 	        	% Loop though optical frames

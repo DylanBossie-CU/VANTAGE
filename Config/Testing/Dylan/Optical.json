@@ -5,5 +5,10 @@
 	"PlotBinarizedImages": true,
 	"PlotCentroids": true,
 	"PlotHist": false,
-	"PlotAny": true
+	"PlotAny": true,
+	"Clean100m": [
+	  		{"bottomleft": [1271,1253], "topright": [1432, 1175]},
+	  		{"bottomleft": [0, 2076], "topright": [1111, 1070]},
+	  		{"bottomleft": [2141, 1308], "topright": [2454, 1135]}
+  	]
 }
