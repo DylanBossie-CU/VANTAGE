@@ -6,8 +6,8 @@ clear
 % High-level directory of all TOF information. This should contain the
 % executable data capture script and the desired location to save point
 % cloud outputs.
-tofDirName = '/home/vantage/Documents/githere/VANTAGE/Automation/TOF_Automation/examples/';
-tofDirPointClouds = strcat(tofDirName,'TOF_PointClouds/');
+tofDirName = '/home/vantage/Documents/githere/VANTAGE/Data/';
+tofDirPointClouds = strcat(tofDirName,'TOF_Automated/3_25_TOF/Test1/');
 
 % Grab all point cloud files in the defined output directory.
 PointClouds = dir(tofDirPointClouds);
@@ -18,7 +18,7 @@ PointClouds = dir(tofDirPointClouds);
 % For this to be accurate, have the TOF take images upright (The LED lights
 % on the back, 2 green, 2 orange, should on top).
 az = 0;
-el = 270;
+el = 270-180;
 
 %% Plot Point Clouds
 % This for loop iterates each detected point cloud in the defined directory

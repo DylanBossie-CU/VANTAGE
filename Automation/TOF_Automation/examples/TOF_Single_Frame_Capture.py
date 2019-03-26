@@ -33,7 +33,7 @@ class GrabO3D300():
     def readNextFrame(self):
         result = self.data.readNextFrame()
         #print(result.keys())
-        self.Amplitude = np.frombuffer(result['amplitude'],dtype='uint8')
+        self.Amplitude = np.frombuffer(result['amplitude'],dtype='uint16')
         self.Amplitude = self.Amplitude.reshape(imageHeight,imageWidth)
         self.Distance = np.frombuffer(result['distance'],dtype='uint16')
         self.Distance = self.Distance.reshape(imageHeight,imageWidth)
@@ -60,7 +60,7 @@ class GrabO3D300():
         currentDT = datetime.datetime.now()
         timestamp = str(currentDT.hour) + "_" + str(currentDT.minute) + "_" + str(currentDT.second) + "_" + str(currentDT.microsecond)
         #Convert micro_sec to sec
-        timestampTOF = result['diagnostic']['timeStamp']/1e6
+        timestampTOF = result['timeStamp']/1e6
 
         ### Storing in memory instead
         #pypcd.save_point_cloud(self.pc, "../examples/TOF_PointClouds/testframe_" + timestamp + ".pcd")

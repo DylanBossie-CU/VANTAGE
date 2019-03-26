@@ -101,6 +101,8 @@ b=ueye.UINT(8)
 thing=ueye.is_Exposure(hCam,ueye.IS_EXPOSURE_CMD_SET_EXPOSURE, a,b )
 thing=ueye.is_Exposure(hCam,ueye.IS_EXPOSURE_CMD_GET_EXPOSURE, c,b )
 print(c)
+gain=ueye.UINT(80)
+thingy=ueye.is_SetHardwareGain(hCam,gain, ueye.IS_IGNORE_PARAMETER, ueye.IS_IGNORE_PARAMETER, ueye.IS_IGNORE_PARAMETER)
 #---------------------------------------------------------------------------------------------------------------------------------------
 nRet = ueye.is_FreezeVideo(hCam, ueye.IS_WAIT)
 Iinfo=ueye.UEYEIMAGEINFO()
@@ -121,10 +123,7 @@ while(nRet == ueye.IS_SUCCESS):
 	#print(Iinfo.TimestampSystem)
 
     # Saving directory + filename for image capture
-	TitleString="/home/vantage/Documents/githere/VANTAGE/Data/SingleImageCapture/"+str(Iinfo.TimestampSystem.wMonth.value)
-    +"_"+str(Iinfo.TimestampSystem.wDay.value)+"_"+str(Iinfo.TimestampSystem.wHour.value)+"_"+
-    str(Iinfo.TimestampSystem.wMinute.value)+"_"+str(Iinfo.TimestampSystem.wSecond.value)+"_"+
-    str(Iinfo.TimestampSystem.wMilliseconds.value)+".jpg"
+	TitleString="/home/vantage/Documents/githere/VANTAGE/Data/SingleImageCapture/"+str(Iinfo.TimestampSystem.wMonth.value)+"_"+str(Iinfo.TimestampSystem.wDay.value)+"_"+str(Iinfo.TimestampSystem.wHour.value)+"_"+str(Iinfo.TimestampSystem.wMinute.value)+"_"+str(Iinfo.TimestampSystem.wSecond.value)+"_"+str(Iinfo.TimestampSystem.wMilliseconds.value)+".jpg"
 
 	cv2.imwrite(TitleString, frame)
 	#print("Wrote Image")
