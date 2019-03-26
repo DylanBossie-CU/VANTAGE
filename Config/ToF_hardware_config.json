@@ -27,7 +27,7 @@
           "ExposureTime": "5000",
           "ExposureTimeList": "125;5000",
           "ExposureTimeRatio": "40",
-          "FrameRate": "2",
+          "FrameRate": "15",
           "MaxAllowedLEDFrameRate": "23.2",
           "MinimumAmplitude": "42",
           "Resolution": "1",

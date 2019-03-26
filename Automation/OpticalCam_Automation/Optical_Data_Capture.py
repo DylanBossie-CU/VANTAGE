@@ -95,12 +95,15 @@ else:
 
 
 
-a=ueye.DOUBLE(10)
+a=ueye.DOUBLE(20)
 c=ueye.DOUBLE()
 b=ueye.UINT(8)
+gain=ueye.UINT(100)
 thing=ueye.is_Exposure(hCam,ueye.IS_EXPOSURE_CMD_SET_EXPOSURE, a,b )
 thing=ueye.is_Exposure(hCam,ueye.IS_EXPOSURE_CMD_GET_EXPOSURE, c,b )
 print(c)
+
+thingy=ueye.is_SetHardwareGain(hCam,gain, ueye.IS_IGNORE_PARAMETER, ueye.IS_IGNORE_PARAMETER, ueye.IS_IGNORE_PARAMETER)
 #---------------------------------------------------------------------------------------------------------------------------------------
 nRet = ueye.is_FreezeVideo(hCam, ueye.IS_WAIT)
 Iinfo=ueye.UEYEIMAGEINFO()
@@ -113,7 +116,7 @@ while(nRet == ueye.IS_SUCCESS):
     # In order to display the image in an OpenCV window we need to...
     # ...extract the data of our image memory
   
-    TitleString="/home/vantage/Documents/githere/VANTAGE/Automation/OpticalCam_Automation/TestImages_Automated/VANTAGEOp"+str(Iinfo.TimestampSystem.wYear.value)+str(Iinfo.TimestampSystem.wMonth.value)+"_"+str(Iinfo.TimestampSystem.wDay.value)+"_"+str(Iinfo.TimestampSystem.wHour.value)+"_"+str(Iinfo.TimestampSystem.wMinute.value)+"_"+str(Iinfo.TimestampSystem.wSecond.value)+"_"+str(Iinfo.TimestampSystem.wMilliseconds.value)+".png"
+    TitleString="/home/vantage/Documents/githere/VANTAGE/Data/Optical_Automated/VANTAGEOp"+str(Iinfo.TimestampSystem.wYear.value)+str(Iinfo.TimestampSystem.wMonth.value)+"_"+str(Iinfo.TimestampSystem.wDay.value)+"_"+str(Iinfo.TimestampSystem.wHour.value)+"_"+str(Iinfo.TimestampSystem.wMinute.value)+"_"+str(Iinfo.TimestampSystem.wSecond.value)+"_"+str(Iinfo.TimestampSystem.wMilliseconds.value)+".png"
     nRet = ueye.is_FreezeVideo(hCam, ueye.IS_WAIT)
     array = ueye.get_data(pcImageMemory, width, height, nBitsPerPixel, pitch, copy=False)
     nRet1= ueye.is_GetImageInfo(hCam,MemID, Iinfo, ueye.sizeof(Iinfo) )
@@ -123,7 +126,9 @@ while(nRet == ueye.IS_SUCCESS):
     #print("Wrote Image")
     count+=1
     time.sleep(0.25)
-    if count>100:
+
+    numberOfImages = 250
+    if count>numberOfImages:
         break
 
 

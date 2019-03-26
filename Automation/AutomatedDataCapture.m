@@ -7,13 +7,13 @@ clc
 % executable data capture script and the desired location to save point
 % cloud outputs.
 tofDirName = '/home/vantage/Documents/githere/VANTAGE/Automation/TOF_Automation/examples/';
-tofDirData = '/home/vantage/Documents/githere/VANTAGE/Data/AutomatedTOFCapture/';
+tofDirData = '/home/vantage/Documents/githere/VANTAGE/Data/TOF_Automated/';
 tofFlush = strcat(tofDirData,'pointcloud*');
 tofScript = strcat(tofDirName,'TOF_Data_Capture.py');
 
 opticalDirName = '/home/vantage/Documents/githere/VANTAGE/Automation/OpticalCam_Automation/';
 opticalDirImages = '/home/vantage/Documents/githere/VANTAGE/Data/AutomatedImageCapture/';
-opticalDirData = '/home/vantage/Documents/githere/VANTAGE/Data/';
+opticalDirData = '/home/vantage/Documents/githere/VANTAGE/Data/Optical_Automated/';
 opticalFlush = strcat(opticalDirData,'VANTAGEOp*');
 opticalScript = strcat(opticalDirName,'Optical_Data_Capture.py');
 
