@@ -106,16 +106,38 @@ classdef Optical
     % @author     Justin Fay
     % @date       10-Mar-2019
     %
-    function [didRead,direc] = readInputFramesFromImages(obj)
-        
-        % Initialize read status
-        didRead = false;
+    function [didRead,direc,timing] = readInputFramesFromImages(obj)
+
         
         % Read data directory
         direc = dir(strcat(obj.DataDirec,obj.FileExtension));
-        numFile = numel(direc);
+        numFile = numel(direc);        
+        
+        didRead = false;
+        if numFile ~= 0
+            didRead = true;
+        end
+        
+        % Convert filenames into seconds for ordered processing
+        timing = zeros(numFile,1);
+        for i = 1:numFile
+            filename = direc(i).name;
+            splitname = strsplit(filename,'_');
+            day = str2num(splitname{2})*24*60*60;
+            hour = str2num(splitname{3})*60*60;
+            minute = str2num(splitname{4})*60;
+            second = str2num(splitname{5});
+            
+            fileSuffix = strsplit(splitname{6},'.');
+            milli = str2num(strcat(['.',fileSuffix{1}]));
+            
+            timing(i) = day+hour+minute+second+milli;
+        end
+        
+        [~,indices] = sort(timing);
         
         % Exclude files that aren't data
+        %{
         tmp = false(numFile,1);
         for i = 1:numFile
             tmp(i) = contains(direc(i).name,'.jpg') && ~direc(i).isdir;
@@ -129,14 +151,6 @@ classdef Optical
         else
             didRead = true;
         end
-        
-        % Process frames
-        %{
-        for i = 1:numFile
-            obj.Frame = imread(strcat(obj.DataDirec,'/',direc(i).name));           
-            image = obj.ImageProcessing(obj.Frame);
-            obj.Image = image;
-        end
         %}
     end
 
@@ -144,7 +158,7 @@ classdef Optical
     %% Perform optical processing
     % Process optical frames to find the estimated cubesat positions
     %
-    % @author       Justin Fay
+    %               Dylan Bossie
     % @date         17-Mar-2019
     function [UnitVecsVCF,UnitOriginVCF,timestamp,...
             isSystemCentroid] = OpticalProcessing(obj,image)
@@ -154,13 +168,29 @@ classdef Optical
         
         % Process current frame
         [obj,isSystemCentroid] = obj.ImageProcessing(frame);
-
+            if isSystemCentroid == 'invalid'
+                UnitVecsVCF = [1 1 1];
+                UnitOriginVCF = [0 0 0];
+                timestamp = 1;
+                return
+            end
+        
         % Transform results to VCF unit vectors
         UnitVecsVCF = obj.PixelToUnitVec(isSystemCentroid);
         UnitOriginVCF = [0 0 0];
 
         % Get frame timestamp
         timestamp = image.date;
+    end
+    
+    %% Perform 100m data cleanup (3/19)
+    % Take data from 100m test and clean regions with background noise not
+    % relevant to the test
+    %
+    %               Dylan Bossie
+    % @date         17-Mar-2019
+    function [frame] = TestCleanup100m(~,frame)
+        
     end
     
     %% Perform image processing
@@ -208,7 +238,10 @@ classdef Optical
         
         % Adaptive Thresholding Binarization
         I_binarized = obj.Binarization(I_gray);
-        
+        if I_binarized == 0
+            isSystemCentroid = 'invalid';
+            return
+        end
         
         %I_binarized_mean = imbinarize(I_gray_mean/255,graythresh(I_gray_mean/255));
         
@@ -217,70 +250,76 @@ classdef Optical
         %Isolate boundaries corresponding to CubeSats (remove noise)
         CubeSat_Boundaries = obj.detectObjects(I_boundaries);
         
-        if ~isempty(CubeSat_Boundaries)
-            numCubeSats = length(obj.CubeSats);
-            
-            % Occlusion cutting
-            CubeSat_Boundaries_Cut = cell(0);
-            CubeSat_polyshapes = cell(0);
-            n = 1;
-            for i = 1:numel(CubeSat_Boundaries)
-                cutPoly = obj.occlusionCut(CubeSat_Boundaries{i}(:,1),CubeSat_Boundaries{i}(:,2),obj.ModelRef.Deployer.GetNumCubesats());
-                for j = 1:numel(cutPoly)
-                    CubeSat_Boundaries_Cut{n} = cutPoly{j}.Vertices;
-                    CubeSat_polyshapes{n} = cutPoly{j};
-                    n = n+1;
-                end
-            end
+        try
+            if ~isempty(CubeSat_Boundaries)
+                numCubeSats = length(obj.CubeSats);
 
-            %
-            %Find CubeSat centroids
-            centroids = obj.findCentroids(CubeSat_polyshapes);
-            
-            if obj.is100mSearch
-                meanCent = zeros(1,2);
-                for i = 1:numel(centroids)
-                    meanCent = meanCent + centroids{i};
+                % Occlusion cutting
+                CubeSat_Boundaries_Cut = cell(0);
+                CubeSat_polyshapes = cell(0);
+                n = 1;
+                for i = 1:numel(CubeSat_Boundaries)
+                    cutPoly = obj.occlusionCut(CubeSat_Boundaries{i}(:,1),CubeSat_Boundaries{i}(:,2),obj.ModelRef.Deployer.GetNumCubesats());
+                    for j = 1:numel(cutPoly)
+                        CubeSat_Boundaries_Cut{n} = cutPoly{j}.Vertices;
+                        CubeSat_polyshapes{n} = cutPoly{j};
+                        n = n+1;
+                    end
                 end
-                meanCent = meanCent./numel(centroids);
-                obj.PixelLocation100m = meanCent;
-                isSystemCentroid = true;
-            end
 
-            % Check number of found centroids - 
-            % If centroids found are the same as expected, do not use
-            % system centroid - set to false. If different amount is
-            % detected, set use system centroid to true
-            if numel(centroids) == numCubeSats && ~obj.is100mSearch
-                % Use centroids of individual CubeSats
-                isSystemCentroid = false;
-                
-                % Assign the system centroid for this image to [0 0]
-                obj.CubeSats{end}.centroid = [0 0];
-            elseif ~obj.is100mSearch
-                % Use system centroid 
-                isSystemCentroid = true;
-                meanCent = zeros(1,2);
-                for i = 1:numel(centroids)
-                    meanCent = meanCent + centroids{i};
+                %
+                %Find CubeSat centroids
+                centroids = obj.findCentroids(CubeSat_polyshapes);
+
+                if obj.is100mSearch
+                    meanCent = zeros(1,2);
+                    for i = 1:numel(centroids)
+                        meanCent = meanCent + centroids{i};
+                    end
+                    meanCent = meanCent./numel(centroids);
+                    obj.PixelLocation100m = meanCent;
+                    isSystemCentroid = true;
                 end
-                meanCent = meanCent./numel(centroids);
-                
-                %Assign the mean centroid to the system centroid CubeSat
-                obj.CubeSats{end}.centroid = meanCent;
+
+                % Check number of found centroids - 
+                % If centroids found are the same as expected, do not use
+                % system centroid - set to false. If different amount is
+                % detected, set use system centroid to true
+                if numel(centroids) == numCubeSats && ~obj.is100mSearch
+                    % Use centroids of individual CubeSats
+                    isSystemCentroid = false;
+
+                    % Assign the system centroid for this image to [0 0]
+                    obj.CubeSats{end}.centroid = [0 0];
+                elseif ~obj.is100mSearch
+                    % Use system centroid 
+                    isSystemCentroid = true;
+                    meanCent = zeros(1,2);
+                    for i = 1:numel(centroids)
+                        meanCent = meanCent + centroids{i};
+                    end
+                    meanCent = meanCent./numel(centroids);
+
+                    %Assign the mean centroid to the system centroid CubeSat
+                    obj.CubeSats{end}.centroid = meanCent;
+                end
+
+                if ~obj.is100mSearch && ~isSystemCentroid
+                    % Perform object association
+                    obj.objectAssociation(centroids);
+                end
+
+                %Plot results
+                if obj.PlotBinarizedImages && obj.PlotAny && ~obj.is100mSearch && ~isSystemCentroid
+                    obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries_Cut,centroids,isSystemCentroid)
+                elseif obj.PlotBinarizedImages && obj.PlotAny && ~obj.is100mSearch && isSystemCentroid
+                    obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries_Cut,meanCent,isSystemCentroid)
+                end
             end
-            
-            if ~obj.is100mSearch && ~isSystemCentroid
-                % Perform object association
-                obj.objectAssociation(centroids);
-            end
-            
-            %Plot results
-            if obj.PlotBinarizedImages && obj.PlotAny && ~obj.is100mSearch && ~isSystemCentroid
-                obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries_Cut,centroids,isSystemCentroid)
-            elseif obj.PlotBinarizedImages && obj.PlotAny && ~obj.is100mSearch && isSystemCentroid
-                obj.plotObjectBoundaries(I_gray,CubeSat_Boundaries_Cut,meanCent,isSystemCentroid)
-            end
+        catch
+            warning('Incorrect number of polyshapes detected, skipping...')
+            isSystemCentroid = true;
+            return
 
         end
 
@@ -490,7 +529,7 @@ classdef Optical
         r = zeros(numel(x),1);
         for i = 1:numel(x)
             r(i) = D(y(i),x(i));
-            if r(i) <= 5
+            if r(i) < 1
                 r(i) = 0;
             end
         end
@@ -826,35 +865,42 @@ classdef Optical
     % @date       16-Mar-2019
     %
     function I_binarized = Binarization(obj,I_gray)
-        baseThreshold = 0.05;
-        I_basebinarized = imbinarize(I_gray,baseThreshold);
-        
-        %Update I_gray with [0 0 0] for values below base threshold
-        for i = 1:length(I_gray(:,1))
-            for j = 1:length(I_gray(1,:))
-                if I_basebinarized(i,j) == 0
-                    I_gray(i,j) = 0;
+        try
+            baseThreshold = 0.165;
+            I_basebinarized = imbinarize(I_gray,baseThreshold);
+
+            %Update I_gray with [0 0 0] for values below base threshold
+            for i = 1:length(I_gray(:,1))
+                for j = 1:length(I_gray(1,:))
+                    if I_basebinarized(i,j) == 0
+                        I_gray(i,j) = 0;
+                    end
                 end
             end
+
+            %Find distribution of visual magnitude remaining in I_gray
+            visualMagnitudes = I_gray(I_gray~=0);
+            bins = 80;
+            [histValues,histEdges,~] = histcounts(visualMagnitudes,bins);
+            histValues = sgolayfilt(histValues,2,obj.roundToNearestOdd(bins/10));
+            if obj.PlotHist
+                figure
+                plot(histEdges(1:end-1),histValues)
+            end
+
+            [~,maxIndex] = max(histValues);
+
+            %Set adaptive threshold based 10% of the maximum bin count
+            %(brightest part of CubeSat, peak of image)
+            adaptiveThreshold = histEdges(floor(maxIndex/10))/255;
+
+            %Binarize image again using the new adapative threshold
+            I_binarized = imbinarize(I_gray,adaptiveThreshold);
+        catch
+            warning('Binarization did not detect any objects, skipping')
+            I_binarized = 0;
+            return
         end
-        
-        %Find distribution of visual magnitude remaining in I_gray
-        visualMagnitudes = I_gray(I_gray~=0);
-        bins = 80;
-        [histValues,histEdges,~] = histcounts(visualMagnitudes,bins);
-        histValues = sgolayfilt(histValues,2,obj.roundToNearestOdd(bins/10));
-        if obj.PlotHist
-            figure
-            plot(histEdges(1:end-1),histValues)
-        end
-        [~,maxIndex] = max(histValues);
-        
-        %Set adaptive threshold based 10% of the maximum bin count
-        %(brightest part of CubeSat, peak of image)
-        adaptiveThreshold = histEdges(floor(maxIndex/10))/255;
-        
-        %Binarize image again using the new adapative threshold
-        I_binarized = imbinarize(I_gray,adaptiveThreshold);
     end
 end
     
