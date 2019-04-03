@@ -492,6 +492,8 @@ classdef TOF
                 I = logical(prod(~isnan(pts),2));
                 pc = pointCloud(pts(I,:));
             end
+            xyzPoints = pc.Location./1000;
+            pc = pointCloud(xyzPoints);
             if obj.showDebugPlots % useful for debugging
                 figure            
                 pcshow(pc)
