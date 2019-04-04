@@ -5,6 +5,7 @@
 	"DesiredFPS": 1,
 	"PlotBinarizedImages": false,
 	"PlotCentroids": false,
-	"PlotHist": false
+	"PlotHist": false,
+	"PlotAny": true
 	
 }
