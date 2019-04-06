@@ -64,7 +64,11 @@ classdef Model < handle
             % Process last frame of optical data to find 100m pixel
             % location
             [~,finalImageIndex] = max(timestamps);
-            obj.Optical = obj.Optical.find100mPixel(direc(finalImageIndex));
+            [~,firstImageIndex] = min(timestamps);
+            
+            BackgroundPixels = obj.Optical.FindBackground(direc(firstImageIndex));
+            
+            obj.Optical = obj.Optical.find100mPixel(direc(finalImageIndex),BackgroundPixels);
             
             CamUnitVecsVCF = cell(length(direc),1);
             tic
@@ -76,17 +80,18 @@ classdef Model < handle
 
 	        		% Run optical processing
 	        		[CamUnitVecsVCF{i},CamOriginVCF, CamTimestamp, isSystemCentroid] =...
-                        obj.Optical.OpticalProcessing(obj.Optical.Frame);
+                        obj.Optical.OpticalProcessing(obj.Optical.Frame,BackgroundPixels);
 
                     if isSystemCentroid == 'invalid'
                         continue
                     end
 	        		% Get propogated TOF positions
-                    %lol
 	        		%pos_TOF = obj.TOF.propogatedShit(camTimestep)
 
 	        		% Run sensor fusion
 	        		%[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF, sig_cam, sig_TOF);
+                    
+                    obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
                 end
             toc
 	        else

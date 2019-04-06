@@ -1,11 +1,13 @@
 {
-	"OpticalData": "Data/100m_Tube8_Test1_Optical/",
+	"OpticalData": "Data/3_25_100m/Test1/",
 	"OpticalFileExtension": "VANTAGEOp*",
 	"DesiredFPS": 1,
 	"PlotBinarizedImages": true,
 	"PlotCentroids": true,
 	"PlotHist": false,
 	"PlotAny": false,
+	"PlotCubeSats": false,
+	"RunOcclusion": false,
 	"Clean100m": [
 	  		{"bottomleft": [1271,1253], "topright": [1432, 1175]},
 	  		{"bottomleft": [0, 2076], "topright": [1111, 1070]},
