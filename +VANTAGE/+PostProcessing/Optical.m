@@ -81,7 +81,7 @@ classdef Optical
         for i = 1:numCubesats
             obj.CubeSats{i} = CubeSat_Optical;
             obj.CubeSats{i}.tag = i;
-            obj.CubeSats{i}.centroid = [0,0];
+            obj.CubeSats{i}.unitvec = [0,0];
         end
         obj.CubeSats{end} = CubeSat_Optical;
         obj.CubeSats{end}.tag = 'systemCentroid';
@@ -173,6 +173,10 @@ classdef Optical
 
         % Get frame timestamp
         timestamp = image.date;
+        
+        % Perform object association
+        if isSystemCentroid == 1
+        end
     end
     
     %% Perform 100m data cleanup
@@ -200,6 +204,7 @@ classdef Optical
     % @date         31-Mar-2019
     function [binarizedFrame] = FindBackground(obj,firstFrame)
         frameTitle = firstFrame.name;
+
         frame = imread(strcat(obj.DataDirec,frameTitle));
         
         % Binarize frame with low threshold to find noisy background

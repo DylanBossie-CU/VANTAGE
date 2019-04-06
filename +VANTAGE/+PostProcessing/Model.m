@@ -77,8 +77,11 @@ classdef Model < handle
         	if didRead
 	        	% Loop though optical frames
 	        	for i = 1:numel(direc)
+                    % Find current frame's index in timestamps
+                    currentTime = find(timestampIndices==i);
+                    
 	        		% Read frame
-	        		obj.Optical.Frame = direc(i);
+	        		obj.Optical.Frame = direc(currentTime);
 
 	        		% Run optical processing
 	        		[CamUnitVecsVCF{i},CamOriginVCF, CamTimestamp, isSystemCentroid] =...
