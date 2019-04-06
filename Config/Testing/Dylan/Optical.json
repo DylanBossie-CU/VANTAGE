@@ -1,5 +1,5 @@
 {
-	"OpticalData": "Data/3_25_100m/Test1/",
+	"OpticalData": "Data/3_25_100m/Test1/Temp/",
 	"OpticalFileExtension": "VANTAGEOp*",
 	"DesiredFPS": 1,
 	"PlotBinarizedImages": true,

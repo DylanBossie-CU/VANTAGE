@@ -26,7 +26,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
                         SensorData = jsondecode(fileread('config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube1/Sensors.json'));
                     case 6
                         configDirecName = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube6';
-                        manifestFilename = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube6/Manifest_TOFdev.json';
+                        manifestFilename = 'Config/Manifest.json';
                         SensorData = jsondecode(fileread('config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube6/Sensors.json'));
                     otherwise
                         error('unimplemented tube requested')
@@ -35,7 +35,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
                 
             elseif strcmpi(testType,'100m')
                 configDirecName = 'Config/Testing/TOF/100m 3-25-19 Cropped TOF';
-                manifestFilename = 'Config/Testing/TOF/100m 3-25-19 Cropped TOF/Manifest.json';
+                manifestFilename = 'Config/Manifest.json';
                 SensorData = jsondecode(fileread('config/Testing/TOF/100m 3-25-19 Cropped TOF/Sensors.json'));
             else
                 error('this shouldn''t happen')
@@ -50,7 +50,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             %Truth = obj.processTruthData(truthFileName);
             
             
-            Model.ComputeStateOutput;
+            Model.ComputeStateOutput();
             
             % Unit vector to VCF origin from CCF
             UnitOriginVCF = Model.Deployer.GetCamOriginVCF;

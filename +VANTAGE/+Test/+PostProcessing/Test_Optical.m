@@ -47,9 +47,6 @@ classdef Test_Optical < matlab.unittest.TestCase
             OpticalTest = Model.Optical;
             
             Model.ComputeStateOutput;
-            
-            % Unit vector to VCF origin from CCF
-            UnitOriginVCF = Model.Deployer.GetCamOriginVCF;
         end
         
     end

@@ -80,26 +80,42 @@ classdef Model < handle
             
             obj.Optical = obj.Optical.find100mPixel(direc(finalImageIndex),BackgroundPixels);
             
-            CamUnitVecsVCF = cell(length(direc),1);
             tic
         	if didRead
 	        	% Loop though optical frames
-	        	for i = 1:numel(direc)
+	        	for i = 2:numel(direc)
+                    % Find current frame's index in timestamps
+                    currentTime = find(timestampIndices==i);
+                    
 	        		% Read frame
-	        		obj.Optical.Frame = direc(i);
+	        		obj.Optical.Frame = direc(currentTime);
 
 	        		% Run optical processing
-	        		[CamUnitVecsVCF{i},CamOriginVCF, CamTimestamp, isSystemCentroid] =...
+	        		[obj.Optical,CamOriginVCF, CamTimestamp, isSystemCentroid] =...
                         obj.Optical.OpticalProcessing(obj.Optical.Frame,BackgroundPixels);
 
+                    CamUnitVecsVCF = cell(numel(obj.Optical.CubeSats),1);
+                    for j = 1:length(CamUnitVecsVCF)
+                        CamUnitVecsVCF{j} = obj.Optical.CubeSats{j}.unitvec;
+                    end
+                    
                     if isSystemCentroid == 'invalid'
                         continue
                     end
-	        		% Get propogated TOF positions
-	        		%pos_TOF = obj.TOF.propogatedShit(camTimestep)
+                    
+                    % Get propogated TOF positions
+                    CubeSats = obj.Deployer.CubesatArray;
+                    pos_TOF = zeros(numel(CubeSats),1);
+                    
+                    for j = 1:numel(CubeSats)
+                        pos_TOF(j) = fsolve(@(t) norm(CubeSats(j).evalTofFit(t))-10,10);
+                    end
 
+                    % Assign sensor fusion weights based on pos_TOF
+                    
+                    
 	        		% Run sensor fusion
-	        		%[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF, sig_cam, sig_TOF);
+	        		[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF, sig_cam, sig_TOF);
                     
                     obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
                 end
