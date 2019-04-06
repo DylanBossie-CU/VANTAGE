@@ -13,6 +13,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             close all
             import VANTAGE.PostProcessing.*
             
+            rng(99);
             testType = '100m';
             tube = 6;
 
@@ -46,7 +47,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
                 Model.Deployer,'presentResults',1,'fileLims',fileLims,'showDebugPlots',0);
             % Truth Data processing
-            Truth = obj.processTruthData(truthFileName);
+            %Truth = obj.processTruthData(truthFileName);
             
             
             Model.ComputeStateOutput;
