@@ -5,25 +5,25 @@ classdef Model < handle
     properties (SetAccess = public)
         % Deployer class
         Deployer
+        
+        % Truth data
+        Truth_VCF
     end
+    
     properties (SetAccess = protected)
         % Transform class
         Transform
         
-        % Date string format
-        DateFormat = 'dd-mmm-yyyy HH:MM:SS.FFF'
-        
+        % Time Manager Class
+        TimeMan
     end
+    
     properties (SetAccess = private)
         % Optical camera class
         Optical
 
         % TOF camera class
         TOF
-        
-        % Truth data
-        Truth_VCF
-        
     end
 
     methods
@@ -41,13 +41,17 @@ classdef Model < handle
         	import VANTAGE.PostProcessing.Transform
         	import VANTAGE.PostProcessing.Optical
         	import VANTAGE.PostProcessing.TOF
+            import VANTAGE.PostProcessing.TimeManager
 
         	% Construct child classes and process truth data
             obj.Deployer = Deployer(manifestFilename, strcat(configDirecName,'/Deployer.json'),obj);
-            obj.Truth_VCF = obj.processTruthData(obj.Deployer.TruthFileName);
             obj.Transform = Transform(strcat(configDirecName,'/Transform.json'));
             obj.Optical = Optical(obj,strcat(configDirecName,'/Optical.json'), obj.Deployer.GetNumCubesats());
             obj.TOF = TOF(obj,strcat(configDirecName,'/TOF.json'));
+            SensorData = jsondecode(fileread(strcat(configDirecName,'/Sensors.json')));
+            obj.TimeMan = TimeManager(SensorData);
+            obj.Truth_VCF = obj.processTruthData(obj.Deployer.TruthFileName);
+            obj.TimeMan.syncTruthData(obj);
             
             % Error catching
             if obj.Deployer.numCubesats ~= obj.Truth_VCF.numCubeSats
@@ -273,7 +277,8 @@ classdef Model < handle
             tmp = jsondecode(fileread(truthFilename));
             
             % extract date0
-            Truth.t0_datevec = datevec(tmp{1},obj.DateFormat);
+            Truth = struct;
+            Truth.t0_datevec = datevec(tmp{1},obj.TimeMan.TruthDateFormat);
             tmp = tmp{2}; % reset tmp
             
             % extract timesteps

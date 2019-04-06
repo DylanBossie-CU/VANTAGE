@@ -493,8 +493,11 @@ classdef TOF
                 pc = pointCloud(pts(I,:));
             end
             if ~strcmpi(obj.ModelRef.Deployer.testScenario,'simulation')
+                % Scale mm to m
                 xyzPoints = pc.Location./1000;
                 pc = pointCloud(xyzPoints);
+                % Get timestamp of current point cloud
+                
             end
             if obj.showDebugPlots % useful for debugging
                 figure            
