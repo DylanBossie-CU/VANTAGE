@@ -37,8 +37,8 @@ classdef Validate
             close all;
             rng(99);
             %testType = 'Simulation';
-            testType = 'Modular';
-            %testType = '100m';
+            %testType = 'Modular';
+            testType = '100m';
             tube = 6;
 
             %%% Filenames and Configurables

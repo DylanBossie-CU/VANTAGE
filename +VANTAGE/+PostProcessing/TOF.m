@@ -200,7 +200,7 @@ classdef TOF
                         CubeSats(ii).numTOFpoints = length(CubeSats(ii).time);
                         % Determine the final 3D fit model to the TOF data,
                         % used for propagation
-                        CubeSats(ii).TOFfit = obj.produceFinalTOFfit(CubeSats(ii));
+                        CubeSats(ii).TOFfit_VCF = obj.produceFinalTOFfit(CubeSats(ii));
                     end
                     stopProcessing = 1;
                 end
@@ -1444,10 +1444,10 @@ classdef TOF
         %
         % @author   Joshua Kirby
         % @date     24-Mar-2019
-        function TOFfit = produceFinalTOFfit(~,CubeSat)
-            TOFfit{1} = fit(CubeSat.time',CubeSat.centroids_VCF(1,:)','poly1');
-            TOFfit{2} = fit(CubeSat.time',CubeSat.centroids_VCF(2,:)','poly1');
-            TOFfit{3} = fit(CubeSat.time',CubeSat.centroids_VCF(3,:)','poly1');
+        function TOFfit_VCF = produceFinalTOFfit(~,CubeSat)
+            TOFfit_VCF{1} = fit(CubeSat.time',CubeSat.centroids_VCF(1,:)','poly1');
+            TOFfit_VCF{2} = fit(CubeSat.time',CubeSat.centroids_VCF(2,:)','poly1');
+            TOFfit_VCF{3} = fit(CubeSat.time',CubeSat.centroids_VCF(3,:)','poly1');
         end
         
         
