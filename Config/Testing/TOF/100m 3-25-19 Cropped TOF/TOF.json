@@ -1,6 +1,6 @@
 {
 	"maxAllowableRange": 8,
 	"ptMaxDistFromPlane": 0.018,
-    "fps": 10,
+    "fps": 20,
     "HVfov_deg": [60,45]
 }

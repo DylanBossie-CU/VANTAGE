@@ -492,6 +492,8 @@ classdef TOF
                 I = logical(prod(~isnan(pts),2));
                 pc = pointCloud(pts(I,:));
             end
+            xyzPoints = pc.Location./1000;
+            pc = pointCloud(xyzPoints);
             if obj.showDebugPlots % useful for debugging
                 figure            
                 pcshow(pc)
@@ -693,7 +695,8 @@ classdef TOF
 
             %%% Check that no more than three planes were identified
             if numPlanes > 3
-              error('fitPlanesToCubesat identified more than three planes for a single cubesat')
+              %error('fitPlanesToCubesat identified more than three planes for a single cubesat')
+              CubeSat_TOF.trustedSat = 0;
             end
 
             %%% Check that planes are mutually orthogonal
@@ -1193,6 +1196,7 @@ classdef TOF
             % Plot results
             figure('units','normalized','position',[1/16,1/8,14/16,6/8])
             c = get(gca,'colororder');
+            c = [c;c];
             markersize = 100;
             fontsize = 20;
             legendfontsize = 16;
