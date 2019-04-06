@@ -119,12 +119,9 @@ classdef Validate
                 Model.Deployer,'presentResults',1,'fileLims',fileLims,'showDebugPlots',0);
             % Truth Data processing
             Truth = obj.processTruthData(truthFileName);
-<<<<<<< HEAD
             %%%%%%%%%%%%%%%%%%%%%%%%%
             % Loop over cubesats
-=======
             %%% Absolute Error Plots
->>>>>>> 7c8a6fd01ef0a7a29ead96c135617ea83d6e23fb
             titlefontsize = 20;
             labelfontsize = 16;
             figure
