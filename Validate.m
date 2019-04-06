@@ -57,7 +57,8 @@ classdef Validate
 
             %%% Present Errors
             obj.TOFpresentErrorsVsReqs(Model,SensorData,Model.Deployer.TruthFileName);
-            bla = 1;
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         end
         
         %% Validate Optical
@@ -102,10 +103,12 @@ classdef Validate
         function TOFpresentErrorsVsReqs(obj,Model,SensorData,truthFileName)
             % TOF Processing
             fileLims = [1 inf];
+            %%%%%%%%%%%%%%%%%%%%%%%%%
             Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
                 Model.Deployer,'presentResults',0,'fileLims',fileLims,'showDebugPlots',0);
             % Truth Data processing
             Truth = obj.processTruthData(truthFileName);
+            %%%%%%%%%%%%%%%%%%%%%%%%%
             % Loop over cubesats
             titlefontsize = 20;
             labelfontsize = 16;
