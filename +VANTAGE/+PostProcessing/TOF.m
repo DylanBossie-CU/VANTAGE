@@ -492,8 +492,10 @@ classdef TOF
                 I = logical(prod(~isnan(pts),2));
                 pc = pointCloud(pts(I,:));
             end
-            xyzPoints = pc.Location./1000;
-            pc = pointCloud(xyzPoints);
+            if ~strcmpi(obj.ModelRef.Deployer.testScenario,'simulation')
+                xyzPoints = pc.Location./1000;
+                pc = pointCloud(xyzPoints);
+            end
             if obj.showDebugPlots % useful for debugging
                 figure            
                 pcshow(pc)

@@ -20,6 +20,9 @@ classdef Deployer
         
         % Truth data file location
         TruthFileName
+        
+        % Type of test performed
+        testScenario
     end
     properties (SetAccess = private)
         % Structure of deployer geometry
@@ -30,9 +33,6 @@ classdef Deployer
 
         % Number of expected cubesats
         numCubesats
-        
-        % Type of test performed
-        testScenario
     end
 
     methods

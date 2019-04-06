@@ -37,8 +37,8 @@ classdef Validate
             close all;
             rng(99);
             %testType = 'Simulation';
-            %testType = 'Modular';
-            testType = '100m';
+            testType = 'Modular';
+            %testType = '100m';
             tube = 6;
 
             %%% Filenames and Configurables
@@ -56,7 +56,9 @@ classdef Validate
                         error('unimplemented tube requested')
                 end
             elseif strcmpi(testType,'Modular')
-                
+                configDirecName = 'Config/Testing/TOF/Modular_3-22-19_Cropped_TOF';
+                manifestFilename = 'Config/Testing/TOF/Modular_3-22-19_Cropped_TOF/Manifest.json';
+                SensorData = jsondecode(fileread('config/Testing/TOF/Modular_3-22-19_Cropped_TOF/Sensors.json'));
             elseif strcmpi(testType,'100m')
                 configDirecName = 'Config/Testing/TOF/100m 3-25-19 Cropped TOF';
                 manifestFilename = 'Config/Testing/TOF/100m 3-25-19 Cropped TOF/Manifest.json';
