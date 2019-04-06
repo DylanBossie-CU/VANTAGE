@@ -9,6 +9,10 @@ classdef Model < handle
     properties (SetAccess = protected)
         % Transform class
         Transform
+        
+        % Date string format
+        DateFormat = 'dd-mmm-yyyy HH:MM:SS.FFF'
+        
     end
     properties (SetAccess = private)
         % Optical camera class
@@ -270,6 +274,10 @@ classdef Model < handle
         function Truth = processTruthData(obj,truthFilename)
             % Read json truth file
             tmp = jsondecode(fileread(truthFilename));
+            
+            % extract date0
+            Truth.t0_datevec = datevec(tmp{1},obj.DateFormat);
+            tmp = tmp{2}; % reset tmp
             
             % extract timesteps
             Truth.t = [tmp.t];
