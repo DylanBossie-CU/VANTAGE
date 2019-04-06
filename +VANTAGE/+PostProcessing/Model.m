@@ -70,6 +70,8 @@ classdef Model < handle
             [~,finalImageIndex] = max(timestamps);
             [~,firstImageIndex] = min(timestamps);
             
+            [~,timestampIndices]= sort(timestamps);
+            
             BackgroundPixels = obj.Optical.FindBackground(direc(firstImageIndex));
             
             obj.Optical = obj.Optical.find100mPixel(direc(finalImageIndex),BackgroundPixels);
