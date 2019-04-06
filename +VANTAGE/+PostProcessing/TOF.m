@@ -308,8 +308,12 @@ classdef TOF
                 if numel(IsatsWithEnoughMeas) < length(CubeSats)
                     ItofUsedCentroids = setdiff(ItofFoundCentroids,IsatsWithEnoughMeas);
                     for ii = ItofUsedCentroids
+                        try
                         CubeSats(ii).centroids_VCF = [CubeSats(ii).centroids_VCF,centroid_VCF(:,ii)];
                         CubeSats(ii).time = [CubeSats(ii).time,CubeSats_TOF(ii).time];
+                        catch
+                            disp('boi wtf')
+                        end
                     end
                 end
                 % Obtain predicted point and outlierThresholds for each
