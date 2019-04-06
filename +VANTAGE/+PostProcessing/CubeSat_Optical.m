@@ -11,6 +11,9 @@ classdef CubeSat_Optical
         
         % Centroid pixel location
         centroid
+        
+        % Unit vector to centroid
+        unitvec
     end
     
     %% Methods
@@ -29,6 +32,7 @@ classdef CubeSat_Optical
             if nargin == 3
                 obj.tag = tag;
                 obj.centroid = centroid;
+                obj.unitvec = unitvec;
             end
         end
     end
