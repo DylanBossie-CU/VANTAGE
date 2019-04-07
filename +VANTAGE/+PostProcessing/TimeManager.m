@@ -7,15 +7,6 @@ classdef TimeManager
     %% Properties
     properties(Access = public)
         %
-        % struct containing data on converting between various time frames
-        TDATA
-        
-        % cell mapping frame names to indices in TDATA
-        nomen
-        
-        % maximum allowable number of nomen entries (number of defined frames)
-        maxNomen = 10
-        %
         % TOF Date Format
         TofDateFormat = 'yyyy_mm_dd_HH_MM_SS.FFF'
         
@@ -31,8 +22,6 @@ classdef TimeManager
         % Datevec corresponding to t=0s
         DatevecZero
     end
-    
-    
     
     %% Methods
     methods
@@ -126,6 +115,25 @@ classdef TimeManager
                     error('filetype must be ''TOF'' or ''Optical''')
                 end
                 t(i) = etime(dv,obj.DatevecZero);
+            end
+        end
+        
+        %
+        % Convert a vector of VANTAGE global times [s] to datestrings
+        %
+        % @param    t   length-n vector of VANTAGE global times [s]
+        %
+        % @return   length-n string array of associated date strings
+        %           formatted in TimeManager.VantageDateFormat
+        %
+        % @author   Joshua Kirby
+        % @date     07-Apr-2019
+        function [ds] = VantageTime2DateStr(obj,t)
+            ds = strings(size(t));
+            for i = 1:length(t)
+                dv    = obj.DatevecZero;
+                dv(6) = dv(6) + t(i);
+                ds(i) = string(datestr(dv,obj.VantageDateFormat));
             end
         end
     end
