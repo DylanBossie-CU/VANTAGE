@@ -68,7 +68,7 @@ classdef Model < handle
         %
         function obj = ComputeStateOutput(obj)
         	% Get directory of optical frames
-        	[didRead,direc,timestamps] = readInputFramesFromImages(obj.Optical);
+        	[didRead,direc,timestamps] = obj.Optical.readInputFramesFromImages(obj);
 
             [~,finalImageIndex] = max(timestamps);
             [~,firstImageIndex] = min(timestamps);

@@ -105,7 +105,7 @@ classdef Optical
         obj.PlotCubeSats = SensorData.PlotCubeSats;
         obj.RunOcclusion = SensorData.RunOcclusion;
         obj.CurrentFrameCount = 1;
-        obj.TestType = SensorData.TestType;
+        obj.TestType = ModelRef.Deployer.testScenario;
         
     end
 
@@ -120,9 +120,8 @@ classdef Optical
     % @author     Justin Fay
     % @date       10-Mar-2019
     %
-    function [didRead,direc,timing] = readInputFramesFromImages(obj)
+    function [didRead,direc,timing] = readInputFramesFromImages(obj,Model)
 
-        
         % Read data directory
         direc = dir(strcat(obj.DataDirec,obj.FileExtension));
         numFile = numel(direc);        
@@ -132,7 +131,15 @@ classdef Optical
             didRead = true;
         end
         
+        filenames = cell(numel(direc),1);
+        for i = 1:numel(direc)
+            filenames{i} = direc(i).name;
+        end
+        
+        timing = Model.TimeMan.VantageTime(filenames,'Optical');
+        
         % Convert filenames into seconds for ordered processing
+        %{
         timing = zeros(numFile,1);
         for i = 1:numFile
             filename = direc(i).name;
@@ -147,6 +154,7 @@ classdef Optical
             
             timing(i) = day+hour+minute+second+milli;
         end
+        %}
     end
 
 
@@ -177,7 +185,6 @@ classdef Optical
         % Process current frame
         [obj,isSystemCentroid] = obj.ImageProcessing(frame,BackgroundPixels);
             if isSystemCentroid == 'invalid'
-                UnitVecsVCF = [1 1 1];
                 UnitOriginVCF = [0 0 0];
                 timestamp = 1;
                 return
@@ -197,7 +204,7 @@ classdef Optical
     %
     %               Dylan Bossie
     % @date         17-Mar-2019
-    function [frame] = Cleanup100mData(obj,frame,background)
+    function [frame] = Cleanup100mData(~,frame,background)
         for i = 1:length(frame(:,1))
             for j = 1:length(frame(1,:))
                 if background(i,j) == 1
@@ -244,9 +251,7 @@ classdef Optical
             case '100m'
                 I_gray = obj.Cleanup100mData(frame,BackgroundPixels);
             case 'Modular'
-                I_gray;
             case 'Simulation'
-                I_gray;
         end
         
         % Adaptive Thresholding Binarization

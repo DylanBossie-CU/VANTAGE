@@ -1,5 +1,5 @@
 {
-	"TOFData": "Data/100m 3-25-19 Cropped TOF/ToF_Data/",
+	"TOFData": "Data/ModularTest_3_22/TOF/",
 	"OpticalFocalLength": 0.03649,
 	"OpticalPixelSize": 0.0000024,
 	"OpticalResolution": [3088,2076]

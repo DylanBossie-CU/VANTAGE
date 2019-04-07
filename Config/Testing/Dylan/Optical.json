@@ -1,7 +1,6 @@
 {
-	"OpticalData": "Data/3_25_100m/Test1/Temp/",
+	"OpticalData": "Data/ModularTest_3_22/Optical/",
 	"OpticalFileExtension": "VANTAGEOp*",
-	"TestType": "100m",
 	"DesiredFPS": 1,
 	"PlotBinarizedImages": true,
 	"PlotCentroids": true,
