@@ -7,15 +7,6 @@ classdef TimeManager
     %% Properties
     properties(Access = public)
         %
-        % struct containing data on converting between various time frames
-        TDATA
-        
-        % cell mapping frame names to indices in TDATA
-        nomen
-        
-        % maximum allowable number of nomen entries (number of defined frames)
-        maxNomen = 10
-        %
         % TOF Date Format
         TofDateFormat = 'yyyy_mm_dd_HH_MM_SS.FFF'
         
