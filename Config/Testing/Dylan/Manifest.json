@@ -24,5 +24,5 @@
 			}
 		],
     "TruthDataFile": "Data/ModularTest_3_22/newTruth.json",
-	"testScenario": "100m"
+	"testScenario": "Modular"
 }
