@@ -1152,7 +1152,7 @@ classdef TOF
             for i = 1:obj.ModelRef.Truth_VCF.numCubeSats
                 trueCentroids_VCF(i,:) = interp1(obj.ModelRef.Truth_VCF.t,...
                                                  obj.ModelRef.Truth_VCF.Cubesat(i).pos,...
-                                                 time);
+                                                 time,[],'extrap');
             end
             
             % Transform true centroids from VCF to TCF
