@@ -45,15 +45,12 @@ classdef Test_Fusion < matlab.unittest.TestCase
             
             fileLims = [1 inf];
             Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
-                Model.Deployer,'presentResults',1,'fileLims',fileLims,'showDebugPlots',0);
-            % Truth Data processing
-            %Truth = obj.processTruthData(truthFileName);
+                Model.Deployer,'presentResults',0,'fileLims',fileLims,'showDebugPlots',0);
             
+            % Process truth data
+            Truth = Model.Truth_VCF;
             
             Model.ComputeStateOutput();
-            
-            % Unit vector to VCF origin from CCF
-            UnitOriginVCF = Model.Deployer.GetCamOriginVCF;
         end
         
     end
