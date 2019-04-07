@@ -44,6 +44,7 @@ classdef Model < handle
             import VANTAGE.PostProcessing.TimeManager
 
         	% Construct child classes and process truth data
+            % NOTE: The order of these lines is very important
             obj.Deployer = Deployer(manifestFilename, strcat(configDirecName,'/Deployer.json'),obj);
             obj.Transform = Transform(strcat(configDirecName,'/Transform.json'));
             SensorData = jsondecode(fileread(strcat(configDirecName,'/Sensors.json')));
