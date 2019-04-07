@@ -64,7 +64,7 @@ classdef TimeManager
             dv0_truth = ModelRef.Truth_VCF.t0_datevec;
             offset_sec = etime(obj.DatevecZero,dv0_truth);
             if offset_sec < 0
-                error('Truth data starts after TOF data')
+                warning('Truth data starts after TOF data')
             end
             ModelRef.Truth_VCF.t = ModelRef.Truth_VCF.t - offset_sec;
             dv0_updated = dv0_truth;
