@@ -75,6 +75,18 @@ classdef TOF
             maxAllowableRange = obj.maxAllowableRange;
         end
         
+        % Returns the TOF weight given a predicted mean range of cubesats
+        %
+        % @param    predMeanRange   predicted mean range of CubeSats, m
+        %
+        % @return   current TOF weight for sensor fusion
+        %
+        % @author   Joshua Kirby
+        % @date     07-Apr-2019
+        function [sigmaTOF] = TofWeighting(~,predMeanRange)
+            sigmaTOF = interp1([10 100],[1,0.5],predMeanRange);
+        end
+        
         %% TOF Processing
         %
         % Performs all TOF processing for VANTAGE
