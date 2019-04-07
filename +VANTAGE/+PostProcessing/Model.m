@@ -110,7 +110,7 @@ classdef Model < handle
                     CubeSats = obj.Deployer.CubesatArray;
                     pos_TOF = cell(numel(CubeSats),1);
                     
-                    % pos_TOF: series of column vectors for propagated TOF
+                    % pos_TOF: cell array for propagated TOF
                     % CubeSat positions, (:,1) = CS1, (:,2) = CS2,...
                     for j = 1:numel(CubeSats)
                         pos_TOF{j} = CubeSats(j).evalTofFit(currentTime);
