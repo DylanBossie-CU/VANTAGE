@@ -70,16 +70,18 @@ classdef Model < handle
         	% Get directory of optical frames
         	[didRead,direc,timestamps] = readInputFramesFromImages(obj.Optical);
 
-            % Process last frame of optical data to find 100m pixel
-            % location
             [~,finalImageIndex] = max(timestamps);
             [~,firstImageIndex] = min(timestamps);
             
             [~,timestampIndices]= sort(timestamps);
             
+            % Find background pixels in first optical image for background
+            % subtraction
             BackgroundPixels = obj.Optical.FindBackground(direc(firstImageIndex));
             
-            obj.Optical = obj.Optical.find100mPixel(direc(finalImageIndex),BackgroundPixels);
+            % Find pixel location of CubeSats in last image for object
+            % association in optical data
+            obj.Optical = obj.Optical.findLastImagePixel(direc(finalImageIndex),BackgroundPixels);
             
             tic
         	if didRead
@@ -116,7 +118,7 @@ classdef Model < handle
                     
                     
 	        		% Run sensor fusion
-	        		[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF, sig_cam, sig_TOF);
+	        		%[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF, sig_cam, sig_TOF);
                     
                     obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
                 end
@@ -124,16 +126,6 @@ classdef Model < handle
 	        else
 	        	error(strcat('Unable to read optical data files from ', obj.Optical.DataDirec));
         	end
-        end
-        
-        % A method for synchronizing timestamps between the TOF and optical
-        % cameras.
-        %
-        % @param      sampleparameter sampledescription
-        %
-        % @return     samplereturn
-        function TimeStampSync(obj)
-            
         end
         
         %
