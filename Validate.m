@@ -18,7 +18,7 @@ classdef Validate
         % 
         % @author   Joshua Kirby
         % @date     19-Mar-2019
-        function obj = Validate(obj)
+        function obj = Validate()
             
         end
         
@@ -39,11 +39,11 @@ classdef Validate
             %testType = 'Simulation';
             testType = 'Modular';
             %testType = '100m';
-            tube = 6;
+            simtube = 6;
 
             %%% Filenames and Configurables
             if strcmpi(testType,'Simulation')
-                switch tube
+                switch simtube
                     case 1
                         configDirecName = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube1';
                         manifestFilename = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube1/Manifest_TOFdev.json';
@@ -64,14 +64,14 @@ classdef Validate
                 manifestFilename = 'Config/Testing/TOF/100m 3-25-19 Cropped TOF/Manifest.json';
                 SensorData = jsondecode(fileread('config/Testing/TOF/100m 3-25-19 Cropped TOF/Sensors.json'));
             else
-                error('this shouldn''t happen')
+                error('Invalid testType')
             end
 
             %%% Initialize VANTAGE Model
             Model = VANTAGE.PostProcessing.Model(manifestFilename,configDirecName);
 
             %%% Present Errors
-            obj.TOFpresentErrorsVsReqs(Model,SensorData,Model.Deployer.TruthFileName);
+            obj.TOFpresentErrorsVsReqs(Model,SensorData);
         end
         
         %% Validate Optical
@@ -113,14 +113,14 @@ classdef Validate
         %
         % @author   Joshua Kirby
         % @date     19-Mar-2019
-        function TOFpresentErrorsVsReqs(obj,Model,SensorData,truthFileName)
+        function TOFpresentErrorsVsReqs(~,Model,SensorData)
             % TOF Processing
             fileLims = [1 inf];
             %%%%%%%%%%%%%%%%%%%%%%%%%
             Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
                 Model.Deployer,'presentResults',1,'fileLims',fileLims,'showDebugPlots',0);
             % Truth Data processing
-            Truth = obj.processTruthData(truthFileName);
+            Truth = Model.Truth_VCF;
             %%%%%%%%%%%%%%%%%%%%%%%%%
             % Loop over cubesats
             %%% Absolute Error Plots
@@ -150,38 +150,6 @@ classdef Validate
             hold off
             %%% Errors vs requirements plot
             
-        end
-        
-        %
-        % Processes truth data
-        %
-        % @param    truthFilename   full filename of truth data JSON file
-        %
-        % @return   struct containing truth data for the current execution
-        %           of VANTAGE post processing
-        %
-        % @author   Joshua Kirby
-        % @date     03-Mar-2019
-        function Truth = processTruthData(~,truthFilename)
-            % Read json truth file
-            tmp = jsondecode(fileread(truthFilename));
-            % extract timesteps
-            Truth.t = [tmp.t];
-            % Order Cubesats [first-out to last-out]
-            cubesatNamesUnordered = fieldnames(tmp(1).pos);
-            for i = 1:length(cubesatNamesUnordered)
-                z(i) = tmp(1).pos.(cubesatNamesUnordered{i})(3);
-            end
-            [~,I] = sort(z,'descend');
-            cubesatNames = cubesatNamesUnordered(I);
-            % Extract cubesat position data in meters
-            for i = 1:length(cubesatNames)
-                for j = 1:length(tmp)
-                    Truth.Cubesat(i).pos(j,:) = tmp(j).pos.(cubesatNames{i})./100;
-                end
-            end
-            % Extract number cubesats
-            Truth.numCubeSats = length(cubesatNames);
         end
     end
     

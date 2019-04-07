@@ -63,6 +63,9 @@ classdef TimeManager
         function syncTruthData(obj,ModelRef)
             dv0_truth = ModelRef.Truth_VCF.t0_datevec;
             offset_sec = etime(obj.DatevecZero,dv0_truth);
+            if offset_sec < 0
+                error('Truth data starts after TOF data')
+            end
             ModelRef.Truth_VCF.t = ModelRef.Truth_VCF.t - offset_sec;
             dv0_updated = dv0_truth;
             dv0_updated(6) = dv0_truth(6) + offset_sec;
@@ -79,6 +82,7 @@ classdef TimeManager
         % @author   Joshua Kirby
         % @date     06-Apr-2019
         function [dv] = datevecFromTofFilename(obj,TOF_filename)
+            TOF_filename = char(TOF_filename);
             ds = TOF_filename(12:end-4);
             dv = datevec(ds,obj.TofDateFormat);
         end
@@ -93,12 +97,37 @@ classdef TimeManager
         % @author   Joshua Kirby
         % @date     06-Apr-2019
         function [dv] = datevecFromOpticalFilename(obj,Opt_filename)
+            Opt_filename = char(Opt_filename);
             ds = [Opt_filename(10:13),'_',Opt_filename(14:end-4)];
             dv = datevec(ds,obj.OpticalDateFormat);
         end
         
         %
-        % 
+        % Return time [s] in the global VANTAGE time frame given data
+        % filenames of a consistent type
+        %
+        % @param    filenames        length-n cell or string of TOF or Optical
+        %                           filenames
+        % @param    filetype        'TOF' or 'Optical'
+        %
+        % @return   global VANTAGE time vector [s]
+        %
+        % @author   Joshua Kirby
+        % @date     06-Apr-2019
+        function [t] = VantageTime(obj,filenames,filetype)
+            filenames = string(filenames);
+            t = zeros(length(filenames),1);
+            for i = 1:length(filenames)
+                if strcmpi(filetype,'TOF')
+                    dv = obj.datevecFromTofFilename(filenames(i));
+                elseif strcmpi(filetype,'Optical')
+                    dv = obj.datevecFromOpticalFilename(filenames(i));
+                else
+                    error('filetype must be ''TOF'' or ''Optical''')
+                end
+                t(i) = etime(dv,obj.DatevecZero);
+            end
+        end
     end
     
     

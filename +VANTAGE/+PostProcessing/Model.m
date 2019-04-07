@@ -46,12 +46,12 @@ classdef Model < handle
         	% Construct child classes and process truth data
             obj.Deployer = Deployer(manifestFilename, strcat(configDirecName,'/Deployer.json'),obj);
             obj.Transform = Transform(strcat(configDirecName,'/Transform.json'));
-            obj.Optical = Optical(obj,strcat(configDirecName,'/Optical.json'), obj.Deployer.GetNumCubesats());
-            obj.TOF = TOF(obj,strcat(configDirecName,'/TOF.json'));
             SensorData = jsondecode(fileread(strcat(configDirecName,'/Sensors.json')));
             obj.TimeMan = TimeManager(SensorData);
             obj.Truth_VCF = obj.processTruthData(obj.Deployer.TruthFileName);
             obj.TimeMan.syncTruthData(obj);
+            obj.Optical = Optical(obj,strcat(configDirecName,'/Optical.json'), obj.Deployer.GetNumCubesats());
+            obj.TOF = TOF(obj,strcat(configDirecName,'/TOF.json'));
             
             % Error catching
             if obj.Deployer.numCubesats ~= obj.Truth_VCF.numCubeSats
@@ -311,7 +311,14 @@ classdef Model < handle
             % Extract cubesat position data in meters
             for i = 1:length(cubesatNames)
                 for j = 1:length(tmp)
-                    Truth.Cubesat(i).pos(j,:) = tmp(j).pos.(cubesatNames{i})./100;
+                    Truth.Cubesat(i).pos(j,:) = tmp(j).pos.(cubesatNames{i});
+                end
+                if strcmpi(obj.Deployer.testScenario,'Simulation')
+                    Truth.Cubesat(i).pos = Truth.Cubesat(i).pos./100;
+                elseif strcmpi(obj.Deployer.testScenario,'100m') || strcmpi(obj.Deployer.testScenario,'Modular')
+                    % do nothing
+                else
+                    error('unhandled testScenario in Deployer object, must be ''100m'', ''Modular'', or ''Simulation''')
                 end
             end
             
