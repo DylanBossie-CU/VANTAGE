@@ -86,12 +86,12 @@ classdef Model < handle
             tic
         	if didRead
 	        	% Loop though optical frames
-	        	for i = 2:numel(direc)
-                    % Find current frame's index in timestamps
-                    %currentTime = find(timestampIndices==i);
-                    
+                for i = 2:numel(direc)
 	        		% Read frame
 	        		obj.Optical.Frame = direc(timestampIndices==i);
+                    
+                    % Get current time in VANTAGE global time [s]
+                    currentTime = obj.TimeMan.VantageTime(obj.Optical.Frame.name,'Optical');
 
 	        		% Run optical processing
 	        		[obj.Optical,CamOriginVCF, CamTimestamp, isSystemCentroid] =...
@@ -111,14 +111,11 @@ classdef Model < handle
                     pos_TOF = zeros(numel(CubeSats),1);
                     
                     for j = 1:numel(CubeSats)
-                        pos_TOF(j) = fsolve(@(t) norm(CubeSats(j).evalTofFit(t))-10,10);
+                        pos_TOF(j) = CubeSats(j).evalTofFit(currentTime);
                     end
 
-                    % Assign sensor fusion weights based on pos_TOF
-                    
-                    
 	        		% Run sensor fusion
-	        		%[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF);
+	        		[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF);
                     
                     obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
                 end
