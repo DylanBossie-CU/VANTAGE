@@ -118,7 +118,7 @@ classdef Model < handle
                     
                     
 	        		% Run sensor fusion
-	        		%[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF, sig_cam, sig_TOF);
+	        		%[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF);
                     
                     obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
                 end
@@ -160,22 +160,18 @@ classdef Model < handle
         %                               VCF
         % @param      pos_TOF           VCF position estimates from the TOF
         %                               sensor suite
-        % @param      sig_cam           uncertainty in camera estimates in the
-        %                               VCF
-        % @param      sig_TOF           uncertainty in the TOF estimates in the
-        %                               VCF
         %
         % @return     pos       position estimate of cubesat centroids in the VCF
         %             frame using both sensor method returns
         %
-        function [pos] = RunSensorFusion(obj, isSystemCentroid, camOrigin, camVecs, pos_TOF, sig_cam, sig_TOF)
+        function [pos] = RunSensorFusion(obj, isSystemCentroid, camOrigin, camVecs, pos_TOF)
 
         	% Initialize position cell array
         	numCubesats = obj.Deployer.GetNumCubesats();
-        	pos = cell{numCubesats,1};
+        	pos = cell(numCubesats,1);
 
         	% Perform sensor fusion
-        	if isSystemCentroid
+            if isSystemCentroid
 
         		% Find system centroid from TOF estimates
         		meanTOF = zeros(1,3);
@@ -185,7 +181,7 @@ classdef Model < handle
         		meanTOF = meanTOF./numCubesats;
 
         		% Run sensor fusion on system centroid estimates
-        		tmp = SensorFusion(obj, camOrigin, camVecs{1}, meanTOF, sig_cam, sig_TOF);
+        		tmp = SensorFusion(obj, camOrigin, camVecs{1}, meanTOF);
 
         		% Calculate adjustment vector
         		sensorFusionDiff = tmp-mean_TOF;
@@ -196,11 +192,10 @@ classdef Model < handle
         		end
         	else
         		% Loop through estimates individually and perform sensor fusion
-        		for i = 1:numCubesats
-        			pos{i} = SensorFusion(obj, camOrigin, camVecs{i}, pos_TOF{i}, sig_cam, sig_TOF);
-        		end
-    		end
-
+                for i = 1:numCubesats
+        			pos{i} = SensorFusion(obj, camOrigin, camVecs{i}, pos_TOF{i});
+                end
+            end
         end
         
         % A method for approximating a cubesat centroid using a weighted
@@ -211,13 +206,11 @@ classdef Model < handle
         % @param      camVec     vector pointing from camera origin to estimated
         %                        centroid in VCF
         % @param      pos_TOF    VCF position estimate from the TOF sensor suite
-        % @param      sig_cam    uncertainty in camera estimate in the VCF
-        % @param      sig_TOF    uncertainty in the TOF estimate in the VCF
         %
         % @return     pos       position estimate of cubesat centroid in the VCF
         %                       frame using both sensor method returns
         %
-        function [pos] = SensorFusion(obj, camOrigin, camVec, pos_TOF, sig_cam, sig_TOF)
+        function [pos] = SensorFusion(obj, camOrigin, camVec, pos_TOF)
             % Normalize camera vector
             camVec = camVec./norm(camVec);
 
@@ -229,6 +222,10 @@ classdef Model < handle
             
             % Calculate vector cross product
             vec = cross(a,b);
+            
+            % Calculate cam and TOF weights
+            sig_TOF = obj.TOF.TofWeighting(norm(pos_TOF));
+            sig_cam = obj.Optical.OpticalWeighting(norm(pos_TOF));
             
             % Calculate distance along line for weigthed center point
             d = norm(vec) / norm(a);

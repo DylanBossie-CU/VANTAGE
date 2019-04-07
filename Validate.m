@@ -149,7 +149,11 @@ classdef Validate
             legend(legendstrings,'location','eastoutside')
             hold off
             %%% Errors vs requirements plot
-            
+            err = [];
+            for i = 1:Truth.numCubeSats
+                err = [err Error.Cubesat(i).err'];
+            end
+            onesigmastd = quantile(err,normcdf(1)-normcdf(-1));
         end
     end
     
