@@ -108,10 +108,12 @@ classdef Model < handle
                     
                     % Get propogated TOF positions
                     CubeSats = obj.Deployer.CubesatArray;
-                    pos_TOF = zeros(numel(CubeSats),1);
+                    pos_TOF = cell(numel(CubeSats),1);
                     
+                    % pos_TOF: series of column vectors for propagated TOF
+                    % CubeSat positions, (:,1) = CS1, (:,2) = CS2,...
                     for j = 1:numel(CubeSats)
-                        pos_TOF(j) = CubeSats(j).evalTofFit(currentTime);
+                        pos_TOF{j} = CubeSats(j).evalTofFit(currentTime);
                     end
 
 	        		% Run sensor fusion
@@ -181,7 +183,7 @@ classdef Model < handle
         		tmp = SensorFusion(obj, camOrigin, camVecs{1}, meanTOF);
 
         		% Calculate adjustment vector
-        		sensorFusionDiff = tmp-mean_TOF;
+        		sensorFusionDiff = tmp-meanTOF;
 
         		% Adjust TOF vectors to find new centroids
         		for i = 1:numCubesats
