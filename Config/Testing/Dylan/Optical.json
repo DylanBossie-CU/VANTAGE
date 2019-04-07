@@ -6,7 +6,8 @@
 	"PlotCentroids": true,
 	"PlotHist": false,
 	"PlotAny": true,
-	"PlotCubeSats": true,
+	"PlotCubeSats": false,
+	"PlotIBoundaries": false,
 	"RunOcclusion": false,
 	"PerformDataCleaning": true,
 	"Clean100m": [

@@ -44,6 +44,8 @@ classdef Optical
     PlotAny
     
     PlotCubeSats
+    
+    PlotIBoundaries
 
     % Model handle class
     ModelRef
@@ -85,6 +87,8 @@ classdef Optical
     %
     % @return     A reference to an initialized CubeSat object
     %
+    % pos_TOF(j) = fsolve(@(t) norm(CubeSats(j).evalTofFit(t))-10,10);
+    % use this
     function obj = Optical(ModelRef, configFilename, numCubesats)
         import VANTAGE.PostProcessing.CubeSat_Optical
         obj.ModelRef = ModelRef;
@@ -194,7 +198,7 @@ classdef Optical
     %               Dylan Bossie
     % @date         17-Mar-2019
     function [obj,UnitOriginVCF,timestamp,...
-            isSystemCentroid] = OpticalProcessing(obj,image,BackgroundPixels)
+            isSystemCentroid] = OpticalProcessing(obj,image,BackgroundPixels,firstFrame)
         % Grab image
         frameTitle = image.name;
         frame = imread(strcat(obj.DataDirec,frameTitle));
@@ -542,7 +546,14 @@ classdef Optical
         
         %Set minimum size an object must meet relative to largest object to
         %be considered for processing
-        objectSizeThreshold = 0.05*max(objectSizes);
+        switch obj.TestType
+            case '100m'
+                objectSizeThreshold = 0.05*max(objectSizes);
+            case 'Modular'
+                objectSizeThreshold = 0.3*max(objectSizes);
+            case 'Simulation'
+                objectSizeThreshold = 0.05*max(objectSizes);
+        end
         for i = 1:numel(objectSizes)
             if objectSizes(i) < objectSizeThreshold
                 objectSizes(i) = 0;
@@ -565,16 +576,37 @@ classdef Optical
         weightedPixelLocX = sum(PixelLocationsX.*objectSizes)/sum(objectSizes);
         weightedPixelLocY = sum(PixelLocationsY.*objectSizes)/sum(objectSizes);
         
-        CubeSats = [];
-        for i = 1:numel(I_boundaries)
-            if boundaryCentroids(i,1) > weightedPixelLocX...
-                    && objectSizes(i) >= objectSizeThreshold...
-                    && boundaryCentroids(i,2) < weightedPixelLocY...
-                CubeSats = [CubeSats I_boundaries(i)];
+        if obj.PlotIBoundaries
+            figure
+            imshow(I_binarized)
+            hold on
+            for i = 1:numel(I_boundaries)
+                X = I_boundaries{i}(:,2);
+                Y = I_boundaries{i}(:,1);
+                plot(X,Y)
             end
         end
         
+        CubeSats = [];
+        switch obj.TestType
+            case '100m'
+                for i = 1:numel(I_boundaries)
+                    if boundaryCentroids(i,1) > weightedPixelLocX...
+                            && objectSizes(i) >= objectSizeThreshold...
+                            && boundaryCentroids(i,2) < weightedPixelLocY...
+                        CubeSats = [CubeSats I_boundaries(i)];
+                    end
+                end
+            case 'Modular'
+                for i = 1:numel(I_boundaries)
+                    if objectSizes(i) >= objectSizeThreshold
+                        CubeSats = [CubeSats I_boundaries(i)];
+                    end
+                end
+        end
+        
         if isempty(CubeSats)
+            rightmostLogic = true;
             potentialCubeSats = {};
             boundaryCentroids = [];
             for i = 1:numel(I_boundaries)
@@ -602,7 +634,7 @@ classdef Optical
             hold on
             for i = 1:length(CubeSats)
                 plot(CubeSats{i}(:,2),CubeSats{i}(:,1))
-                scatter(boundaryCentroids(i,1),boundaryCentroids(i,2))
+                %scatter(boundaryCentroids(i,1),boundaryCentroids(i,2))
             end
 %               for i = 1:length(I_boundaries)
 %                   if objectSizes(i) >= objectSizeThreshold
