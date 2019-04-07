@@ -111,7 +111,7 @@ classdef Model < handle
                     pos_TOF = zeros(numel(CubeSats),1);
                     
                     for j = 1:numel(CubeSats)
-                        pos_TOF(j) = fsolve(@(t) norm(CubeSats(j).evalTofFit(t))-10,10);
+                        pos_TOF(j) = CubeSats(j).evalTofFit(t);
                     end
 
                     % Assign sensor fusion weights based on pos_TOF
