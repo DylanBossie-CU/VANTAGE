@@ -77,25 +77,25 @@ classdef Model < handle
             
             % Find background pixels in first optical image for background
             % subtraction
-            BackgroundPixels = obj.Optical.FindBackground(direc(firstImageIndex));
+            [BackgroundPixels,firstFrame] = obj.Optical.FindBackground(direc(firstImageIndex));
             
             % Find pixel location of CubeSats in last image for object
             % association in optical data
-            obj.Optical = obj.Optical.findLastImagePixel(direc(finalImageIndex),BackgroundPixels);
+            obj.Optical = obj.Optical.findLastImagePixel(direc(finalImageIndex),BackgroundPixels,firstFrame);
             
             tic
         	if didRead
 	        	% Loop though optical frames
 	        	for i = 2:numel(direc)
                     % Find current frame's index in timestamps
-                    currentTime = find(timestampIndices==i);
+                    %currentTime = find(timestampIndices==i);
                     
 	        		% Read frame
-	        		obj.Optical.Frame = direc(currentTime);
+	        		obj.Optical.Frame = direc(timestampIndices==i);
 
 	        		% Run optical processing
 	        		[obj.Optical,CamOriginVCF, CamTimestamp, isSystemCentroid] =...
-                        obj.Optical.OpticalProcessing(obj.Optical.Frame,BackgroundPixels);
+                        obj.Optical.OpticalProcessing(obj.Optical.Frame,BackgroundPixels,firstFrame);
 
                     CamUnitVecsVCF = cell(numel(obj.Optical.CubeSats),1);
                     for j = 1:length(CamUnitVecsVCF)

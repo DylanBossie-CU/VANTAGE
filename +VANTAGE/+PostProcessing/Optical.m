@@ -62,6 +62,15 @@ classdef Optical
     
     % Type of test being evaluated
     TestType
+    
+    % Modular data region to clean
+    CleanModular
+    
+    % 100m data region to clean
+    Clean100m
+    
+    % Boolean for if data should be cleaned before processing
+    PerformDataCleaning
   end
   
   
@@ -107,6 +116,14 @@ classdef Optical
         obj.CurrentFrameCount = 1;
         obj.TestType = ModelRef.Deployer.testScenario;
         
+        switch obj.TestType
+            case '100m'
+                obj.Clean100m = SensorData.Clean100m;
+            case 'Modular'
+                obj.CleanModular = SensorData.CleanModular;
+        end
+        
+        obj.PerformDataCleaning = SensorData.PerformDataCleaning;
     end
 
     %% Read data directory
@@ -183,7 +200,7 @@ classdef Optical
         frame = imread(strcat(obj.DataDirec,frameTitle));
         
         % Process current frame
-        [obj,isSystemCentroid] = obj.ImageProcessing(frame,BackgroundPixels);
+        [obj,isSystemCentroid] = obj.ImageProcessing(frame,BackgroundPixels,firstFrame);
             if isSystemCentroid == 'invalid'
                 UnitOriginVCF = [0 0 0];
                 timestamp = 1;
@@ -198,19 +215,30 @@ classdef Optical
         timestamp = image.date;
     end
     
-    %% Perform 100m data cleanup
-    % Take data from 100m test and clean regions with background noise not
+    %% Perform data cleanup
+    % Take data from test and clean regions with background noise not
     % relevant to the test
     %
     %               Dylan Bossie
     % @date         17-Mar-2019
-    function [frame] = Cleanup100mData(~,frame,background)
-        for i = 1:length(frame(:,1))
-            for j = 1:length(frame(1,:))
-                if background(i,j) == 1
-                    frame(i,j) = 0;
+    function [frame] = CleanupData(obj,frame,background,firstFrame)
+        switch obj.TestType
+            case '100m'
+                for i = 1:length(frame(:,1))
+                    for j = 1:length(frame(1,:))
+                        if background(i,j) == 1
+                            frame(i,j) = 0;
+                        end
+                    end
                 end
-            end
+            case 'Modular'
+                for i=1:length(frame(:,1))
+                    for j=1:length(frame(1,:))
+                        if frame(i,j)<firstFrame(i,j)+50 && frame(i,j)>firstFrame(i,j)-50
+                            frame(i,j) = 0;
+                        end
+                    end
+                end
         end
     end
     
@@ -221,14 +249,21 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         31-Mar-2019
-    function [binarizedFrame] = FindBackground(obj,firstFrame)
+    function [binarizedFrame,frame] = FindBackground(obj,firstFrame)
         frameTitle = firstFrame.name;
 
         frame = imread(strcat(obj.DataDirec,frameTitle));
         
         % Binarize frame with low threshold to find noisy background
         % objects
-        binarizedFrame = imbinarize(frame,0.01);
+        switch obj.TestType
+            case '100m'
+                binarizedFrame = imbinarize(frame,0.01);
+            case 'Modular'
+                binarizedFrame = imbinarize(frame,1.0);
+            case 'Simulation'
+                binarizedFrame = imbinarize(frame,0.01);
+        end
     end
     
     %% Perform image processing
@@ -237,7 +272,7 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         24-Jan-2019
-    function [obj,isSystemCentroid] = ImageProcessing(obj,frame,BackgroundPixels)
+    function [obj,isSystemCentroid] = ImageProcessing(obj,frame,BackgroundPixels,firstFrame)
         I = frame;
         if size(I,3) > 1
             I_gray = rgb2gray(I);
@@ -249,8 +284,9 @@ classdef Optical
         testType = obj.TestType;
         switch testType
             case '100m'
-                I_gray = obj.Cleanup100mData(frame,BackgroundPixels);
+                I_gray = obj.CleanupData(frame,BackgroundPixels,firstFrame);
             case 'Modular'
+                I_gray = obj.CleanupData(frame,BackgroundPixels,firstFrame);
             case 'Simulation'
         end
         
@@ -437,14 +473,14 @@ classdef Optical
     %
     % @author       Dylan Bossie
     % @date         14-Feb-2019
-    function obj = findLastImagePixel(obj,imageFile,BackgroundPixels)
+    function obj = findLastImagePixel(obj,imageFile,BackgroundPixels,firstFrame)
          % Grab image
         frameTitle = imageFile.name;
         frame = imread(strcat(obj.DataDirec,frameTitle));
         
         % Process current frame
         obj.isInitialSearch = true;
-        [obj,~] = obj.ImageProcessing(frame,BackgroundPixels);
+        [obj,~] = obj.ImageProcessing(frame,BackgroundPixels,firstFrame);
         
         % Disable 100m pixel search
         obj.isInitialSearch = false;
@@ -950,7 +986,14 @@ classdef Optical
     %
     function I_binarized = Binarization(obj,I_gray)
         try
-            baseThreshold = 0.17;
+            switch obj.TestType
+                case '100m'
+                    baseThreshold = 0.17;
+                case 'Modular'
+                    baseThreshold = 0.08;
+                case 'Simulation'
+                    baseThreshold = 0.08;
+            end
             I_basebinarized = imbinarize(I_gray,baseThreshold);
 
             %Update I_gray with [0 0 0] for values below base threshold
@@ -962,8 +1005,8 @@ classdef Optical
                 end
             end
 
-            debugging = true;
-            if debugging == true
+            noAdaptive = true;
+            if noAdaptive == true
                 I_binarized = I_basebinarized;
                 return
             end
@@ -990,6 +1033,20 @@ classdef Optical
             I_binarized = 0;
             return
         end
+    end
+    
+    % Get desired weight for optical camera measurements based on current
+    % range
+    %
+    % @param      predRange            Predicted mean range of CubeSats
+    % @return     optWeight            Desired weight (0-1) of optical cam
+    %                                  for sensor fusion
+    %
+    % @author     Dylan Bossie
+    % @date       7-Apr-2019
+    %
+    function optWeight = OpticalWeighting(~,predRange)
+        optWeight = 1;
     end
 end
     
