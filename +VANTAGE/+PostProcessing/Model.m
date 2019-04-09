@@ -117,7 +117,7 @@ classdef Model < handle
                     end
 
 	        		% Run sensor fusion
-	        		[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF);
+	        		%[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF);
                     
                     obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
                 end

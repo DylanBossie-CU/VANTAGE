@@ -288,14 +288,14 @@ classdef Optical
         testType = obj.TestType;
         switch testType
             case '100m'
-                I_gray = obj.CleanupData(frame,BackgroundPixels,firstFrame);
+                I_gray_clean = obj.CleanupData(frame,BackgroundPixels,firstFrame);
             case 'Modular'
-                I_gray = obj.CleanupData(frame,BackgroundPixels,firstFrame);
+                I_gray_clean = obj.CleanupData(frame,BackgroundPixels,firstFrame);
             case 'Simulation'
         end
         
         % Adaptive Thresholding Binarization
-        I_binarized = obj.Binarization(I_gray);
+        I_binarized = obj.Binarization(I_gray_clean);
         if I_binarized == 0
             isSystemCentroid = 'invalid';
             return
@@ -411,7 +411,9 @@ classdef Optical
             text(centroids(1)+centroids(1)*.05,centroids(2)+...
                     centroids(2)*.05,'Calculated System Centroid','Color','r')
         end
-        saveas(gcf,[obj.DataDirec 'GrayscaleOut/' num2str(obj.CurrentFrameCount) '.jpg']);
+        %imwrite(gcf,[obj.DataDirec 'GrayscaleOut/' num2str(obj.CurrentFrameCount) '.jpg']);
+        outFile = [obj.DataDirec 'GrayscaleOut/' num2str(obj.CurrentFrameCount)];
+        export_fig(sprintf('%s',outFile),'-png');
     end
     
     
@@ -548,7 +550,7 @@ classdef Optical
         %be considered for processing
         switch obj.TestType
             case '100m'
-                objectSizeThreshold = 0.05*max(objectSizes);
+                objectSizeThreshold = 0.1*max(objectSizes);
             case 'Modular'
                 objectSizeThreshold = 0.3*max(objectSizes);
             case 'Simulation'

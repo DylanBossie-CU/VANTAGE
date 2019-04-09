@@ -10,6 +10,9 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function test100mData(testCase)
+            
+            addpath('./export-fig')
+            
             %%% Housekeeping and Allocation
             close all;
             rng(99);
