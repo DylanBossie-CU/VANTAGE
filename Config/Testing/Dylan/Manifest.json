@@ -23,10 +23,6 @@
 				"actualDims": [0.1,0.1,0.1225]
 			}
 		],
-<<<<<<< HEAD
     "TruthDataFile": "Data/100m 3-25-19 Cropped TOF/newTruth.json",
-=======
-    "TruthDataFile": "Data/03_25_19_100m_Test1/newTruth.json",
->>>>>>> 19389ffd208d8777f8cf7c2c2f733fe11b7efb1d
 	"testScenario": "100m"
 }

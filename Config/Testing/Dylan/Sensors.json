@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
 	"TOFData": "Data/100m 3-25-19 Cropped TOF/ToF_Data/",
-=======
-	"TOFData": "Data/03_25_19_100m_Test1/TOF/",
->>>>>>> 19389ffd208d8777f8cf7c2c2f733fe11b7efb1d
 	"OpticalFocalLength": 0.03649,
 	"OpticalPixelSize": 0.0000024,
 	"OpticalResolution": [3088,2076]
