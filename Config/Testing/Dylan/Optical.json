@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
 	"OpticalData": "Data/3_25_100m/Test1/Temp/",
+=======
+	"OpticalData": "Data/03_25_19_100m_Test1/Optical/",
+>>>>>>> 19389ffd208d8777f8cf7c2c2f733fe11b7efb1d
 	"OpticalFileExtension": "VANTAGEOp*",
 	"DesiredFPS": 1,
 	"PlotBinarizedImages": true,

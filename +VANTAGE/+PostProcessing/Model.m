@@ -66,7 +66,7 @@ classdef Model < handle
         % @param      obj   The object
         %
         %
-        function obj = ComputeStateOutput(obj)
+        function pos = ComputeStateOutput(obj)
         	% Get directory of optical frames
         	[didRead,direc,timestamps] = obj.Optical.readInputFramesFromImages(obj);
 
@@ -86,6 +86,7 @@ classdef Model < handle
             tic
         	if didRead
 	        	% Loop though optical frames
+                pos = cell(numel(direc)-1,obj.Deployer.GetNumCubesats());
                 for i = 2:numel(direc)
 	        		% Read frame
 	        		obj.Optical.Frame = direc(timestampIndices==i);
@@ -117,7 +118,7 @@ classdef Model < handle
                     end
 
 	        		% Run sensor fusion
-	        		%[pos] = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF);
+	        		pos(i-1,:) = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF)';
                     
                     obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
                 end
@@ -173,14 +174,14 @@ classdef Model < handle
             if isSystemCentroid
 
         		% Find system centroid from TOF estimates
-        		meanTOF = zeros(1,3);
+        		meanTOF = zeros(3,1);
         		for i = 1:numCubesats
         			meanTOF = meanTOF + pos_TOF{i};
         		end
         		meanTOF = meanTOF./numCubesats;
 
         		% Run sensor fusion on system centroid estimates
-        		tmp = SensorFusion(obj, camOrigin, camVecs{1}, meanTOF);
+        		tmp = SensorFusion(obj, camOrigin, camVecs{end}', meanTOF);
 
         		% Calculate adjustment vector
         		sensorFusionDiff = tmp-meanTOF;

@@ -411,7 +411,6 @@ classdef Optical
             text(centroids(1)+centroids(1)*.05,centroids(2)+...
                     centroids(2)*.05,'Calculated System Centroid','Color','r')
         end
-        %imwrite(gcf,[obj.DataDirec 'GrayscaleOut/' num2str(obj.CurrentFrameCount) '.jpg']);
         outFile = [obj.DataDirec 'GrayscaleOut/' num2str(obj.CurrentFrameCount)];
         export_fig(sprintf('%s',outFile),'-png');
     end
@@ -1080,7 +1079,7 @@ classdef Optical
     % @date       7-Apr-2019
     %
     function optWeight = OpticalWeighting(~,predRange)
-        optWeight = 1;
+        optWeight = 0;
     end
 end
     

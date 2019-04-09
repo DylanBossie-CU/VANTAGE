@@ -17,8 +17,8 @@ classdef Test_Fusion < matlab.unittest.TestCase
             close all;
             rng(99);
             %testType = 'Simulation';
-            testType = 'Modular';
-            %testType = '100m';
+            %testType = 'Modular';
+            testType = '100m';
             simtube = 6;
 
             %%% Filenames and Configurables
@@ -56,7 +56,14 @@ classdef Test_Fusion < matlab.unittest.TestCase
             % Process truth data
             Truth = Model.Truth_VCF;
             
-            Model.ComputeStateOutput();
+            pos = Model.ComputeStateOutput();
+            tmp = horzcat(pos{:,1})';
+            figure
+            plot3(tmp(:,1),tmp(:,2),tmp(:,3))
+            axis equal
+            zlabel('Z')
+            hold on
+            plot3(Truth.Cubesat(1).pos(:,1),Truth.Cubesat(1).pos(:,2),Truth.Cubesat(1).pos(:,3))
         end
         
     end
