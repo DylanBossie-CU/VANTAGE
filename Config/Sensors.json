@@ -1,7 +1,5 @@
 {
-	"OpticalData": "Data/OpticalData/",
-	"OpticalVideoInput": "TwoObjectsRender.mp4",
-	"TOFData": "Data/TOFData/",
+	"TOFData": "Data/ModularTest_3_22/TOF/",
 	"OpticalFocalLength": 0.03649,
 	"OpticalPixelSize": 0.0000024,
 	"OpticalResolution": [3088,2076]

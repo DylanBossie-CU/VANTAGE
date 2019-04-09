@@ -84,7 +84,11 @@ classdef TOF
         % @author   Joshua Kirby
         % @date     07-Apr-2019
         function [sigmaTOF] = TofWeighting(~,predMeanRange)
-            sigmaTOF = interp1([10 100],[1,0.5],predMeanRange);
+            if predMeanRange <= 10
+                sigmaTOF = 1;
+            else
+                sigmaTOF = interp1([10 100],[1,0.5],predMeanRange);
+            end
         end
         
         %% TOF Processing
