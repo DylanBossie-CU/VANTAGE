@@ -157,7 +157,15 @@ classdef Optical
             filenames{i} = direc(i).name;
         end
         
-        timing = Model.TimeMan.VantageTime(filenames,'Optical');
+        switch obj.TestType
+            case {'100m','Modular'}
+              timing = Model.TimeMan.VantageTime(filenames,'Optical');
+            case 'Simulation'
+                timing = zeros(numel(direc),1);
+                for i = 1:numel(direc)
+                    timing(i) = i;
+                end
+        end
         
         % Convert filenames into seconds for ordered processing
         %{
@@ -292,6 +300,7 @@ classdef Optical
             case 'Modular'
                 I_gray_clean = obj.CleanupData(frame,BackgroundPixels,firstFrame);
             case 'Simulation'
+                I_gray_clean = I_gray;
         end
         
         % Adaptive Thresholding Binarization
@@ -599,6 +608,12 @@ classdef Optical
                     end
                 end
             case 'Modular'
+                for i = 1:numel(I_boundaries)
+                    if objectSizes(i) >= objectSizeThreshold
+                        CubeSats = [CubeSats I_boundaries(i)];
+                    end
+                end
+            case 'Simulation'
                 for i = 1:numel(I_boundaries)
                     if objectSizes(i) >= objectSizeThreshold
                         CubeSats = [CubeSats I_boundaries(i)];

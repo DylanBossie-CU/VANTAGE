@@ -91,8 +91,12 @@ classdef Model < handle
 	        		% Read frame
 	        		obj.Optical.Frame = direc(timestampIndices==i);
                     
-                    % Get current time in VANTAGE global time [s]
-                    currentTime = obj.TimeMan.VantageTime(obj.Optical.Frame.name,'Optical');
+                    if obj.Optical.TestType ~= 'Simulation'
+                        % Get current time in VANTAGE global time [s]
+                        currentTime = obj.TimeMan.VantageTime(obj.Optical.Frame.name,'Optical');
+                    else
+                        currentTime = i;
+                    end
 
 	        		% Run optical processing
 	        		[obj.Optical,CamOriginVCF, CamTimestamp, isSystemCentroid] =...
@@ -113,13 +117,14 @@ classdef Model < handle
                     
                     % pos_TOF: cell array for propagated TOF
                     % CubeSat positions, (:,1) = CS1, (:,2) = CS2,...
+                    %{
                     for j = 1:numel(CubeSats)
                         pos_TOF{j} = CubeSats(j).evalTofFit(currentTime);
                     end
 
 	        		% Run sensor fusion
 	        		pos(i-1,:) = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF)';
-                    
+                    %}
                     obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
                 end
             toc

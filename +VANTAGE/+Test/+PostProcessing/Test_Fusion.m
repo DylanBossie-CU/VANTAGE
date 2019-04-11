@@ -57,6 +57,8 @@ classdef Test_Fusion < matlab.unittest.TestCase
             Truth = Model.Truth_VCF;
             
             pos = Model.ComputeStateOutput();
+            
+            if false
             tmp = horzcat(pos{:,1})';
             figure
             plot3(tmp(:,1),tmp(:,2),tmp(:,3))
@@ -64,6 +66,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             zlabel('Z')
             hold on
             plot3(Truth.Cubesat(1).pos(:,1),Truth.Cubesat(1).pos(:,2),Truth.Cubesat(1).pos(:,3))
+            end
         end
         
     end
