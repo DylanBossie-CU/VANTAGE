@@ -157,7 +157,15 @@ classdef Optical
             filenames{i} = direc(i).name;
         end
         
-        timing = Model.TimeMan.VantageTime(filenames,'Optical');
+        switch obj.TestType
+            case {'100m','Modular'}
+              timing = Model.TimeMan.VantageTime(filenames,'Optical');
+            case 'Simulation'
+                timing = zeros(numel(direc),1);
+                for i = 1:numel(direc)
+                    timing(i) = i;
+                end
+        end
         
         % Convert filenames into seconds for ordered processing
         %{
@@ -288,14 +296,15 @@ classdef Optical
         testType = obj.TestType;
         switch testType
             case '100m'
-                I_gray = obj.CleanupData(frame,BackgroundPixels,firstFrame);
+                I_gray_clean = obj.CleanupData(frame,BackgroundPixels,firstFrame);
             case 'Modular'
-                I_gray = obj.CleanupData(frame,BackgroundPixels,firstFrame);
+                I_gray_clean = obj.CleanupData(frame,BackgroundPixels,firstFrame);
             case 'Simulation'
+                I_gray_clean = I_gray;
         end
         
         % Adaptive Thresholding Binarization
-        I_binarized = obj.Binarization(I_gray);
+        I_binarized = obj.Binarization(I_gray_clean);
         if I_binarized == 0
             isSystemCentroid = 'invalid';
             return
@@ -411,9 +420,8 @@ classdef Optical
             text(centroids(1)+centroids(1)*.05,centroids(2)+...
                     centroids(2)*.05,'Calculated System Centroid','Color','r')
         end
-        warning('off','MATLAB:MKDIR:DirectoryExists')
-        mkdir([obj.DataDirec 'GrayscaleOut']);
-        saveas(gcf,[obj.DataDirec 'GrayscaleOut/' num2str(obj.CurrentFrameCount) '.jpg']);
+        outFile = [obj.DataDirec 'GrayscaleOut/' num2str(obj.CurrentFrameCount)];
+        export_fig(sprintf('%s',outFile),'-png');
     end
     
     
@@ -550,7 +558,7 @@ classdef Optical
         %be considered for processing
         switch obj.TestType
             case '100m'
-                objectSizeThreshold = 0.05*max(objectSizes);
+                objectSizeThreshold = 0.1*max(objectSizes);
             case 'Modular'
                 objectSizeThreshold = 0.3*max(objectSizes);
             case 'Simulation'
@@ -600,6 +608,12 @@ classdef Optical
                     end
                 end
             case 'Modular'
+                for i = 1:numel(I_boundaries)
+                    if objectSizes(i) >= objectSizeThreshold
+                        CubeSats = [CubeSats I_boundaries(i)];
+                    end
+                end
+            case 'Simulation'
                 for i = 1:numel(I_boundaries)
                     if objectSizes(i) >= objectSizeThreshold
                         CubeSats = [CubeSats I_boundaries(i)];

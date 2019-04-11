@@ -308,9 +308,11 @@ while ~done
             h = cross( [0,0,1], p );
             k = cross( p, h );
             
-            u = dot( [u,v,w], p.*ones( size( [u,v,w] ) ), 2 );
-            v = dot( [u,v,w], h.*ones( size( [u,v,w] ) ), 2 );
-            w = dot( [u,v,w], k.*ones( size( [u,v,w] ) ), 2 );
+            if strcmpi(type,'100m')
+                u = dot( [u,v,w], p.*ones( size( [u,v,w] ) ), 2 );
+                v = dot( [u,v,w], h.*ones( size( [u,v,w] ) ), 2 );
+                w = dot( [u,v,w], k.*ones( size( [u,v,w] ) ), 2 );
+            end
             
             p = dot( [x,y,z], p.*ones( size( [x,y,z] ) ), 2 );
             h = dot( [x,y,z], h.*ones( size( [x,y,z] ) ), 2 );

@@ -41,6 +41,9 @@ classdef Test_Optical < matlab.unittest.TestCase
         function test100mData(testCase)
             close all
             import VANTAGE.PostProcessing.*
+            
+            addpath('./export-fig')
+            
             manifestFilename = 'Config/Testing/Dylan/Manifest.json';
             Model = VANTAGE.PostProcessing.Model(manifestFilename,'./Config/Testing/Dylan');
             
