@@ -1,0 +1,21 @@
+{
+	"OpticalData": "Data/04_08_2019_modular/Test3/Optical/",
+	"OpticalFileExtension": "VANTAGEOp*",
+	"DesiredFPS": 1,
+	"PlotBinarizedImages": true,
+	"PlotCentroids": true,
+	"PlotHist": false,
+	"PlotAny": true,
+	"PlotCubeSats": false,
+	"PlotIBoundaries": false,
+	"RunOcclusion": false,
+	"PerformDataCleaning": true,
+	"Clean100m": [
+	  		{"bottomleft": [1271,1253], "topright": [1432, 1175]},
+	  		{"bottomleft": [0, 2076], "topright": [1111, 1070]},
+	  		{"bottomleft": [2141, 1308], "topright": [2454, 1135]}
+  	],
+  	"CleanModular":[
+  			{"bottomleft": [0,1118], "topright": [1445, 965]}
+  	]
+}

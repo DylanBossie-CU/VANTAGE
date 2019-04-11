@@ -74,6 +74,13 @@ classdef Model < handle
             [~,firstImageIndex] = min(timestamps);
             
             [~,timestampIndices]= sort(timestamps);
+            direc = direc(timestampIndices);
+            timestamps_VANTAGE = obj.TimeMan.VantageTime(vertcat({direc(:).name})','Optical');
+            
+            % Find time index right after TOF predicts the cubesats will be
+            % at 10m
+            t_10m = fsolve(@(t) norm(obj.Deployer.CubesatArray(1).evalTofFit(t)) - 10, 10 );
+            I_10m = find(timestamps_VANTAGE>t_10m,1,'first');
             
             % Find background pixels in first optical image for background
             % subtraction
@@ -85,42 +92,55 @@ classdef Model < handle
             
             tic
         	if didRead
-	        	% Loop though optical frames
-                pos = cell(numel(direc)-1,obj.Deployer.GetNumCubesats());
-                for i = 2:numel(direc)
-	        		% Read frame
-	        		obj.Optical.Frame = direc(timestampIndices==i);
-                    
-                    % Get current time in VANTAGE global time [s]
-                    currentTime = obj.TimeMan.VantageTime(obj.Optical.Frame.name,'Optical');
+                if ~isempty(I_10m)
+    	        	% Loop though optical frames
+                    n = numel(direc) - I_10m;
+                    pos = cell(n,obj.Deployer.GetNumCubesats());
+                    for i = 1:numel(direc)
+    	        		% Read frame
+    	        		obj.Optical.Frame = direc(i);
+                        
+                        % Get current time in VANTAGE global time [s]
+                        currentTime = timestamps_VANTAGE(i);
 
-	        		% Run optical processing
-	        		[obj.Optical,CamOriginVCF, CamTimestamp, isSystemCentroid] =...
-                        obj.Optical.OpticalProcessing(obj.Optical.Frame,BackgroundPixels,firstFrame);
+    	        		% Run optical processing
+    	        		[obj.Optical,CamOriginVCF, CamTimestamp, isSystemCentroid] =...
+                            obj.Optical.OpticalProcessing(obj.Optical.Frame,BackgroundPixels,firstFrame);
 
-                    CamUnitVecsVCF = cell(numel(obj.Optical.CubeSats),1);
-                    for j = 1:length(CamUnitVecsVCF)
-                        CamUnitVecsVCF{j} = obj.Optical.CubeSats{j}.unitvec;
-                    end
-                    
-                    if isSystemCentroid == 'invalid'
-                        continue
-                    end
-                    
-                    % Get propogated TOF positions
-                    CubeSats = obj.Deployer.CubesatArray;
-                    pos_TOF = cell(numel(CubeSats),1);
-                    
-                    % pos_TOF: cell array for propagated TOF
-                    % CubeSat positions, (:,1) = CS1, (:,2) = CS2,...
-                    for j = 1:numel(CubeSats)
-                        pos_TOF{j} = CubeSats(j).evalTofFit(currentTime);
-                    end
+                        CamUnitVecsVCF = cell(numel(obj.Optical.CubeSats),1);
+                        for j = 1:length(CamUnitVecsVCF)
+                            CamUnitVecsVCF{j} = obj.Optical.CubeSats{j}.unitvec;
+                        end
+                        
+                        if isSystemCentroid == 'invalid'
+                            continue
+                        end
+                        
+                        % Get propogated TOF positions
+                        CubeSats = obj.Deployer.CubesatArray;
+                        pos_TOF = cell(numel(CubeSats),1);
+                        
+                        % pos_TOF: cell array for propagated TOF
+                        % CubeSat positions, (:,1) = CS1, (:,2) = CS2,...
+                        for j = 1:numel(CubeSats)
+                            pos_TOF{j} = CubeSats(j).evalTofFit(currentTime);
+                        end
 
-	        		% Run sensor fusion
-	        		pos(i-1,:) = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF)';
-                    
-                    obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
+    	        		% Run sensor fusion
+    	        		pos(i-1,:) = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF)';
+                        
+                        obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
+                    end
+                else
+                    % Just extrapolate TOF data to 10m
+                    n = 100;
+                    pos = cell(n,obj.Deployer.GetNumCubesats());
+                    t = linspace(0,t_10m,n);
+                    for i = 1:n
+                        for j = 1:obj.Deployer.GetNumCubesats()
+                            pos{i,j} = obj.Deployer.CubesatArray(j).evalTofFit(t(i));
+                        end
+                    end
                 end
             toc
 	        else

@@ -260,12 +260,12 @@ classdef Optical
         
         % Binarize frame with low threshold to find noisy background
         % objects
-        switch obj.TestType
+        switch lower(obj.TestType)
             case '100m'
                 binarizedFrame = imbinarize(frame,0.01);
-            case 'Modular'
+            case 'modular'
                 binarizedFrame = imbinarize(frame,1.0);
-            case 'Simulation'
+            case 'simulation'
                 binarizedFrame = imbinarize(frame,0.01);
         end
     end
