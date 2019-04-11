@@ -10,14 +10,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
     end
     
     methods (Test)
-<<<<<<< HEAD
         function test100mData(obj)
-=======
-        function test100mData(testCase)
-            
-            addpath('./export-fig')
-            
->>>>>>> 74b18fd3fbb679d8fec560dc51812592d29a80cd
             %%% Housekeeping and Allocation
             close all;
             rng(99);
