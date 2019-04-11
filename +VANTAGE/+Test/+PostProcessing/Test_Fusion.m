@@ -54,13 +54,18 @@ classdef Test_Fusion < matlab.unittest.TestCase
             
             pos = Model.ComputeStateOutput();
             
-            if false
-            tmp = horzcat(pos{:,1})';
-            figure
-            plot3(tmp(:,1),tmp(:,2),tmp(:,3))
-            zlabel('Z')
-            hold on
-            plot3(Truth.Cubesat(1).pos(:,1),Truth.Cubesat(1).pos(:,2),Truth.Cubesat(1).pos(:,3))
+            if true
+                tmp = horzcat(pos{:,1})';
+                figure
+                plot3(tmp(:,1),tmp(:,2),tmp(:,3))
+                hold on
+                plot3(Truth.Cubesat(1).pos(:,1),Truth.Cubesat(1).pos(:,2),Truth.Cubesat(1).pos(:,3))
+                grid on
+                xlabel('X (m)')
+                ylabel('Y (m)')
+                zlabel('Z (m)')
+                legend('VANTAGE Estimated Trajectory','VICON Measured Trajectory')
+                title(sprintf('%s: Trajectory 3D',Model.Deployer.TruthFileName(1:end-11)),'Interpreter','none')
             end
         end
         
