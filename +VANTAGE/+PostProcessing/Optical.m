@@ -73,6 +73,12 @@ classdef Optical
     
     % Boolean for if data should be cleaned before processing
     PerformDataCleaning
+    
+    % Storage for relative timestamps for sensor fusion comparison
+    Timestamps
+    
+    % Range for starting optical processing
+    rangeStart = 10;
   end
   
   

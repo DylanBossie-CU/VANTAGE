@@ -1,6 +1,6 @@
 classdef Test_Fusion < matlab.unittest.TestCase
     properties
-        configDirecName = 'Config/Testing/Justin';
+        configDirecName = 'Config/Testing/Dylan';
     end
     
     methods (TestClassSetup)
@@ -18,6 +18,10 @@ classdef Test_Fusion < matlab.unittest.TestCase
             %testType = 'Modular';
             testType = 'Modular';
             simtube = 6;
+            
+            % Create validation class for validation methods
+            import Validate
+            Validation = Validate();
 
             %%% Filenames and Configurables
             if strcmpi(testType,'Simulation')
@@ -45,6 +49,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             
             Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName);
             
+            
             fileLims = [1 inf];
             Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
                 Model.Deployer,'presentResults',0,'fileLims',fileLims,'showDebugPlots',0);
@@ -52,16 +57,22 @@ classdef Test_Fusion < matlab.unittest.TestCase
             % Process truth data
             Truth = Model.Truth_VCF;
             
-            pos = Model.ComputeStateOutput();
+            % pos - cell array (n x 3) containing 3-D VCF positions of
+            % CubeSats over the full testing range:
+            % pos(:,i) - CubeSat_i from 0-z
+            [pos,t] = Model.ComputeStateOutput();
             
-            if false
-            tmp = horzcat(pos{:,1})';
-            figure
-            plot3(tmp(:,1),tmp(:,2),tmp(:,3))
-            zlabel('Z')
-            hold on
-            plot3(Truth.Cubesat(1).pos(:,1),Truth.Cubesat(1).pos(:,2),Truth.Cubesat(1).pos(:,3))
+            CubeSatFitted = cell(length(pos(1,:)),1);
+            TruthFitted = cell(length(pos(1,:)),1);
+            AbsoluteError = cell(length(pos(1,:)),1);
+            for i=1:length(pos(1,:))
+               CubeSatFitted{i} = Validation.fitCubeSatTraj(pos(:,i),t,'CS');
+               TruthFitted{i} = Validation.fitCubeSatTraj(Truth.Cubesat(i).pos,Model.Truth_VCF.t,'Truth');
+               
+               AbsoluteError{i} = Validation.ProcessError(CubeSatFitted{i},TruthFitted{i});
             end
+            
+            Validation.PlotResults(CubeSatFitted,TruthFitted,AbsoluteError);
         end
         
     end

@@ -66,7 +66,7 @@ classdef Model < handle
         % @param      obj   The object
         %
         %
-        function pos = ComputeStateOutput(obj)
+        function [pos,t] = ComputeStateOutput(obj)
         	% Get directory of optical frames
         	[didRead,direc,timestamps] = obj.Optical.readInputFramesFromImages(obj);
 
@@ -79,8 +79,15 @@ classdef Model < handle
             
             % Find time index right after TOF predicts the cubesats will be
             % at 10m
+            t_start = fsolve(@(t) norm(obj.Deployer.CubesatArray(1).evalTofFit(t)) - obj.Optical.rangeStart, obj.Optical.rangeStart);
+            I_start = find(timestamps_VANTAGE>t_start,1,'first');
             t_10m = fsolve(@(t) norm(obj.Deployer.CubesatArray(1).evalTofFit(t)) - 10, 10 );
             I_10m = find(timestamps_VANTAGE>t_10m,1,'first');
+            I_stop = numel(direc);
+            if strcmpi(obj.Deployer.testScenario,'Modular')
+                I_stop = I_10m-1;
+            end
+            
             
             % Find background pixels in first optical image for background
             % subtraction
@@ -89,14 +96,15 @@ classdef Model < handle
             % Find pixel location of CubeSats in last image for object
             % association in optical data
             obj.Optical = obj.Optical.findLastImagePixel(direc(finalImageIndex),BackgroundPixels,firstFrame);
+            obj.Optical.Timestamps = timestamps;
             
             tic
         	if didRead
-                if ~isempty(I_10m)
+                if ~isempty(I_start) && ~isempty(I_stop)
     	        	% Loop though optical frames
-                    n = numel(direc) - I_10m;
+                    n = numel(direc) - I_start;
                     pos = cell(n,obj.Deployer.GetNumCubesats());
-                    for i = 1:numel(direc)
+                    for i = I_start:I_stop
     	        		% Read frame
     	        		obj.Optical.Frame = direc(i);
                         

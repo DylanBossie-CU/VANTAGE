@@ -19,7 +19,6 @@ classdef Validate
         % @author   Joshua Kirby
         % @date     19-Mar-2019
         function obj = Validate()
-            
         end
         
         %% Validate TOF
@@ -96,10 +95,123 @@ classdef Validate
         %
         % @return 
         %
-        % @author   
-        % @date     
+        % @author 
+        % @date   
         function validateVantage(obj)
             
+        end
+        
+        %% Fit polynomial to CubeSat data
+        %
+        % Apply a linear fit to a CubeSat VCF XYZ input
+        % 
+        % @param        CubeSat         Cell array or array of X Y Z values
+        % @param        t               Timestamps
+        %
+        % @return       CubeSatFitted   Array of XYZ values fitted
+        %
+        % @author Dylan Bossie 
+        % @date   11-Apr-2019
+        function CubeSatFitted = fitCubeSatTraj(~,CubeSat,t,Type)
+            CS_X = zeros(length(CubeSat),1);
+            CS_Y = zeros(length(CubeSat),1);
+            CS_Z = zeros(length(CubeSat),1);
+            for i = 1:length(CubeSat)
+                if strcmpi(Type,'CS')
+                    tmp = CubeSat{i};
+                elseif strcmpi(Type,'Truth')
+                    tmp = CubeSat(i,:);
+                else
+                    error('No')
+                end
+                
+                CS_X(i) = tmp(1);
+                CS_Y(i) = tmp(2);
+                CS_Z(i) = tmp(3);
+            end
+            
+            XFit_CubeSat = polyfit(t',CS_X,1);
+            YFit_CubeSat = polyfit(t',CS_Y,1);
+            ZFit_CubeSat = polyfit(t',CS_Z,1);
+            
+            fitPoints = linspace(0,t(end),1000);
+            
+            CSFitted_X = polyval(XFit_CubeSat,fitPoints);
+            CSFitted_Y = polyval(YFit_CubeSat,fitPoints);
+            CSFitted_Z = polyval(ZFit_CubeSat,fitPoints);
+            
+            CubeSatFitted = [CSFitted_X; CSFitted_Y; CSFitted_Z]';
+        end
+        
+        %% Plot error
+        %
+        % Compute error between CubeSat and truth, plot results
+        % 
+        % @param    
+        %
+        % @return 
+        %
+        % @author Dylan Bossie 
+        % @date   11-Apr-2019
+        function Error = ProcessError(~, CubeSat, Truth)
+            XError = abs(CubeSat(:,1) - Truth(:,1));
+            YError = abs(CubeSat(:,2) - Truth(:,2));
+            ZError = abs(CubeSat(:,3) - Truth(:,3));
+            
+            ErrorVec = [XError YError ZError];
+            
+            Error = zeros(length(ErrorVec),1);
+            for i = 1:length(ErrorVec)
+                Error(i) = norm(ErrorVec(i,:))*100;
+            end
+            
+        end
+        
+        %% Plot results
+        %
+        % Plot final fitted results
+        % 
+        % @param        CubeSatFitted       Cell array of CubeSats with
+        %                               corresponding fitted measurements
+        % @param        TruthFitted         Cell array of truth data for
+        %                               corrresponding CubeSats
+        % @param        AbsoluteError       Distances between meas. and
+        %                                   truth values
+        %
+        % @return 
+        %
+        % @author Dylan Bossie
+        % @date   11-Apr-2019
+        function PlotResults(~,CubeSatFitted,TruthFitted,AbsoluteError)
+            %{
+            figure
+            hold on
+            plot(CubeSat(:,3))
+            plot(Truth(:,3))
+            legend('Measured Range (m)','True Range (m)','Location','SouthEast')
+            title('Downrange Distance of CubeSat Measured and True Values')
+            ylabel('Range (m)')
+            %}
+            
+            figure
+            hold on
+            title('Absolute Error between CubeSat Measurements and True Values')
+            ylabel('Error (cm)')
+            xlabel('Range (m)')
+            for i = 1:length(CubeSatFitted)
+                CubeSat = CubeSatFitted{i};
+                Error = AbsoluteError{i};
+                plot(CubeSat(:,3),Error)
+            end
+            
+            legendEntries = cell(length(CubeSatFitted)+1,1);
+            for i = 1:length(CubeSatFitted)
+                legendEntries{i} = strcat('CubeSat ',num2str(i),' Error');
+            end
+            legendEntries{end} = 'Error Requirement';
+            errorReq = zeros(length(CubeSat(:,3)),1) + 10;
+            plot(CubeSat(:,3),errorReq,'LineWidth',2,'Color',[0.7 0 0])
+            legend(legendEntries,'Location','NorthWest');
         end
     end
     %% Private methods
