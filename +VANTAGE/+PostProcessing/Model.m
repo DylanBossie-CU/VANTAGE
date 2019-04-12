@@ -82,10 +82,15 @@ classdef Model < handle
             t_start = fsolve(@(t) norm(obj.Deployer.CubesatArray(1).evalTofFit(t)) - obj.Optical.rangeStart, obj.Optical.rangeStart);
             I_start = find(timestamps_VANTAGE>t_start,1,'first');
             t_10m = fsolve(@(t) norm(obj.Deployer.CubesatArray(1).evalTofFit(t)) - 10, 10 );
-            I_10m = find(timestamps_VANTAGE>t_10m,1,'first');
+            I_10m = find(timestamps_VANTAGE>=t_10m,1,'first');
+            if isempty(I_10m)
+                I_10m = numel(direc);
+            end
             I_stop = numel(direc);
             if strcmpi(obj.Deployer.testScenario,'Modular')
                 I_stop = I_10m-1;
+%                 I_start = [];
+%                 I_stop = [];
             end
             
             
@@ -98,13 +103,12 @@ classdef Model < handle
             obj.Optical = obj.Optical.findLastImagePixel(direc(finalImageIndex),BackgroundPixels,firstFrame);
             obj.Optical.Timestamps = timestamps;
             
-            tic
         	if didRead
                 if ~isempty(I_start) && ~isempty(I_stop)
     	        	% Loop though optical frames
                     n = numel(direc) - I_start;
                     pos = cell(n,obj.Deployer.GetNumCubesats());
-                    
+                    posCount = 1;
                     for i = I_start:I_stop
     	        		% Read frame
     	        		obj.Optical.Frame = direc(i);
@@ -113,7 +117,7 @@ classdef Model < handle
                         currentTime = timestamps_VANTAGE(i);
 
     	        		% Run optical processing
-    	        		[obj.Optical,CamOriginVCF, CamTimestamp, isSystemCentroid] =...
+    	        		[obj.Optical,~, ~, isSystemCentroid] =...
                             obj.Optical.OpticalProcessing(obj.Optical.Frame,BackgroundPixels,firstFrame);
 
                         CamUnitVecsVCF = cell(numel(obj.Optical.CubeSats),1);
@@ -121,7 +125,7 @@ classdef Model < handle
                             CamUnitVecsVCF{j} = obj.Optical.CubeSats{j}.unitvec;
                         end
                         
-                        if isSystemCentroid == 'invalid'
+                        if strcmpi(isSystemCentroid,'invalid')
                             continue
                         end
                         
@@ -136,12 +140,17 @@ classdef Model < handle
                         end
 
     	        		% Run sensor fusion
-    	        		pos(i,:) = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF)';
+    	        		pos(posCount,:) = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF)';
+                        t(posCount) = currentTime;
+                        posCount = posCount + 1;
                         %plot3(pos{i,1}(1),pos{i,1}(2),pos{i,1}(3),'*r')
                         %drawnow
                         %hold on
                         obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
                     end
+                    pos = pos(1:(I_stop-I_start)+1,1:3);
+                    
+                    obj.CombineResults(pos,t);
                 else
                     % Just extrapolate TOF data to 10m
                     n = 100;
@@ -152,11 +161,42 @@ classdef Model < handle
                             pos{i,j} = obj.Deployer.CubesatArray(j).evalTofFit(t(i));
                         end
                     end
+                    
+                    for i = 1:obj.Deployer.numCubesats
+                        obj.Deployer.CubesatArray(i).centroids_VCF = pos(:,i);
+                        obj.Deployer.CubesatArray(i).time = t;
+                    end
                 end
-            toc
+
 	        else
 	        	error(strcat('Unable to read optical data files from ', obj.Optical.DataDirec));
         	end
+        end
+        
+        % Combine results from ComputeStateOutput and TOF processing
+        %
+        %
+        % @return   obj             Updated object with centroids_VCF and
+        %                           time parameters
+        % @author   Dylan Bossie
+        % @date     11-Apr-2019
+        function [obj] = CombineResults(obj,pos,t)
+            CubeSats = obj.Deployer.CubesatArray;
+            
+            for i = 1:length(CubeSats)
+                CubeSat_i = pos(:,i);
+                positions = CubeSats(i).centroids_VCF;
+                posCellArray = cell(length(positions),1);
+                
+                for j = 1:length(positions)
+                    posCellArray{j} = positions(:,j);
+                end
+                
+                CubeSat_i_comb = [posCellArray; CubeSat_i];
+                t_comb = [obj.Deployer.CubesatArray(i).time t];
+                obj.Deployer.CubesatArray(i).centroids_VCF = CubeSat_i_comb;
+                obj.Deployer.CubesatArray(i).time = t_comb;
+            end
         end
         
         %
@@ -286,7 +326,7 @@ classdef Model < handle
         %
         % @return     { description_of_the_return_value }
         %
-        function PredictionModel(obj)
+        function PredictionModel(~)
             
         end
         
@@ -295,7 +335,7 @@ classdef Model < handle
         % @param      sampleparameter sampledescription
         %
         % @return     samplereturn
-        function OutputStateVector(obj)
+        function OutputStateVector(~)
             
         end
         
@@ -326,6 +366,7 @@ classdef Model < handle
             
             % Order Cubesats [first-out to last-out]
             cubesatNamesUnordered = fieldnames(tmp(1).pos);
+            z = zeros(length(cubesatNamesUnordered),1);
             for i = 1:length(cubesatNamesUnordered)
                 z(i) = tmp(1).pos.(cubesatNamesUnordered{i})(3);
             end

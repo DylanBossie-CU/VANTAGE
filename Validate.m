@@ -182,16 +182,38 @@ classdef Validate
         %
         % @author Dylan Bossie
         % @date   11-Apr-2019
-        function PlotResults(~,CubeSatFitted,TruthFitted,AbsoluteError)
-            %{
+        function PlotResults(obj,CubeSatFitted,TruthFitted,AbsoluteError)
+            
             figure
             hold on
-            plot(CubeSat(:,3))
-            plot(Truth(:,3))
+            plot(CubeSatFitted{1}(:,3))
+            plot(TruthFitted{1}(:,3))
             legend('Measured Range (m)','True Range (m)','Location','SouthEast')
-            title('Downrange Distance of CubeSat Measured and True Values')
+            title('Downrange Distance of CubeSat Measured and True Values - Fusion')
             ylabel('Range (m)')
-            %}
+            outFile = [pwd '/Data/ErrorOut/CubeSat1_DownrangeErrorFusion'];
+            export_fig(sprintf('%s',outFile),'-png');
+            
+            figure
+            hold on
+            plot(CubeSatFitted{1}(:,1))
+            plot(TruthFitted{1}(:,1))
+            legend('Measured Horizontal (m)','True Horizontal (m)','Location','SouthEast')
+            title('Horizontal Distance of CubeSat Measured and True Values - Fusion')
+            ylabel('Range (m)')
+            outFile = [pwd '/Data/ErrorOut/CubeSat1_HorizontalErrorFusion'];
+            export_fig(sprintf('%s',outFile),'-png');
+            
+            figure
+            hold on
+            plot(CubeSatFitted{1}(:,2))
+            plot(TruthFitted{1}(:,2))
+            legend('Measured Vertical (m)','True Vertical (m)','Location','SouthEast')
+            title('Vertical Distance of CubeSat Measured and True Values - Fusion')
+            ylabel('Range (m)')
+            outFile = [pwd '/Data/ErrorOut/CubeSat1_VerticalErrorFusion'];
+            export_fig(sprintf('%s',outFile),'-png');
+            
             
             figure
             hold on
@@ -209,8 +231,9 @@ classdef Validate
                 legendEntries{i} = strcat('CubeSat ',num2str(i),' Error');
             end
             legendEntries{end} = 'Error Requirement';
-            errorReq = zeros(length(CubeSat(:,3)),1) + 10;
-            plot(CubeSat(:,3),errorReq,'LineWidth',2,'Color',[0.7 0 0])
+            errorReq = zeros(50,1) + 10;
+            errorReq_X = linspace(1,10,50);
+            plot(errorReq_X,errorReq,'LineWidth',2,'Color',[0.7 0 0])
             legend(legendEntries,'Location','NorthWest');
         end
     end

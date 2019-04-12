@@ -62,11 +62,12 @@ classdef Test_Fusion < matlab.unittest.TestCase
             % pos(:,i) - CubeSat_i from 0-z
             [pos,t] = Model.ComputeStateOutput();
             
-            CubeSatFitted = cell(length(pos(1,:)),1);
-            TruthFitted = cell(length(pos(1,:)),1);
-            AbsoluteError = cell(length(pos(1,:)),1);
-            for i=1:length(pos(1,:))
-               CubeSatFitted{i} = Validation.fitCubeSatTraj(pos(:,i),t,'CS');
+            CubeSatFitted = cell(Model.Deployer.numCubesats,1);
+            TruthFitted = cell(Model.Deployer.numCubesats,1);
+            AbsoluteError = cell(Model.Deployer.numCubesats,1);
+            for i=1:Model.Deployer.numCubesats
+               CubeSat = Model.Deployer.CubesatArray(i);
+               CubeSatFitted{i} = Validation.fitCubeSatTraj(CubeSat.centroids_VCF,CubeSat.time,'CS');
                TruthFitted{i} = Validation.fitCubeSatTraj(Truth.Cubesat(i).pos,Model.Truth_VCF.t,'Truth');
                
                AbsoluteError{i} = Validation.ProcessError(CubeSatFitted{i},TruthFitted{i});
