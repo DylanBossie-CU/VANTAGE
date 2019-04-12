@@ -1,6 +1,6 @@
 classdef Test_Fusion < matlab.unittest.TestCase
     properties
-        configDirecName = 'Config/Testing/Justin';
+        configDirecName = 'Config/Testing/Dylan';
     end
     
     methods (TestClassSetup)
@@ -18,6 +18,10 @@ classdef Test_Fusion < matlab.unittest.TestCase
             %testType = 'Modular';
             testType = 'Modular';
             simtube = 6;
+            
+            % Create validation class for validation methods
+            import Validate
+            Validation = Validate();
 
             %%% Filenames and Configurables
             if strcmpi(testType,'Simulation')
@@ -45,6 +49,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             
             Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName);
             
+            
             fileLims = [1 inf];
             Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
                 Model.Deployer,'presentResults',0,'fileLims',fileLims,'showDebugPlots',0);
@@ -52,10 +57,24 @@ classdef Test_Fusion < matlab.unittest.TestCase
             % Process truth data
             Truth = Model.Truth_VCF;
             
-            pos = Model.ComputeStateOutput();
+            % pos - cell array (n x 3) containing 3-D VCF positions of
+            % CubeSats over the full testing range:
+            % pos(:,i) - CubeSat_i from 0-z
+            [pos,t] = Model.ComputeStateOutput();
             
-            if true
-                tmp = horzcat(pos{:,1}(:,1))';
+            CubeSatFitted = cell(Model.Deployer.numCubesats,1);
+            TruthFitted = cell(Model.Deployer.numCubesats,1);
+            AbsoluteError = cell(Model.Deployer.numCubesats,1);
+            for i=1:Model.Deployer.numCubesats
+               CubeSat = Model.Deployer.CubesatArray(i);
+               CubeSatFitted{i} = Validation.fitCubeSatTraj(CubeSat.centroids_VCF,CubeSat.time,'CS');
+               TruthFitted{i} = Validation.fitCubeSatTraj(Truth.Cubesat(i).pos,Model.Truth_VCF.t,'Truth');
+               
+               AbsoluteError{i} = Validation.ProcessError(CubeSatFitted{i},TruthFitted{i});
+            end
+            
+            if false
+                tmp = horzcat(pos{:,1})';
                 figure
                 plot3(tmp(:,1),tmp(:,2),tmp(:,3))
                 hold on
@@ -67,6 +86,8 @@ classdef Test_Fusion < matlab.unittest.TestCase
                 legend('VANTAGE Estimated Trajectory','VICON Measured Trajectory')
                 title(sprintf('%s: Trajectory 3D',Model.Deployer.TruthFileName(1:end-11)),'Interpreter','none')
             end
+            
+            Validation.PlotResults(CubeSatFitted,TruthFitted,AbsoluteError);
         end
         
     end
