@@ -426,6 +426,8 @@ classdef Optical
             text(centroids(1)+centroids(1)*.05,centroids(2)+...
                     centroids(2)*.05,'Calculated System Centroid','Color','r')
         end
+        warning('off','MATLAB:MKDIR:DirectoryExists');
+        mkdir(strcat(obj.DataDirec,'/GrayscaleOut'))
         outFile = [obj.DataDirec 'GrayscaleOut/' num2str(obj.CurrentFrameCount)];
         export_fig(sprintf('%s',outFile),'-png');
     end

@@ -104,6 +104,7 @@ classdef Model < handle
     	        	% Loop though optical frames
                     n = numel(direc) - I_start;
                     pos = cell(n,obj.Deployer.GetNumCubesats());
+                    
                     for i = I_start:I_stop
     	        		% Read frame
     	        		obj.Optical.Frame = direc(i);
@@ -135,8 +136,10 @@ classdef Model < handle
                         end
 
     	        		% Run sensor fusion
-    	        		pos(i-1,:) = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF)';
-                        
+    	        		pos(i,:) = RunSensorFusion(obj, isSystemCentroid, obj.Deployer.GetCamOriginVCF(), CamUnitVecsVCF, pos_TOF)';
+                        %plot3(pos{i,1}(1),pos{i,1}(2),pos{i,1}(3),'*r')
+                        %drawnow
+                        %hold on
                         obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
                     end
                 else
@@ -197,6 +200,9 @@ classdef Model < handle
         	% Initialize position cell array
         	numCubesats = obj.Deployer.GetNumCubesats();
         	pos = cell(numCubesats,1);
+            
+            if numel(camVecs)>1
+            end
 
         	% Perform sensor fusion
             if isSystemCentroid
