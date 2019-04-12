@@ -55,7 +55,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             pos = Model.ComputeStateOutput();
             
             if true
-                tmp = horzcat(pos{:,1})';
+                tmp = horzcat(pos{:,1}(:,1))';
                 figure
                 plot3(tmp(:,1),tmp(:,2),tmp(:,3))
                 hold on
