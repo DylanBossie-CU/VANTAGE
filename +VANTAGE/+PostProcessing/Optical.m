@@ -93,8 +93,6 @@ classdef Optical
     %
     % @return     A reference to an initialized CubeSat object
     %
-    % pos_TOF(j) = fsolve(@(t) norm(CubeSats(j).evalTofFit(t))-10,10);
-    % use this
     function obj = Optical(ModelRef, configFilename, numCubesats)
         import VANTAGE.PostProcessing.CubeSat_Optical
         obj.ModelRef = ModelRef;

@@ -148,11 +148,11 @@ classdef Model < handle
                         %hold on
                         obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
                     end
-                    if strcmpi(obj.Deployer.testScenario,'100m')
-                        pos = pos(1:(I_stop-I_start),1:3);
-                    else
-                        pos = pos(1:(I_stop-I_start)+1,1:3);
-                    end
+                    %if strcmpi(obj.Deployer.testScenario,'100m')
+                    %    pos = pos(1:(I_stop-I_start),1:3);
+                    %else
+                    %    pos = pos(1:(I_stop-I_start)+1,1:3);
+                    %end
                     
                     obj.CombineResults(pos,t);
                 else

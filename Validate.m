@@ -36,8 +36,8 @@ classdef Validate
             close all;
             rng(99);
             %testType = 'Simulation';
-            testType = 'Modular';
-            %testType = '100m';
+            %testType = 'Modular';
+            testType = '100m';
             simtube = 6;
 
             %%% Filenames and Configurables
@@ -239,6 +239,8 @@ classdef Validate
             errorReq_X = linspace(1,10,50);
             plot(errorReq_X,errorReq,'LineWidth',2,'Color',[0.7 0 0])
             legend(legendEntries,'Location','NorthWest');
+            outFile = [pwd '/Data/ErrorOut/CubeSat1_FullErrorFusion'];
+            export_fig(sprintf('%s',outFile),'-png');
         end
     end
     %% Private methods

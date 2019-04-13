@@ -23,6 +23,6 @@
 				"actualDims": [0.1,0.1,0.1225]
 			}
 		],
-    "TruthDataFile": "Data/3_25_100m/Test6/truth.json",
-	"testScenario": "100m"
+    "TruthDataFile": "Data/ModularTest_4_9/Test18/truth.json",
+	"testScenario": "Modular"
 }

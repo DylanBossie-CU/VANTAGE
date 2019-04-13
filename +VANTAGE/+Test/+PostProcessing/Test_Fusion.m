@@ -1,6 +1,6 @@
 classdef Test_Fusion < matlab.unittest.TestCase
     properties
-        configDirecName = 'Config/Testing/Justin';
+        configDirecName = 'Config/Testing/Dylan';
     end
     
     methods (TestClassSetup)
@@ -16,7 +16,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             rng(99);
             %testType = 'Simulation';
             %testType = 'Modular';
-            testType = '100m';
+            testType = 'Modular';
             simtube = 6;
             
             % Create validation class for validation methods
