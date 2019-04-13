@@ -1,6 +1,6 @@
 classdef Test_Fusion < matlab.unittest.TestCase
     properties
-        configDirecName = 'Config/Testing/Dylan';
+        configDirecName = 'Config/Testing/Justin';
     end
     
     methods (TestClassSetup)
