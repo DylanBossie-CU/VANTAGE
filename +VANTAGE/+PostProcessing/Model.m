@@ -124,7 +124,7 @@ classdef Model < handle
                         for j = 1:length(CamUnitVecsVCF)
                             CamUnitVecsVCF{j} = obj.Optical.CubeSats{j}.unitvec;
                         end
-                        
+
                         if strcmpi(isSystemCentroid,'invalid')
                             continue
                         end

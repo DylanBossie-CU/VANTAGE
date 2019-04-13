@@ -172,24 +172,6 @@ classdef Optical
                     timing(i) = i;
                 end
         end
-        
-        % Convert filenames into seconds for ordered processing
-        %{
-        timing = zeros(numFile,1);
-        for i = 1:numFile
-            filename = direc(i).name;
-            splitname = strsplit(filename,'_');
-            day = str2num(splitname{2})*24*60*60;
-            hour = str2num(splitname{3})*60*60;
-            minute = str2num(splitname{4})*60;
-            second = str2num(splitname{5});
-            
-            fileSuffix = strsplit(splitname{6},'.');
-            milli = str2num(strcat(['.',fileSuffix{1}]));
-            
-            timing(i) = day+hour+minute+second+milli;
-        end
-        %}
     end
 
 
