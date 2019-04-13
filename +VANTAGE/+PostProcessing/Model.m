@@ -66,7 +66,7 @@ classdef Model < handle
         % @param      obj   The object
         %
         %
-        function [pos,t] = ComputeStateOutput(obj)
+        function [] = ComputeStateOutput(obj)
         	% Get directory of optical frames
         	[didRead,direc,timestamps] = obj.Optical.readInputFramesFromImages(obj);
 
@@ -148,7 +148,11 @@ classdef Model < handle
                         %hold on
                         obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
                     end
-                    pos = pos(1:(I_stop-I_start),1:3);
+                    if strcmpi(obj.Deployer.testScenario,'100m')
+                        pos = pos(1:(I_stop-I_start),1:3);
+                    else
+                        pos = pos(1:(I_stop-I_start)+1,1:3);
+                    end
                     
                     obj.CombineResults(pos,t);
                 else

@@ -16,7 +16,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             rng(99);
             %testType = 'Simulation';
             %testType = 'Modular';
-            testType = 'Modular';
+            testType = '100m';
             simtube = 6;
             
             % Create validation class for validation methods
@@ -57,10 +57,8 @@ classdef Test_Fusion < matlab.unittest.TestCase
             % Process truth data
             Truth = Model.Truth_VCF;
             
-            % pos - cell array (n x 3) containing 3-D VCF positions of
-            % CubeSats over the full testing range:
-            % pos(:,i) - CubeSat_i from 0-z
-            [pos,t] = Model.ComputeStateOutput();
+            % Compute results
+            Model.ComputeStateOutput();
             
             CubeSatFitted = cell(Model.Deployer.numCubesats,1);
             TruthFitted = cell(Model.Deployer.numCubesats,1);
