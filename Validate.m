@@ -112,7 +112,7 @@ classdef Validate
         %
         % @author Dylan Bossie 
         % @date   11-Apr-2019
-        function CubeSatFitted = fitCubeSatTraj(~,CubeSat,t,Type)
+        function CubeSatFitted = fitCubeSatTraj(~,CubeSat,t,Type,data_t)
             CS_X = zeros(length(CubeSat),1);
             CS_Y = zeros(length(CubeSat),1);
             CS_Z = zeros(length(CubeSat),1);
@@ -138,7 +138,7 @@ classdef Validate
             YFit_CubeSat = polyfit(t,CS_Y,1);
             ZFit_CubeSat = polyfit(t,CS_Z,1);
             
-            fitPoints = linspace(0,t(end),1000);
+            fitPoints = linspace(0,data_t,1000);
             
             CSFitted_X = polyval(XFit_CubeSat,fitPoints);
             CSFitted_Y = polyval(YFit_CubeSat,fitPoints);

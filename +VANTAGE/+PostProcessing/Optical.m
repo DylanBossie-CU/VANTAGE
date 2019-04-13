@@ -78,7 +78,7 @@ classdef Optical
     Timestamps
     
     % Range for starting optical processing
-    rangeStart = 3;
+    rangeStart = 4;
   end
   
   
