@@ -1,6 +1,6 @@
 classdef Test_Fusion < matlab.unittest.TestCase
     properties
-        configDirecName = 'Config/Testing/Dylan';
+        configDirecName = 'Config/Testing/Justin';
     end
     
     methods (TestClassSetup)
@@ -65,11 +65,14 @@ classdef Test_Fusion < matlab.unittest.TestCase
             CubeSatFitted = cell(Model.Deployer.numCubesats,1);
             TruthFitted = cell(Model.Deployer.numCubesats,1);
             AbsoluteError = cell(Model.Deployer.numCubesats,1);
+            
+            data_t = Model.Deployer.CubesatArray(1).time(end);
+            t_fit = linspace(0,data_t);
             for i=1:Model.Deployer.numCubesats
                CubeSat = Model.Deployer.CubesatArray(i);
-               data_t = CubeSat.time(end);
-               CubeSatFitted{i} = Validation.fitCubeSatTraj(CubeSat.centroids_VCF,CubeSat.time,'CS',data_t,Model);
-               TruthFitted{i} = Validation.fitCubeSatTraj(Truth.Cubesat(i).pos,Model.Truth_VCF.t,'Truth',data_t,Model);
+               CubeSatFitted{i} = Validation.fitCubeSatTraj(CubeSat.centroids_VCF,CubeSat.time,'CS',t_fit,Model);
+               TruthFitted{i} = interp1(Model.Truth_VCF.t,Truth.Cubesat(i).pos,t_fit,'linear');
+               %TruthFitted{i} = Validation.fitCubeSatTraj(Truth.Cubesat(i).pos,Model.Truth_VCF.t,'Truth',t_fit,Model);
                
                AbsoluteError{i} = Validation.ProcessError(CubeSatFitted{i},TruthFitted{i});
             end
@@ -88,7 +91,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
                 title(sprintf('%s: Trajectory 3D',Model.Deployer.TruthFileName(1:end-11)),'Interpreter','none')
             end
             
-            Validation.PlotResults(CubeSatFitted,TruthFitted,AbsoluteError);
+            Validation.PlotResults(t_fit,CubeSatFitted,TruthFitted,AbsoluteError);
         end
         
     end
