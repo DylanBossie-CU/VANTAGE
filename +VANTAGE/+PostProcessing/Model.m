@@ -110,6 +110,8 @@ classdef Model < handle
                     pos = cell(n,obj.Deployer.GetNumCubesats());
                     posCount = 1;
                     for i = I_start:I_stop
+                        if posCount==60
+                        end
     	        		% Read frame
     	        		obj.Optical.Frame = direc(i);
                         
@@ -148,7 +150,7 @@ classdef Model < handle
                         %hold on
                         obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
                     end
-                    pos = pos(1:(I_stop-I_start)+1,1:3);
+                    pos = pos(1:(I_stop-I_start),1:3);
                     
                     obj.CombineResults(pos,t);
                 else
@@ -285,6 +287,18 @@ classdef Model < handle
         %                       frame using both sensor method returns
         %
         function [pos] = SensorFusion(obj, camOrigin, camVec, pos_TOF)
+            
+            % Make everything a column vector
+            if numel(camOrigin) > size(camOrigin,1)
+                camOrigin = camOrigin';
+            end
+            if numel(camVec) > size(camVec,1)
+                camVec = camVec';
+            end
+            if numel(pos_TOF) > size(pos_TOF,1)
+                pos_TOF = pos_TOF';
+            end
+            
             % Normalize camera vector
             camVec = camVec./norm(camVec);
 
