@@ -83,11 +83,11 @@ classdef TOF
         %
         % @author   Joshua Kirby
         % @date     07-Apr-2019
-        function [sigmaTOF] = TofWeighting(~,predMeanRange)
-            if predMeanRange <= 10
+        function [sigmaTOF] = TofWeighting(obj,predMeanRange)
+            if predMeanRange <= obj.ModelRef.Optical.rangeStart
                 sigmaTOF = 1;
             else
-                sigmaTOF = interp1([10 100],[1,0.5],predMeanRange,'linear','extrap');
+                sigmaTOF = interp1([obj.ModelRef.Optical.rangeStart 100],[1,0.1],predMeanRange,'linear','extrap');
             end
         end
         

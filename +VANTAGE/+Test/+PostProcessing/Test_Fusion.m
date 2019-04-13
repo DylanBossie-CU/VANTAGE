@@ -1,6 +1,6 @@
 classdef Test_Fusion < matlab.unittest.TestCase
     properties
-        configDirecName = 'Config/Testing/Justin';
+        configDirecName = 'Config/Testing/Dylan';
     end
     
     methods (TestClassSetup)
@@ -68,8 +68,8 @@ classdef Test_Fusion < matlab.unittest.TestCase
             for i=1:Model.Deployer.numCubesats
                CubeSat = Model.Deployer.CubesatArray(i);
                data_t = CubeSat.time(end);
-               CubeSatFitted{i} = Validation.fitCubeSatTraj(CubeSat.centroids_VCF,CubeSat.time,'CS',data_t);
-               TruthFitted{i} = Validation.fitCubeSatTraj(Truth.Cubesat(i).pos,Model.Truth_VCF.t,'Truth',data_t);
+               CubeSatFitted{i} = Validation.fitCubeSatTraj(CubeSat.centroids_VCF,CubeSat.time,'CS',data_t,Model);
+               TruthFitted{i} = Validation.fitCubeSatTraj(Truth.Cubesat(i).pos,Model.Truth_VCF.t,'Truth',data_t,Model);
                
                AbsoluteError{i} = Validation.ProcessError(CubeSatFitted{i},TruthFitted{i});
             end

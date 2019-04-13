@@ -112,7 +112,7 @@ classdef Validate
         %
         % @author Dylan Bossie 
         % @date   11-Apr-2019
-        function CubeSatFitted = fitCubeSatTraj(~,CubeSat,t,Type,data_t)
+        function CubeSatFitted = fitCubeSatTraj(~,CubeSat,t,Type,data_t,Model)
             CS_X = zeros(length(CubeSat),1);
             CS_Y = zeros(length(CubeSat),1);
             CS_Z = zeros(length(CubeSat),1);
@@ -134,9 +134,9 @@ classdef Validate
                 t = t';
             end
 
-            XFit_CubeSat = polyfit(t,CS_X,1);
-            YFit_CubeSat = polyfit(t,CS_Y,1);
-            ZFit_CubeSat = polyfit(t,CS_Z,1);
+            XFit_CubeSat = Model.ransacLine(t,CS_X,0.15);
+            YFit_CubeSat = Model.ransacLine(t,CS_Y,0.15);
+            ZFit_CubeSat = Model.ransacLine(t,CS_Z,0.15);
             
             fitPoints = linspace(0,data_t,1000);
             
@@ -206,7 +206,7 @@ classdef Validate
             plot(TruthFitted{1}(:,1))
             legend('Measured Horizontal (m)','True Horizontal (m)','Location','SouthEast')
             title('Horizontal Distance of CubeSat Measured and True Values - Fusion')
-            ylabel('Range (m)')
+            ylabel('Distance (m)')
             outFile = [pwd '/Data/ErrorOut/CubeSat1_HorizontalErrorFusion'];
             export_fig(sprintf('%s',outFile),'-png');
             
@@ -216,7 +216,7 @@ classdef Validate
             plot(TruthFitted{1}(:,2))
             legend('Measured Vertical (m)','True Vertical (m)','Location','SouthEast')
             title('Vertical Distance of CubeSat Measured and True Values - Fusion')
-            ylabel('Range (m)')
+            ylabel('Distance (m)')
             outFile = [pwd '/Data/ErrorOut/CubeSat1_VerticalErrorFusion'];
             export_fig(sprintf('%s',outFile),'-png');
             

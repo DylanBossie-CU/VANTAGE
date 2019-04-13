@@ -1084,7 +1084,7 @@ classdef Optical
     % @date       7-Apr-2019
     %
     function optWeight = OpticalWeighting(~,predRange)
-        optWeight = 0;
+        optWeight = 1;
     end
 end
     
