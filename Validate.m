@@ -227,7 +227,7 @@ classdef Validate
             for i = 1:length(CubeSatFitted)
                 CubeSat = CubeSatFitted{i};
                 Error = AbsoluteError{i};
-                plot(t_fit,CubeSat(:,3),Error)
+                plot(CubeSat(:,3),Error)
             end
             
             legendEntries = cell(length(CubeSatFitted)+1,1);
