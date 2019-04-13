@@ -84,7 +84,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
                 xlabel('X (m)')
                 ylabel('Y (m)')
                 zlabel('Z (m)')
-                legend('VANTAGE Estimated Trajectory','VICON Measured Trajectory')
+                legend('VANTAGE Estimated Trajectory','Truth Measured Trajectory')
                 title(sprintf('%s: Trajectory 3D',Model.Deployer.TruthFileName(1:end-11)),'Interpreter','none')
             end
             
