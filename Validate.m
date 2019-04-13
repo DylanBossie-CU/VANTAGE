@@ -187,6 +187,8 @@ classdef Validate
         % @author Dylan Bossie
         % @date   11-Apr-2019
         function PlotResults(obj,CubeSatFitted,TruthFitted,AbsoluteError)
+            warning('off','MATLAB:MKDIR:DirectoryExists');
+            mkdir('./Data/ErrorOut')
             
             figure
             hold on

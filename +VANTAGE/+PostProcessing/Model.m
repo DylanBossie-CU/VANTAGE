@@ -395,6 +395,32 @@ classdef Model < handle
         function OutputStateVector(~)
             
         end
+
+        %% ransac line fitting for obfuscation
+        %
+        % This function uses the ransac algorithm to fit a line to noisy data
+        %
+        % @param      x            x coordinates to fit
+        % @param      y            y coordinates to fit
+        % @param      maxDistance  The maximum distance from the line
+        %
+        % @return     polyfit line
+        %
+        % @author       Justin Fay
+        % @date         21-Feb-2019
+        function p = ransacLine(obj,x,y,maxDistance)
+            points = [x,y];
+            sampleSize = 2; % number of points to sample per trial
+
+            fitLineFcn = @(points) polyfit(points(:,1),points(:,2),1); % fit function using polyfit
+            evalLineFcn = ...   % distance evaluation function
+              @(model, points) sum((points(:, 2) - polyval(model, points(:,1))).^2,2);
+
+            [~, inlierIdx] = ransac(points,fitLineFcn,evalLineFcn, ...
+              sampleSize,maxDistance);
+          
+            p = polyfit(points(inlierIdx,1),points(inlierIdx,2),1);
+        end
         
     end
     
