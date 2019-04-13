@@ -89,8 +89,6 @@ classdef Model < handle
             I_stop = numel(direc);
             if strcmpi(obj.Deployer.testScenario,'Modular')
                 I_stop = I_10m-1;
-%                 I_start = [];
-%                 I_stop = [];
             end
             
             
@@ -150,7 +148,7 @@ classdef Model < handle
                         %hold on
                         obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
                     end
-                    pos = pos(1:(I_stop-I_start),1:3);
+                    pos = pos(1:(I_stop-I_start)+1,1:3);
                     
                     obj.CombineResults(pos,t);
                 else
@@ -186,18 +184,63 @@ classdef Model < handle
             CubeSats = obj.Deployer.CubesatArray;
             
             for i = 1:length(CubeSats)
-                CubeSat_i = pos(:,i);
-                positions = CubeSats(i).centroids_VCF;
-                posCellArray = cell(length(positions),1);
                 
-                for j = 1:length(positions)
-                    posCellArray{j} = positions(:,j);
+                iter_t = 1;
+                iter_cs = 1;
+                counter = 1;
+                
+                CubeSat_positions = cell(length(t)+length(CubeSats(i).time),1);
+                CubeSat_times = zeros(length(t)+length(CubeSats(i).time),1);
+                
+                positions = pos(:,i);
+                % Iterate through the two sets of time values to zip
+                % together
+                while iter_t <= length(t) && iter_cs <= length(CubeSats(i).time)
+                    if t(iter_t) < CubeSats(i).time(iter_cs)
+                        % Next time to save is from pos & t
+                        CubeSat_times(counter) = t(iter_t);
+                        CubeSat_positions(counter) = positions(iter_t);
+                        iter_t = iter_t + 1;
+                        counter = counter + 1;
+                    elseif t(iter_t) > CubeSats(i).time(iter_cs)
+                        % Next time to save is from CubeSats
+                        CubeSat_times(counter) = CubeSats(i).time(iter_cs);
+                        CubeSat_positions(counter) = {CubeSats(i).centroids_VCF(:,iter_cs)};
+                        iter_cs = iter_cs + 1;
+                        counter = counter + 1;
+                    else
+                        % Times magically align perfectly
+                        CubeSat_times(counter) = t(iter_t);
+                        CubeSat_positions(counter) = pos(iter_t);
+                        iter_t = iter_t + 1;
+                        counter = counter + 1;
+                    end
                 end
                 
-                CubeSat_i_comb = [posCellArray; CubeSat_i];
-                t_comb = [obj.Deployer.CubesatArray(i).time t];
-                obj.Deployer.CubesatArray(i).centroids_VCF = CubeSat_i_comb;
-                obj.Deployer.CubesatArray(i).time = t_comb;
+                % For when MATLAB ignores the rest of the data after one of
+                % the indices reaches end
+                if iter_cs <= length(CubeSats(i).time)
+                    iter_init = iter_cs;
+                    for j = iter_init:length(CubeSats(i).time)
+                        CubeSat_times(counter) = CubeSats(i).time(iter_cs);
+                        CubeSat_positions(counter) = {CubeSats(i).centroids_VCF(:,iter_cs)};
+                        iter_cs = iter_cs + 1;
+                        counter = counter + 1;
+                    end
+                elseif iter_t <= length(t)
+                    iter_init = iter_t;
+                    for j = iter_init:length(t)
+                        CubeSat_times(counter) = t(iter_t);
+                        CubeSat_positions(counter) = positions(iter_t);
+                        iter_t = iter_t + 1;
+                        counter = counter + 1;
+                    end   
+                else
+                    continue
+                end
+                
+                obj.Deployer.CubesatArray(i).centroids_VCF = CubeSat_positions;
+                obj.Deployer.CubesatArray(i).time = CubeSat_times;
             end
         end
         

@@ -130,9 +130,13 @@ classdef Validate
                 CS_Z(i) = tmp(3);
             end
             
-            XFit_CubeSat = polyfit(t',CS_X,1);
-            YFit_CubeSat = polyfit(t',CS_Y,1);
-            ZFit_CubeSat = polyfit(t',CS_Z,1);
+            if length(t(:,1)) == 1
+                t = t';
+            end
+
+            XFit_CubeSat = polyfit(t,CS_X,1);
+            YFit_CubeSat = polyfit(t,CS_Y,1);
+            ZFit_CubeSat = polyfit(t,CS_Z,1);
             
             fitPoints = linspace(0,t(end),1000);
             
