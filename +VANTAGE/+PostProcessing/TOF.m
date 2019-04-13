@@ -87,7 +87,7 @@ classdef TOF
             if predMeanRange <= 10
                 sigmaTOF = 1;
             else
-                sigmaTOF = interp1([10 100],[1,0.5],predMeanRange);
+                sigmaTOF = interp1([10 100],[1,0.5],predMeanRange,'linear','extrap');
             end
         end
         

@@ -108,7 +108,7 @@ classdef Model < handle
                     pos = cell(n,obj.Deployer.GetNumCubesats());
                     posCount = 1;
                     for i = I_start:I_stop
-                        if posCount==60
+                        if posCount==202
                         end
     	        		% Read frame
     	        		obj.Optical.Frame = direc(i);
@@ -148,7 +148,7 @@ classdef Model < handle
                         %hold on
                         obj.Optical.CurrentFrameCount = obj.Optical.CurrentFrameCount + 1;
                     end
-                    pos = pos(1:(I_stop-I_start)+1,1:3);
+                    pos = pos(1:(I_stop-I_start),1:3);
                     
                     obj.CombineResults(pos,t);
                 else
