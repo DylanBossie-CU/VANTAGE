@@ -112,7 +112,7 @@ classdef Validate
         %
         % @author Dylan Bossie 
         % @date   11-Apr-2019
-        function CubeSatFitted = fitCubeSatTraj(~,CubeSat,t,Type,data_t,Model)
+        function CubeSatFitted = fitCubeSatTraj(~,CubeSat,t,Type,t_fit,Model)
             CS_X = zeros(length(CubeSat),1);
             CS_Y = zeros(length(CubeSat),1);
             CS_Z = zeros(length(CubeSat),1);
@@ -138,11 +138,9 @@ classdef Validate
             YFit_CubeSat = Model.ransacLine(t,CS_Y,0.15);
             ZFit_CubeSat = Model.ransacLine(t,CS_Z,0.15);
             
-            fitPoints = linspace(0,data_t,1000);
-            
-            CSFitted_X = polyval(XFit_CubeSat,fitPoints);
-            CSFitted_Y = polyval(YFit_CubeSat,fitPoints);
-            CSFitted_Z = polyval(ZFit_CubeSat,fitPoints);
+            CSFitted_X = polyval(XFit_CubeSat,t_fit);
+            CSFitted_Y = polyval(YFit_CubeSat,t_fit);
+            CSFitted_Z = polyval(ZFit_CubeSat,t_fit);
             
             CubeSatFitted = [CSFitted_X; CSFitted_Y; CSFitted_Z]';
         end
@@ -186,14 +184,14 @@ classdef Validate
         %
         % @author Dylan Bossie
         % @date   11-Apr-2019
-        function PlotResults(obj,CubeSatFitted,TruthFitted,AbsoluteError)
+        function PlotResults(obj,t_fit,CubeSatFitted,TruthFitted,AbsoluteError)
             warning('off','MATLAB:MKDIR:DirectoryExists');
             mkdir('./Data/ErrorOut')
             
             figure
             hold on
-            plot(CubeSatFitted{1}(:,3))
-            plot(TruthFitted{1}(:,3))
+            plot(t_fit,CubeSatFitted{1}(:,3))
+            plot(t_fit,TruthFitted{1}(:,3))
             legend('Measured Range (m)','True Range (m)','Location','SouthEast')
             title('Downrange Distance of CubeSat Measured and True Values - Fusion')
             ylabel('Range (m)')
@@ -202,8 +200,8 @@ classdef Validate
             
             figure
             hold on
-            plot(CubeSatFitted{1}(:,1))
-            plot(TruthFitted{1}(:,1))
+            plot(t_fit,CubeSatFitted{1}(:,1))
+            plot(t_fit,TruthFitted{1}(:,1))
             legend('Measured Horizontal (m)','True Horizontal (m)','Location','SouthEast')
             title('Horizontal Distance of CubeSat Measured and True Values - Fusion')
             ylabel('Distance (m)')
@@ -212,8 +210,8 @@ classdef Validate
             
             figure
             hold on
-            plot(CubeSatFitted{1}(:,2))
-            plot(TruthFitted{1}(:,2))
+            plot(t_fit,CubeSatFitted{1}(:,2))
+            plot(t_fit,TruthFitted{1}(:,2))
             legend('Measured Vertical (m)','True Vertical (m)','Location','SouthEast')
             title('Vertical Distance of CubeSat Measured and True Values - Fusion')
             ylabel('Distance (m)')
@@ -229,7 +227,7 @@ classdef Validate
             for i = 1:length(CubeSatFitted)
                 CubeSat = CubeSatFitted{i};
                 Error = AbsoluteError{i};
-                plot(CubeSat(:,3),Error)
+                plot(t_fit,CubeSat(:,3),Error)
             end
             
             legendEntries = cell(length(CubeSatFitted)+1,1);
