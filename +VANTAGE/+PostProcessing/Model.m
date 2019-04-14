@@ -8,6 +8,9 @@ classdef Model < handle
         
         % Truth data
         Truth_VCF
+        
+        % Validation class
+        Validate
     end
     
     properties (SetAccess = protected)
@@ -42,6 +45,7 @@ classdef Model < handle
         	import VANTAGE.PostProcessing.Optical
         	import VANTAGE.PostProcessing.TOF
             import VANTAGE.PostProcessing.TimeManager
+            import VANTAGE.PostProcessing.Validate
 
         	% Construct child classes and process truth data
             % NOTE: The order of these lines is very important
@@ -53,6 +57,7 @@ classdef Model < handle
             obj.TimeMan.syncTruthData(obj);
             obj.Optical = Optical(obj,strcat(configDirecName,'/Optical.json'), obj.Deployer.GetNumCubesats());
             obj.TOF = TOF(obj,strcat(configDirecName,'/TOF.json'));
+            obj.Validate = Validate();
             
             % Error catching
             if obj.Deployer.numCubesats ~= obj.Truth_VCF.numCubeSats

@@ -14,14 +14,8 @@ classdef Test_Fusion < matlab.unittest.TestCase
             %%% Housekeeping and Allocation
             close all;
             rng(99);
-            %testType = 'Simulation';
-            %testType = 'Modular';
             testType = 'Modular';
             simtube = 6;
-            
-            % Create validation class for validation methods
-            import Validate
-            Validation = Validate();
 
             %%% Filenames and Configurables
             if strcmpi(testType,'Simulation')
@@ -68,11 +62,11 @@ classdef Test_Fusion < matlab.unittest.TestCase
             t_fit = linspace(0,data_t);
             for i=1:Model.Deployer.numCubesats
                CubeSat = Model.Deployer.CubesatArray(i);
-               CubeSatFitted{i} = Validation.fitCubeSatTraj(CubeSat.centroids_VCF,CubeSat.time,'CS',t_fit,Model);
-               TruthFitted{i} = interp1(Model.Truth_VCF.t,Truth.Cubesat(i).pos,t_fit,'linear');
-               %TruthFitted{i} = Validation.fitCubeSatTraj(Truth.Cubesat(i).pos,Model.Truth_VCF.t,'Truth',t_fit,Model);
+               CubeSatFitted{i} = Model.Validate.fitCubeSatTraj(CubeSat.centroids_VCF,CubeSat.time,'CS',t_fit,Model);
+               %TruthFitted{i} = interp1(Model.Truth_VCF.t,Truth.Cubesat(i).pos,t_fit,'linear');
+               TruthFitted{i} = Model.Validate.fitCubeSatTraj(Truth.Cubesat(i).pos,Model.Truth_VCF.t,'Truth',t_fit,Model);
                
-               AbsoluteError{i} = Validation.ProcessError(CubeSatFitted{i},TruthFitted{i});
+               AbsoluteError{i} = Model.Validate.ProcessError(CubeSatFitted{i},TruthFitted{i});
             end
             
             if false
@@ -89,7 +83,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
                 title(sprintf('%s: Trajectory 3D',Model.Deployer.TruthFileName(1:end-11)),'Interpreter','none')
             end
             
-            Validation.PlotResults(t_fit,CubeSatFitted,TruthFitted,AbsoluteError);
+            Model.Validate.PlotResults(t_fit,CubeSatFitted,TruthFitted,AbsoluteError);
         end
         
     end
