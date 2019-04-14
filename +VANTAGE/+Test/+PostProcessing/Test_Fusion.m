@@ -44,11 +44,6 @@ classdef Test_Fusion < matlab.unittest.TestCase
             
             Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName);
             
-%             getResults = true;
-%             if getResults
-%                 Model.Validate.ComputeMeanError(Model);
-%             end
-            
             fileLims = [1 inf];
             Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
                 Model.Deployer,'presentResults',0,'fileLims',fileLims,'showDebugPlots',0);
@@ -58,6 +53,13 @@ classdef Test_Fusion < matlab.unittest.TestCase
             
             % Compute results
             Model.ComputeStateOutput();
+            
+            Validator = Validate(obj.configDirecName,Model);
+            
+%             getResults = true;
+%             if getResults
+%                 Validator.ComputeMeanError(Model);
+%             end
             
             CubeSatFitted = cell(Model.Deployer.numCubesats,1);
             TruthFitted = cell(Model.Deployer.numCubesats,1);
@@ -70,10 +72,10 @@ classdef Test_Fusion < matlab.unittest.TestCase
             t_fit = linspace(0,data_t);
             for i=1:Model.Deployer.numCubesats
                CubeSat = Model.Deployer.CubesatArray(i);
-               CubeSatFitted{i} = Model.Validate.fitCubeSatTraj(CubeSat.centroids_VCF,CubeSat.time,'CS',t_fit,Model);
+               CubeSatFitted{i} = Validator.fitCubeSatTraj(CubeSat.centroids_VCF,CubeSat.time,'CS',t_fit,Model);
                TruthFitted{i} = interp1(Model.Truth_VCF.t,Truth.Cubesat(i).pos,t_fit,'linear');
                [AbsoluteError{i},XError{i},YError{i},ZError{i}] = ...
-                   Model.Validate.ProcessError(CubeSatFitted{i},TruthFitted{i});
+                   Validator.ProcessError(CubeSatFitted{i},TruthFitted{i});
             end
             
             % Save fitted results for error analysis later
@@ -97,11 +99,11 @@ classdef Test_Fusion < matlab.unittest.TestCase
             save([pwd '/' dataFolder '/YErrorData' testNumber '.mat'],'YError');
             save([pwd '/' dataFolder '/ZErrorData' testNumber '.mat'],'ZError');
             
-            %Model.Validate.ComputeMeanError();
+            %Validator.ComputeMeanError();
             
-            Model.Validate.morshol();
+            Validator.morshol();
             
-            %Model.Validate.PlotResults(t_fit,CubeSatFitted,TruthFitted,AbsoluteError);
+            %Validator.PlotResults(t_fit,CubeSatFitted,TruthFitted,AbsoluteError);
         end
         
     end

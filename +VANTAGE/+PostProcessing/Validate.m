@@ -22,11 +22,17 @@ classdef Validate
         % @author   Dylan Bossie
         % @date     14-Apr-2019
         function obj = Validate(configFilename,ModelRef)
+            configFilename = [configFilename '/Validate.json'];
             parameters = jsondecode(fileread(configFilename));
             obj.CorrelateTruthData = parameters.CorrelateTruthData;
             obj.ModelRef = ModelRef;
             
-            
+            % If user chooses to update truth data with corrections
+            if obj.CorrelateTruthData
+                updatedTruth = obj.PerformTruthDataCorrelation();
+                obj.ModelRef.Truth_VCF = updatedTruth;
+                obj.WriteUpdatedTruthData(updatedTruth,ModelRef.Deployer.TruthFileName);
+            end
         end
         
         %% Validate TOF
@@ -360,7 +366,7 @@ classdef Validate
             onesigmastd = quantile(err,normcdf(1)-normcdf(-1));
         end
         
-        %% fill this out
+        %% Correlate truth data timestamps etc.
         %
         % func description
         % 
@@ -370,8 +376,21 @@ classdef Validate
         %
         % @author Marshall Herr
         % @date   14-Apr-2019
-        function [] = morshol(~)
-
+        function [updatedTruth] = PerformTruthDataCorrelation(~)
+            updatedTruth = [420 69];
+        end
+        
+        %% Write out new truth data with corrections
+        %
+        % func description
+        % 
+        % @param        name       desc
+        %
+        % @return       bruhmoment#2        yeetus that feetus
+        %
+        % @author Marshall Herr
+        % @date   14-Apr-2019
+        function [] = WriteUpdatedTruthData(~)
         end
     end
     
