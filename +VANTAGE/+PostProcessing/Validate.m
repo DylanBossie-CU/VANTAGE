@@ -1,8 +1,11 @@
 classdef Validate
     %% Properties
     properties(Access = public)
-        %
+        % Boolean for whether or not to auto update truth data
+        CorrelateTruthData
         
+        % Model handle class
+        ModelRef
     end
     
     
@@ -10,15 +13,20 @@ classdef Validate
     methods
         %% Class Constructor
         %
-        % Constructs class 
+        % Constructs validate class 
         %
         % @param    
         %
         % @return   Class instance
         % 
-        % @author   Joshua Kirby
-        % @date     19-Mar-2019
-        function obj = Validate()
+        % @author   Dylan Bossie
+        % @date     14-Apr-2019
+        function obj = Validate(configFilename,ModelRef)
+            parameters = jsondecode(fileread(configFilename));
+            obj.CorrelateTruthData = parameters.CorrelateTruthData;
+            obj.ModelRef = ModelRef;
+            
+            
         end
         
         %% Validate TOF
@@ -71,34 +79,6 @@ classdef Validate
 
             %%% Present Errors
             obj.TOFpresentErrorsVsReqs(Model,SensorData);
-        end
-        
-        %% Validate Optical
-        %
-        % 
-        % 
-        % @param    
-        %
-        % @return 
-        %
-        % @author  
-        % @date     
-        function validateOptical(obj)
-            
-        end
-        
-        %% Validate VANTAGE
-        %
-        % 
-        % 
-        % @param    
-        %
-        % @return 
-        %
-        % @author 
-        % @date   
-        function validateVantage(obj)
-            
         end
         
         %% Fit polynomial to CubeSat data
@@ -192,7 +172,8 @@ classdef Validate
             end
             
             for i = 1:numel(AbsoluteErrorFiles)
-                load([ans.folder '/' ans.name])
+                absError = load([AbsoluteErrorFiles(i).folder '/' AbsoluteErrorFiles(i).name]);
+                
             end
         end
         
@@ -264,7 +245,7 @@ classdef Validate
         %
         % @author Dylan Bossie
         % @date   11-Apr-2019
-        function PlotResults(obj,t_fit,CubeSatFitted,TruthFitted,AbsoluteError)
+        function PlotResults(~,t_fit,CubeSatFitted,TruthFitted,AbsoluteError)
             warning('off','MATLAB:MKDIR:DirectoryExists');
             mkdir('./Data/ErrorOut')
             
@@ -322,6 +303,8 @@ classdef Validate
             outFile = [pwd '/Data/ErrorOut/CubeSat1_FullErrorFusion'];
             export_fig(sprintf('%s',outFile),'-png');
         end
+        
+        
     end
     %% Private methods
     methods (Access = private)
@@ -375,6 +358,20 @@ classdef Validate
                 err = [err Error.Cubesat(i).err'];
             end
             onesigmastd = quantile(err,normcdf(1)-normcdf(-1));
+        end
+        
+        %% fill this out
+        %
+        % func description
+        % 
+        % @param        name       desc
+        %
+        % @return       bruhmoment#2        yeetus that feetus
+        %
+        % @author Marshall Herr
+        % @date   14-Apr-2019
+        function [] = morshol(~)
+
         end
     end
     

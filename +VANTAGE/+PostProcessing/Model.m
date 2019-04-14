@@ -57,7 +57,7 @@ classdef Model < handle
             obj.TimeMan.syncTruthData(obj);
             obj.Optical = Optical(obj,strcat(configDirecName,'/Optical.json'), obj.Deployer.GetNumCubesats());
             obj.TOF = TOF(obj,strcat(configDirecName,'/TOF.json'));
-            obj.Validate = Validate();
+            obj.Validate = Validate(strcat(configDirecName,'/Validate.json'),obj);
             
             % Error catching
             if obj.Deployer.numCubesats ~= obj.Truth_VCF.numCubeSats

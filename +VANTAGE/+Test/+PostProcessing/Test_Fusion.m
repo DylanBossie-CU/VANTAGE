@@ -44,10 +44,10 @@ classdef Test_Fusion < matlab.unittest.TestCase
             
             Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName);
             
-            getResults = true;
-            if getResults
-                Model.Validate.ComputeMeanError(Model);
-            end
+%             getResults = true;
+%             if getResults
+%                 Model.Validate.ComputeMeanError(Model);
+%             end
             
             fileLims = [1 inf];
             Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
@@ -96,7 +96,11 @@ classdef Test_Fusion < matlab.unittest.TestCase
             save([pwd '/' dataFolder '/XErrorData' testNumber '.mat'],'XError');
             save([pwd '/' dataFolder '/YErrorData' testNumber '.mat'],'YError');
             save([pwd '/' dataFolder '/ZErrorData' testNumber '.mat'],'ZError');
-                        
+            
+            %Model.Validate.ComputeMeanError();
+            
+            Model.Validate.morshol();
+            
             %Model.Validate.PlotResults(t_fit,CubeSatFitted,TruthFitted,AbsoluteError);
         end
         
