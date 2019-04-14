@@ -127,7 +127,7 @@ while(nRet == ueye.IS_SUCCESS):
     count+=1
     time.sleep(0.25)
 
-    numberOfImages = 250
+    numberOfImages = 70
     if count>numberOfImages:
         break
 
