@@ -89,7 +89,7 @@ def main():
     camData = o3d3xx.ImageClient(address, 50010)
     grabber = GrabO3D300(camData)
 
-    frameCount = 300
+    frameCount = 100
     pointCloudStorage = []
     timeStamps = []
     for x in range(0, frameCount):

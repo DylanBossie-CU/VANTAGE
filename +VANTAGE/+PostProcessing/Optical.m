@@ -73,6 +73,12 @@ classdef Optical
     
     % Boolean for if data should be cleaned before processing
     PerformDataCleaning
+    
+    % Storage for relative timestamps for sensor fusion comparison
+    Timestamps
+    
+    % Range for starting optical processing
+    rangeStart = 4;
   end
   
   
@@ -87,8 +93,6 @@ classdef Optical
     %
     % @return     A reference to an initialized CubeSat object
     %
-    % pos_TOF(j) = fsolve(@(t) norm(CubeSats(j).evalTofFit(t))-10,10);
-    % use this
     function obj = Optical(ModelRef, configFilename, numCubesats)
         import VANTAGE.PostProcessing.CubeSat_Optical
         obj.ModelRef = ModelRef;
@@ -157,25 +161,15 @@ classdef Optical
             filenames{i} = direc(i).name;
         end
         
-        timing = Model.TimeMan.VantageTime(filenames,'Optical');
-        
-        % Convert filenames into seconds for ordered processing
-        %{
-        timing = zeros(numFile,1);
-        for i = 1:numFile
-            filename = direc(i).name;
-            splitname = strsplit(filename,'_');
-            day = str2num(splitname{2})*24*60*60;
-            hour = str2num(splitname{3})*60*60;
-            minute = str2num(splitname{4})*60;
-            second = str2num(splitname{5});
-            
-            fileSuffix = strsplit(splitname{6},'.');
-            milli = str2num(strcat(['.',fileSuffix{1}]));
-            
-            timing(i) = day+hour+minute+second+milli;
+        switch obj.TestType
+            case {'100m','Modular'}
+              timing = Model.TimeMan.VantageTime(filenames,'Optical');
+            case 'Simulation'
+                timing = zeros(numel(direc),1);
+                for i = 1:numel(direc)
+                    timing(i) = i;
+                end
         end
-        %}
     end
 
 
@@ -260,12 +254,12 @@ classdef Optical
         
         % Binarize frame with low threshold to find noisy background
         % objects
-        switch obj.TestType
+        switch lower(obj.TestType)
             case '100m'
                 binarizedFrame = imbinarize(frame,0.01);
-            case 'Modular'
+            case 'modular'
                 binarizedFrame = imbinarize(frame,1.0);
-            case 'Simulation'
+            case 'simulation'
                 binarizedFrame = imbinarize(frame,0.01);
         end
     end
@@ -292,6 +286,7 @@ classdef Optical
             case 'Modular'
                 I_gray_clean = obj.CleanupData(frame,BackgroundPixels,firstFrame);
             case 'Simulation'
+                I_gray_clean = I_gray;
         end
         
         % Adaptive Thresholding Binarization
@@ -411,6 +406,8 @@ classdef Optical
             text(centroids(1)+centroids(1)*.05,centroids(2)+...
                     centroids(2)*.05,'Calculated System Centroid','Color','r')
         end
+        warning('off','MATLAB:MKDIR:DirectoryExists');
+        mkdir(strcat(obj.DataDirec,'/GrayscaleOut'))
         outFile = [obj.DataDirec 'GrayscaleOut/' num2str(obj.CurrentFrameCount)];
         export_fig(sprintf('%s',outFile),'-png');
     end
@@ -599,6 +596,12 @@ classdef Optical
                     end
                 end
             case 'Modular'
+                for i = 1:numel(I_boundaries)
+                    if objectSizes(i) >= objectSizeThreshold
+                        CubeSats = [CubeSats I_boundaries(i)];
+                    end
+                end
+            case 'Simulation'
                 for i = 1:numel(I_boundaries)
                     if objectSizes(i) >= objectSizeThreshold
                         CubeSats = [CubeSats I_boundaries(i)];
@@ -1079,7 +1082,7 @@ classdef Optical
     % @date       7-Apr-2019
     %
     function optWeight = OpticalWeighting(~,predRange)
-        optWeight = 0;
+        optWeight = 1;
     end
 end
     
@@ -1089,31 +1092,6 @@ end
     
   %% Private methods
   methods (Access = private)
-    %% ransac line fitting for obfuscation
-    %
-    % This function uses the ransac algorithm to fit a line to noisy data
-    %
-    % @param      x            x coordinates to fit
-    % @param      y            y coordinates to fit
-    % @param      maxDistance  The maximum distance from the line
-    %
-    % @return     polyfit line
-    %
-    % @author       Justin Fay
-    % @date         21-Feb-2019
-    function p = ransacLine(obj,x,y,maxDistance)
-        points = [x,y];
-        sampleSize = 2; % number of points to sample per trial
-
-        fitLineFcn = @(points) polyfit(points(:,1),points(:,2),1); % fit function using polyfit
-        evalLineFcn = ...   % distance evaluation function
-          @(model, points) sum((points(:, 2) - polyval(model, points(:,1))).^2,2);
-
-        [~, inlierIdx] = ransac(points,fitLineFcn,evalLineFcn, ...
-          sampleSize,maxDistance);
-      
-        p = polyfit(points(inlierIdx,1),points(inlierIdx,2),1);
-    end
     
     % 
         % Round to nearest odd integer

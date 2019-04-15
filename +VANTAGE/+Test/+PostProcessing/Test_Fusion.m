@@ -1,5 +1,6 @@
 classdef Test_Fusion < matlab.unittest.TestCase
     properties
+        configDirecName = 'Config/Testing/Dylan';
     end
     
     methods (TestClassSetup)
@@ -9,16 +10,12 @@ classdef Test_Fusion < matlab.unittest.TestCase
     end
     
     methods (Test)
-        function test100mData(testCase)
-            
-            addpath('./export-fig')
-            
+        function testFullSystem(obj)
+            import VANTAGE.PostProcessing.Validate
             %%% Housekeeping and Allocation
             close all;
             rng(99);
-            %testType = 'Simulation';
-            %testType = 'Modular';
-            testType = '100m';
+            testType = 'Modular';
             simtube = 6;
 
             %%% Filenames and Configurables
@@ -36,18 +33,16 @@ classdef Test_Fusion < matlab.unittest.TestCase
                         error('unimplemented tube requested')
                 end
             elseif strcmpi(testType,'Modular')
-                configDirecName = 'Config/Testing/Dylan';
-                manifestFilename = 'Config/Testing/Dylan/Manifest.json';
-                SensorData = jsondecode(fileread('config/Testing/Dylan/Sensors.json'));
+                manifestFilename = strcat(obj.configDirecName,'/Manifest.json');
+                SensorData = jsondecode(fileread(strcat(obj.configDirecName,'/Sensors.json')));
             elseif strcmpi(testType,'100m')
-                configDirecName = 'Config/Testing/Dylan/';
-                manifestFilename = 'Config/Testing/Dylan/Manifest.json';
-                SensorData = jsondecode(fileread('config/Testing/Dylan/Sensors.json'));
+                manifestFilename = strcat(obj.configDirecName,'/Manifest.json');
+                SensorData = jsondecode(fileread(strcat(obj.configDirecName,'/Sensors.json')));
             else
                 error('Invalid testType')
             end
             
-            Model = VANTAGE.PostProcessing.Model(manifestFilename,'./Config/Testing/Dylan');
+            Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName);
             
             fileLims = [1 inf];
             Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
@@ -56,14 +51,59 @@ classdef Test_Fusion < matlab.unittest.TestCase
             % Process truth data
             Truth = Model.Truth_VCF;
             
-            pos = Model.ComputeStateOutput();
-            tmp = horzcat(pos{:,1})';
-            figure
-            plot3(tmp(:,1),tmp(:,2),tmp(:,3))
-            axis equal
-            zlabel('Z')
-            hold on
-            plot3(Truth.Cubesat(1).pos(:,1),Truth.Cubesat(1).pos(:,2),Truth.Cubesat(1).pos(:,3))
+            % Compute results
+            Model.ComputeStateOutput();
+            
+            Validator = Validate(obj.configDirecName,Model);
+            
+%             getResults = true;
+%             if getResults
+%                 Validator.ComputeMeanError(Model);
+%             end
+            
+            CubeSatFitted = cell(Model.Deployer.numCubesats,1);
+            TruthFitted = cell(Model.Deployer.numCubesats,1);
+            AbsoluteError = cell(Model.Deployer.numCubesats,1);
+            XError = cell(Model.Deployer.numCubesats,1);
+            YError = cell(Model.Deployer.numCubesats,1);
+            ZError = cell(Model.Deployer.numCubesats,1);
+            
+            data_t = Model.Deployer.CubesatArray(1).time(end);
+            t_fit = linspace(0,data_t);
+            for i=1:Model.Deployer.numCubesats
+               CubeSat = Model.Deployer.CubesatArray(i);
+               CubeSatFitted{i} = Validator.fitCubeSatTraj(CubeSat.centroids_VCF,CubeSat.time,'CS',t_fit,Model);
+               TruthFitted{i} = interp1(Model.Truth_VCF.t,Truth.Cubesat(i).pos,t_fit,'linear');
+               [AbsoluteError{i},XError{i},YError{i},ZError{i}] = ...
+                   Validator.ProcessError(CubeSatFitted{i},TruthFitted{i});
+            end
+            
+            % Save fitted results for error analysis later
+            if strcmpi(Model.Deployer.testScenario,'Modular')
+                dataFolder = 'Data/ModularTest_4_9/Results';
+                folderString = Model.Deployer.TruthFileName;
+                tmp = split(folderString,'/');
+                testNumber = tmp{3};
+            elseif strcmpi(Model.Deployer.testScenario,'100m')
+                dataFolder = 'Data/3_25_100m/Results';
+                testNumber = 'Test1';
+            else
+                testNumber = 'notimplemented';
+            end
+            
+            mkdir(dataFolder)
+            save([pwd '/' dataFolder '/CSData' testNumber '.mat'],'CubeSatFitted');
+            save([pwd '/' dataFolder '/TruthData' testNumber '.mat'],'TruthFitted');
+            save([pwd '/' dataFolder '/AbsErrorData' testNumber '.mat'],'AbsoluteError');
+            save([pwd '/' dataFolder '/XErrorData' testNumber '.mat'],'XError');
+            save([pwd '/' dataFolder '/YErrorData' testNumber '.mat'],'YError');
+            save([pwd '/' dataFolder '/ZErrorData' testNumber '.mat'],'ZError');
+            
+            %Validator.ComputeMeanError();
+            
+            Validator.morshol();
+            
+            %Validator.PlotResults(t_fit,CubeSatFitted,TruthFitted,AbsoluteError);
         end
         
     end

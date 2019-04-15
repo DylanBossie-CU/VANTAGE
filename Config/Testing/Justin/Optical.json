@@ -1,5 +1,5 @@
 {
-	"OpticalData": "Data/ModularTest_4_9/Test19/Optical/",
+	"OpticalData": "Data/03_25_19_100m/Test6/Optical/",
 	"OpticalFileExtension": "VANTAGEOp*",
 	"DesiredFPS": 1,
 	"PlotBinarizedImages": false,
@@ -9,7 +9,7 @@
 	"PlotCubeSats": false,
 	"PlotIBoundaries": false,
 	"RunOcclusion": false,
-	"PerformDataCleaning": false,
+	"PerformDataCleaning": true,
 	"Clean100m": [
 	  		{"bottomleft": [1271,1253], "topright": [1432, 1175]},
 	  		{"bottomleft": [0, 2076], "topright": [1111, 1070]},
