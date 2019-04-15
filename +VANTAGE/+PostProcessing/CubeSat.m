@@ -32,6 +32,9 @@ classdef CubeSat
         % Final 3D model fit to the TOF centroids, used for propagation
         TOFfit_VCF
         
+        % Range over which TOF centroiding was used
+        TOFrange
+        
     end
     
     %% Methods
