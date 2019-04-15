@@ -1159,14 +1159,18 @@ classdef Validate
         function [] = WriteUpdatedTruthData(~,updatedTruth,TruthFileName,dt,n_vec,theta,offset_vec)
             % gets the absolute path to the file
             fullPath = fullfile(pwd, TruthFileName);
+            
+            % Define output path
+            tmp = split(TruthFileName,'/');
+            testNum = tmp{3};
             % cuts it up
             [filePath,fileName,fileExtension] = fileparts(fullPath);
-            newTruthFileFullPath = [ filePath, fileName, '_corrected', fileExtension ];
+            newTruthFileFullPath = [ filePath, '/', fileName, '_corrected', fileExtension ];
             jason = jsonencode(updatedTruth);
             fID = fopen( newTruthFileFullPath, 'w' );
             fprintf( fID, jason );
             fclose(fID);
-            newTruthCorrectionsFullPath = [ filePath, fileName, '_corrections', fileExtension ];
+            newTruthCorrectionsFullPath = [ filePath, '/', fileName, '_corrections', fileExtension ];
             jason = jsonencode({dt,n_vec,theta,offset_vec});
             fID = fopen( newTruthCorrectionsFullPath, 'w' );
             fprintf( fID, jason );
