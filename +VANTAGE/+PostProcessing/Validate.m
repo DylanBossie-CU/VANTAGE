@@ -39,7 +39,7 @@ classdef Validate
                 TruthData = obj.ModelRef.Truth_VCF;
                 % Updating truth data
 %                 [updatedTruth,dt,n_vec,theta,offset_vec] = obj.PerformTruthDataCorrelation(MeasuredDataArray,TruthData,mostTrustedCubesat);
-                [updatedTruth,dt,n_vec,theta,offset_vec] = PerformTruthDataCorrelationMultiple(MeasuredDataArray,TruthData);
+                [updatedTruth,dt,n_vec,theta,offset_vec] = obj.PerformTruthDataCorrelationMultiple(MeasuredDataArray,TruthData);
                 % Replacing old truth data with new truth data
                 obj.ModelRef.Truth_VCF = updatedTruth;
                 % Writting new truth data to json file
@@ -440,9 +440,8 @@ classdef Validate
                 VANTAGE_Data.y(i) = CubeSatofInterest.centroids_VCF{i}(2);
                 VANTAGE_Data.z(i) = CubeSatofInterest.centroids_VCF{i}(3);
             end
-            % we're hardcoded values because idk how to determine these
-            % yet!
-            VANTAGE_Data.d = [ 1, 5 ];
+            % thanks josh!
+            VANTAGE_Data.d = CubeSatofInterest.TOFrange;
             
             CubeSatofInterest = TruthData.Cubesat(mostTrustedCubesat);
             N = length( TruthData.t );
@@ -1065,9 +1064,8 @@ classdef Validate
                     VANTAGE_Data.y(i) = CubeSatofInterest.centroids_VCF{i}(2);
                     VANTAGE_Data.z(i) = CubeSatofInterest.centroids_VCF{i}(3);
                 end
-                % we're hardcoded values because idk how to determine these
-                % yet!
-                VANTAGE_Data.d = [ 1, 5 ];
+                % thanks josh!
+                VANTAGE_Data.d = CubeSatofInterest.TOFrange;
                 
                 CubeSatofInterest = TruthData.Cubesat(k);
                 N = length( TruthData.t );
