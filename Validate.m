@@ -37,9 +37,10 @@ classdef Validate
             close all;
             rng(99);
             %testType = 'Simulation';
-            testType = 'Modular';
-            %testType = '100m';
+            %testType = 'Modular';
+            testType = '100m';
             simtube = 6;
+            t100mTestNum = 6;
 
             %%% Filenames and Configurables
             if strcmpi(testType,'Simulation')
@@ -56,13 +57,28 @@ classdef Validate
                         error('unimplemented tube requested')
                 end
             elseif strcmpi(testType,'Modular')
-                configDirecName = 'Config/Testing/TOF/Modular_3-22-19_Cropped_TOF';
-                manifestFilename = 'Config/Testing/TOF/Modular_3-22-19_Cropped_TOF/Manifest.json';
-                SensorData = jsondecode(fileread('config/Testing/TOF/Modular_3-22-19_Cropped_TOF/Sensors.json'));
+                if 0
+                    configDirecName = 'Config/Testing/TOF/Modular_3-22-19_Cropped_TOF';
+                    manifestFilename = 'Config/Testing/TOF/Modular_3-22-19_Cropped_TOF/Manifest.json';
+                    SensorData = jsondecode(fileread('config/Testing/TOF/Modular_3-22-19_Cropped_TOF/Sensors.json'));
+                else
+                    configDirecName = 'Config/Testing/TOF/Modular_040819_Test3';
+                    manifestFilename = 'Config/Testing/TOF/Modular_040819_Test3/Manifest.json';
+                    SensorData = jsondecode(fileread('config/Testing/TOF/Modular_040819_Test3/Sensors.json'));
+                end
             elseif strcmpi(testType,'100m')
-                configDirecName = 'Config/Testing/TOF/100m 3-25-19 Cropped TOF';
-                manifestFilename = 'Config/Testing/TOF/100m 3-25-19 Cropped TOF/Manifest.json';
-                SensorData = jsondecode(fileread('config/Testing/TOF/100m 3-25-19 Cropped TOF/Sensors.json'));
+                switch t100mTestNum
+                    case 1
+                        configDirecName = 'Config/Final_Tests/100m_032519/Test 1';
+                        manifestFilename = 'Config/Final_Tests/100m_032519/Test 1/Manifest.json';
+                        SensorData = jsondecode(fileread('Config/Final_Tests/100m_032519/Test 1/Sensors.json'));
+                    case 6
+                        configDirecName = 'Config/Final_Tests/100m_032519/Test 6';
+                        manifestFilename = 'Config/Final_Tests/100m_032519/Test 6/Manifest.json';
+                        SensorData = jsondecode(fileread('Config/Final_Tests/100m_032519/Test 6/Sensors.json'));
+                    otherwise
+                        error('Invalid t100mTestNum')
+                end
             else
                 error('Invalid testType')
             end
@@ -154,6 +170,7 @@ classdef Validate
                 err = [err Error.Cubesat(i).err'];
             end
             onesigmastd = quantile(err,normcdf(1)-normcdf(-1));
+            fprintf(['One Sigma Std over all TOF points: ',num2str(onesigmastd),' m\n\n']);
         end
     end
     

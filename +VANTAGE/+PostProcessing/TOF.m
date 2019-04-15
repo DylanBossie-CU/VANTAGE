@@ -1216,7 +1216,6 @@ classdef TOF
             zlabel('z [m]','fontsize',legendfontsize)
             hold off
             
-            
             subplot(1,3,2)
             grid on
             grid minor
