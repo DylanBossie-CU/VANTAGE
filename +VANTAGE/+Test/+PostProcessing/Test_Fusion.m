@@ -56,11 +56,6 @@ classdef Test_Fusion < matlab.unittest.TestCase
             
             Validator = Validate(obj.configDirecName,Model);
             
-%             getResults = true;
-%             if getResults
-%                 Validator.ComputeMeanError(Model);
-%             end
-            
             CubeSatFitted = cell(Model.Deployer.numCubesats,1);
             TruthFitted = cell(Model.Deployer.numCubesats,1);
             AbsoluteError = cell(Model.Deployer.numCubesats,1);
@@ -98,12 +93,6 @@ classdef Test_Fusion < matlab.unittest.TestCase
             save([pwd '/' dataFolder '/XErrorData' testNumber '.mat'],'XError');
             save([pwd '/' dataFolder '/YErrorData' testNumber '.mat'],'YError');
             save([pwd '/' dataFolder '/ZErrorData' testNumber '.mat'],'ZError');
-            
-            %Validator.ComputeMeanError();
-            
-            Validator.morshol();
-            
-            %Validator.PlotResults(t_fit,CubeSatFitted,TruthFitted,AbsoluteError);
         end
         
     end
