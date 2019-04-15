@@ -207,6 +207,8 @@ classdef TOF
                         % Determine the final 3D fit model to the TOF data,
                         % used for propagation
                         CubeSats(ii).TOFfit_VCF = obj.produceFinalTOFfit(CubeSats(ii));
+                        % Save range over which TOF centroiding was used
+                        CubeSats(ii).TOFrange   = [min(CubeSats(ii).centroids_VCF(3,:)) max(CubeSats(ii).centroids_VCF(3,:))];
                     end
                     stopProcessing = 1;
                 end
@@ -1215,7 +1217,6 @@ classdef TOF
             ylabel('y [m]','fontsize',legendfontsize)
             zlabel('z [m]','fontsize',legendfontsize)
             hold off
-            
             
             subplot(1,3,2)
             grid on
