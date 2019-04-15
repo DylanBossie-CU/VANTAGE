@@ -23,6 +23,6 @@
 				"actualDims": [0.1,0.1,0.1225]
 			}
 		],
-    "TruthDataFile": "Data/100m 3-25-19 Cropped TOF/config_simulation_template_2_25_Josh_ToF_Calibration_tube1_truth_data.json",
+    "TruthDataFile": "Data/100m 3-25-19 Test 1/newTruth.json",
 	"testScenario": "100m"
 }
