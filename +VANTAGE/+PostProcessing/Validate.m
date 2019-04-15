@@ -263,9 +263,12 @@ classdef Validate
         %
         % @author Dylan Bossie
         % @date   11-Apr-2019
-        function PlotResults(~,t_fit,CubeSatFitted,TruthFitted,AbsoluteError)
+        function PlotResults(~,t_fit,CubeSatFitted,TruthFitted,AbsoluteError,ModelRef)
             warning('off','MATLAB:MKDIR:DirectoryExists');
             mkdir('./Data/ErrorOut')
+            
+            tmp = split(ModelRef.Deployer.TruthFileName,'/');
+            TestNum = tmp{3};
             
             figure
             hold on
@@ -274,7 +277,7 @@ classdef Validate
             legend('Measured Range (m)','True Range (m)','Location','SouthEast')
             title('Downrange Distance of CubeSat Measured and True Values - Fusion')
             ylabel('Range (m)')
-            outFile = [pwd '/Data/ErrorOut/CubeSat1_DownrangeErrorFusion'];
+            outFile = [pwd '/Data/ErrorOut/CubeSat1_DownrangeErrorFusion' TestNum];
             export_fig(sprintf('%s',outFile),'-png');
             
             figure
@@ -284,7 +287,7 @@ classdef Validate
             legend('Measured Horizontal (m)','True Horizontal (m)','Location','SouthEast')
             title('Horizontal Distance of CubeSat Measured and True Values - Fusion')
             ylabel('Distance (m)')
-            outFile = [pwd '/Data/ErrorOut/CubeSat1_HorizontalErrorFusion'];
+            outFile = [pwd '/Data/ErrorOut/CubeSat1_HorizontalErrorFusion' TestNum];
             export_fig(sprintf('%s',outFile),'-png');
             
             figure
@@ -294,7 +297,7 @@ classdef Validate
             legend('Measured Vertical (m)','True Vertical (m)','Location','SouthEast')
             title('Vertical Distance of CubeSat Measured and True Values - Fusion')
             ylabel('Distance (m)')
-            outFile = [pwd '/Data/ErrorOut/CubeSat1_VerticalErrorFusion'];
+            outFile = [pwd '/Data/ErrorOut/CubeSat1_VerticalErrorFusion' TestNum];
             export_fig(sprintf('%s',outFile),'-png');
             
             
@@ -318,7 +321,7 @@ classdef Validate
             errorReq_X = linspace(1,10,50);
             plot(errorReq_X,errorReq,'LineWidth',2,'Color',[0.7 0 0])
             legend(legendEntries,'Location','NorthWest');
-            outFile = [pwd '/Data/ErrorOut/CubeSat1_FullErrorFusion'];
+            outFile = [pwd '/Data/ErrorOut/CubeSat1_FullErrorFusion' TestNum];
             export_fig(sprintf('%s',outFile),'-png');
         end
         

@@ -1,5 +1,5 @@
 {
-	"OpticalData": "Data/ModularTest_4_9/Test19/Optical/",
+	"OpticalData": "Data/ModularTest_4_9/Test5/Optical/",
 	"OpticalFileExtension": "VANTAGEOp*",
 	"DesiredFPS": 1,
 	"PlotBinarizedImages": false,

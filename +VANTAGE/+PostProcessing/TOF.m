@@ -87,7 +87,7 @@ classdef TOF
             if predMeanRange <= obj.ModelRef.Optical.rangeStart
                 sigmaTOF = 1;
             else
-                sigmaTOF = interp1([obj.ModelRef.Optical.rangeStart 100],[1,0.01],predMeanRange,'linear','extrap');
+                sigmaTOF = interp1([obj.ModelRef.Optical.rangeStart 100],[1,0.1],predMeanRange,'linear','extrap');
             end
         end
         

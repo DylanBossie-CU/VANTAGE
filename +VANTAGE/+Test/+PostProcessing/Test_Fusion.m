@@ -68,7 +68,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             for i=1:Model.Deployer.numCubesats
                CubeSat = Model.Deployer.CubesatArray(i);
                CubeSatFitted{i} = Validator.fitCubeSatTraj(CubeSat.centroids_VCF,CubeSat.time,'CS',t_fit,Model);
-               TruthFitted{i} = interp1(Model.Truth_VCF.t,Truth.Cubesat(i).pos,t_fit,'linear');
+               TruthFitted{i} = interp1(Model.Truth_VCF.t,Model.Truth_VCF.Cubesat(i).pos,t_fit,'linear');
                [AbsoluteError{i},XError{i},YError{i},ZError{i}] = ...
                    Validator.ProcessError(CubeSatFitted{i},TruthFitted{i});
             end
@@ -93,6 +93,8 @@ classdef Test_Fusion < matlab.unittest.TestCase
             save([pwd '/' dataFolder '/XErrorData' testNumber '.mat'],'XError');
             save([pwd '/' dataFolder '/YErrorData' testNumber '.mat'],'YError');
             save([pwd '/' dataFolder '/ZErrorData' testNumber '.mat'],'ZError');
+            
+            Validator.PlotResults(t_fit,CubeSatFitted,TruthFitted,AbsoluteError,Model);
         end
         
     end
