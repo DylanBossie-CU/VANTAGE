@@ -429,6 +429,7 @@ classdef Validate
             MAKE THE CALL TO YOUR FUNCTION HERE
             %}
             matFileDirectory = [pwd 'Data/Results/matFiles'];
+            obj.masterPlotter(matFileDirectory);
             
         end
         
