@@ -1306,16 +1306,18 @@ classdef Validate
         %
         % @return   outputStruct   a structure with the following fields:
         %                          distance = a cell array into which the
-        %                          ith mat files distance vector goes,
-        %                          velocity = a vector into which the ith
-        %                          mat files velocity goes, t_err = a
-        %                          vector into which the ith mat files
+        %                          ith mat files distance cell goes
+        %                          (cubesats are listed as farthest to
+        %                          nearest), velocity = a vector into which
+        %                          the ith mat files velocity goes, t_err =
+        %                          a vector into which the ith mat files
         %                          t_err goes, v_err = a vector into which
         %                          the ith mat files v_err goes, pos_err =
         %                          a cell array into which the ith mat
-        %                          files pos_err vector goes. this struct
-        %                          is sorted into outputStruct.velocity
-        %                          ascending order
+        %                          files pos_err cell goes (cubesats are
+        %                          listed as farthest to nearest)... this
+        %                          struct is sorted into
+        %                          outputStruct.velocity ascending order
         %
         % @author Marshall Herr
         % @date   16-Apr-2019
@@ -1337,11 +1339,11 @@ classdef Validate
                 fileName = [ fileStruct(i).folder, '/', ...
                     fileStruct(i).name ];
                 dataStruct = load( fileName );
-                outputStruct.distance{i} = dataStruct.distance;
+                outputStruct.distance(i) = dataStruct.distance;
                 outputStruct.velocity(i) = dataStruct.velocity;
                 outputStruct.t_err(i) = dataStruct.t_err;
                 outputStruct.v_err(i) = dataStruct.v_err;
-                outputStruct.pos_err{i} = dataStruct.pos_err;
+                outputStruct.pos_err(i) = dataStruct.pos_err;
                 
             end
             
