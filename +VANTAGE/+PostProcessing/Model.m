@@ -48,7 +48,7 @@ classdef Model < handle
             obj.Deployer = Deployer(manifestFilename, strcat(configDirecName,'/Deployer.json'),obj);
             obj.Transform = Transform(strcat(configDirecName,'/Transform.json'));
             SensorData = jsondecode(fileread(strcat(configDirecName,'/Sensors.json')));
-            obj.TimeMan = TimeManager(SensorData,obj.Deployer.testScenario);
+            obj.TimeMan = TimeManager(SensorData,obj.Deployer.testScenario,obj);
             obj.Truth_VCF = obj.processTruthData(obj.Deployer.TruthFileName);
             obj.TimeMan.syncTruthData(obj);
             obj.Optical = Optical(obj,strcat(configDirecName,'/Optical.json'), obj.Deployer.GetNumCubesats());
@@ -451,7 +451,7 @@ classdef Model < handle
             % extract date0
             Truth = struct;
             if strcmpi(obj.Deployer.testScenario,'Simulation')
-                Truth.t0_datevec = datevec(tmp(1).t,obj.TimeMan.TruthDateFormat);
+                Truth.t0_datevec = datevec(tmp(1).t);
             else
                 Truth.t0_datevec = datevec(tmp{1},obj.TimeMan.TruthDateFormat);
                 tmp = tmp{2}; % reset tmp

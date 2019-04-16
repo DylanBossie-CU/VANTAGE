@@ -21,6 +21,8 @@ classdef TimeManager
         
         % Datevec corresponding to t=0s
         DatevecZero
+        
+        ModelRef
     end
     
     %% Methods
@@ -33,11 +35,12 @@ classdef TimeManager
         % 
         % @author   Joshua Kirby
         % @date     06-Apr-2019
-        function obj = TimeManager(SensorData,testType)
+        function obj = TimeManager(SensorData,testType,ModelRef)
             % Get DateVecZero
             ls = dir(SensorData.TOFData);
             ls = ls([ls.bytes]~=0);
             obj.DatevecZero = obj.datevecFromTofFilename(ls(1).name,testType);
+            obj.ModelRef = ModelRef;
         end
         
         %
@@ -114,15 +117,33 @@ classdef TimeManager
         function [t] = VantageTime(obj,filenames,filetype,TestType)
             filenames = string(filenames);
             t = zeros(length(filenames),1);
-            for i = 1:length(filenames)
-                if strcmpi(filetype,'TOF')
-                    dv = obj.datevecFromTofFilename(filenames(i),TestType);
-                elseif strcmpi(filetype,'Optical')
-                    dv = obj.datevecFromOpticalFilename(filenames(i),TestType);
-                else
-                    error('filetype must be ''TOF'' or ''Optical''')
+            if ~strcmpi(TestType,'simulation')
+                for i = 1:length(filenames)
+                    if strcmpi(filetype,'TOF')
+                        dv = obj.datevecFromTofFilename(filenames(i),TestType);
+                    elseif strcmpi(filetype,'Optical')
+                        dv = obj.datevecFromOpticalFilename(filenames(i),TestType);
+                    else
+                        error('filetype must be ''TOF'' or ''Optical''')
+                    end
+                    t(i) = etime(dv,obj.DatevecZero);
                 end
-                t(i) = etime(dv,obj.DatevecZero);
+            else
+                for i = 1:length(filenames)
+                    if strcmpi(filetype,'TOF')
+                        tmp = char(filenames(i));
+                        filenum = str2num(tmp(end-8:end-4));
+                        tofFps = 10;
+                        t(i) = filenum/tofFps;
+                    elseif strcmpi(filetype,'Optical')
+                        tmp = char(filenames(i));
+                        filenum = str2num(tmp(end-7:end-4));
+                        opticalFps = 2;
+                        t(i) = filenum/opticalFps;
+                    else
+                        error('filetype must be ''TOF'' or ''Optical''')
+                    end
+                end
             end
         end
         
