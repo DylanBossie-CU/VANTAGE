@@ -177,7 +177,7 @@ classdef Validate
         %
         % @author Dylan Bossie 
         % @date   14-Apr-2019
-        function [] = ComputeMeanError(~,Model)
+        function [] = ErrorAnalysis(~,Model)
             if strcmpi(Model.Deployer.testScenario,'Modular')
                 resultsFolder = 'Data/ModularTest_4_9/Results/';
                 
@@ -191,7 +191,15 @@ classdef Validate
                 interpolationPoints = linspace(0,10,1000);
                 
             elseif strcmpi(Model.Deployer.testScenario,'100m')
-                error('notimplemented')
+                resultsFolder = 'Data/3_25_100m/Results/';
+                
+                AbsoluteErrorFiles = dir([resultsFolder 'AbsError*']);
+                CubeSatDataFiles = dir([resultsFolder 'CSData*']);
+                TruthDataFiles = dir([resultsFolder 'TruthData*']);
+                XErrorFiles = dir([resultsFolder 'XError*']);
+                YErrorFiles = dir([resultsFolder 'YError*']);
+                ZErrorFiles = dir([resultsFolder 'ZError*']);
+                
                 interpolationPoints = linspace(0,100,1000);
             elseif strcmpi(Model.Deployer.testScenario,'Simulation')
                 error('notimplemented')
@@ -235,6 +243,32 @@ classdef Validate
             for i = 1:length(interpolationPoints)
                 TotalMeanError(i) = mean(MeanErrorAllFiles(:,i));
             end
+            
+            % Compute mu (
+            
+            % Construct necessary inputs to .mat
+            finalOutput = struct('type',' ','d',[0 1],'mu',interpolationPoints,'sigma',interpolationPoints);
+            
+            finalOutput.type = Model.Deployer.testScenario;
+            finalOutput.mu = TotalMeanError;
+            
+            
+            % Output final .mat file
+            if strcmpi(Model.Deployer.testScenario,'Modular')
+                dataFolder = 'Data/ModularTest_4_9/Results';
+                folderString = Model.Deployer.TruthFileName;
+                save([pwd '/' dataFolder '/FINALERROR_Modular.mat'],'TotalMeanError');
+            elseif strcmpi(Model.Deployer.testScenario,'100m')
+                dataFolder = 'Data/3_25_100m/Results';
+                folderString = Model.Deployer.TruthFileName;
+                save([pwd '/' dataFolder '/FINALERROR_100m.mat'],'TotalMeanError');
+            elseif strcmpi(Model.Deployer.testScenario,'Simulation')
+                testNumber = 'notimplemented';
+            else
+                error('invalid test type in Deployer.TruthFileName')
+            end
+            
+            
         end
         
         function generateErrorPlot( r, mu, sigma )
@@ -1129,7 +1163,7 @@ classdef Validate
                 %{
                 Now that that's done, we can blindly paste my algorith below!
                 %}
-                [dt(k),n_vec(k,:),theta(k),offset_vec(k,:)] = obj.CorrelationMachine(VANTAGE_Data,Truth_Data,1);
+                [dt(k),n_vec(k,:),theta(k),offset_vec(k,:)] = obj.CorrelationMachine(VANTAGE_Data,Truth_Data);
                 
             end
             

@@ -21,26 +21,8 @@
 				"rangeOrder": 3,
 				"expectedU": 1,
 				"actualDims": [0.1,0.1,0.1225]
-			},
-			{
-				"name": "TOF TestSat 1U 4",
-				"rangeOrder": 4,
-				"expectedU": 1,
-				"actualDims": [0.1,0.1,0.1225]
-			},
-			{
-				"name": "TOF TestSat 1U 5", 
-				"rangeOrder": 5,
-				"expectedU": 1,
-				"actualDims": [0.1,0.1,0.1225]
-			},
-			{
-				"name": "TOF TestSat 1U 6",
-				"rangeOrder": 6,
-				"expectedU": 1,
-				"actualDims": [0.1,0.1,0.1225]
 			}
 		],
-    "TruthDataFile": "Data/Simulation_4_15/truth.json",
-	"testScenario": "Simulation"
+    "TruthDataFile": "Data/3_25_100m/Test2/truth.json",
+	"testScenario": "100m"
 }

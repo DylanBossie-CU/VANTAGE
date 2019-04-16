@@ -1,6 +1,6 @@
 {
-	"OpticalData": "Data/Simulation_4_15/Optical/",
-	"OpticalFileExtension": "VTube*",
+	"OpticalData": "Data/3_25_100m/Test2/Optical/",
+	"OpticalFileExtension": "VANTAGEOp*",
 	"DesiredFPS": 1,
 	"PlotBinarizedImages": false,
 	"PlotCentroids": false,

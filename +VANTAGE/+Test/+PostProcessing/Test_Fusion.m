@@ -11,6 +11,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function testFullSystem(obj)
+            return
             import VANTAGE.PostProcessing.Validate
             %%% Housekeeping and Allocation
             close all;
@@ -81,9 +82,13 @@ classdef Test_Fusion < matlab.unittest.TestCase
                 testNumber = tmp{3};
             elseif strcmpi(Model.Deployer.testScenario,'100m')
                 dataFolder = 'Data/3_25_100m/Results';
-                testNumber = 'Test1';
-            else
+                folderString = Model.Deployer.TruthFileName;
+                tmp = split(folderString,'/');
+                testNumber = tmp{3};
+            elseif strcmpi(Model.Deployer.testScenario,'Simulation')
                 testNumber = 'notimplemented';
+            else
+                error('invalid test type in Deployer.TruthFileName')
             end
             
             mkdir(dataFolder)
@@ -98,7 +103,6 @@ classdef Test_Fusion < matlab.unittest.TestCase
         end
         
         function testError(obj)
-            return
             import VANTAGE.PostProcessing.Validate
             %%% Housekeeping and Allocation
             close all;
@@ -128,7 +132,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
 
             Validator = Validate(obj.configDirecName,Model);
             
-            Validator.ComputeMeanError(Model);
+            Validator.ErrorAnalysis(Model);
         end
     end
     
