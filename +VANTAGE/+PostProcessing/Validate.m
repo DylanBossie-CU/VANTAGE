@@ -23,15 +23,15 @@ classdef Validate
         % 
         % @author   Dylan Bossie
         % @date     14-Apr-2019
-        function obj = Validate(configFilename,ModelRef)
+        function obj = Validate(configFilename,ModelRef,CorrelateTruthData)
             configFilename = [configFilename '/Validate.json'];
             parameters = jsondecode(fileread(configFilename));
-            obj.CorrelateTruthData = parameters.CorrelateTruthData;
+            %obj.CorrelateTruthData = parameters.CorrelateTruthData;
             obj.ComputingResults = parameters.ComputingResults;
             obj.ModelRef = ModelRef;
             
             % If user chooses to update truth data with corrections
-            if obj.CorrelateTruthData
+            if CorrelateTruthData
                 % I'm a hardcoded value for which CubeSat is most trusted,
                 % you should change me when you know how to determine this
                 % in general!
@@ -283,7 +283,7 @@ classdef Validate
         % @date   14-Apr-2019
         function [] = ErrorAnalysis(obj,Model,SensorData)
             if strcmpi(Model.Deployer.testScenario,'Modular')
-                resultsFolder = 'Data/ModularTest_4_9/Results/';
+                resultsFolder = 'Data/Results/matFiles/ModularTest_4_9/';
                 
                 AbsoluteErrorFiles = dir([resultsFolder 'AbsError*']);
                 CubeSatDataFiles = dir([resultsFolder 'CSData*']);
@@ -296,7 +296,7 @@ classdef Validate
                 interpolationPoints = linspace(0,10,1000);
                 
             elseif strcmpi(Model.Deployer.testScenario,'100m')
-                resultsFolder = 'Data/3_25_100m/Results/';
+                resultsFolder = 'Data/Results/matFiles/100m/';
                 
                 AbsoluteErrorFiles = dir([resultsFolder 'AbsError*']);
                 CubeSatDataFiles = dir([resultsFolder 'CSData*']);
@@ -308,7 +308,7 @@ classdef Validate
                 
                 interpolationPoints = linspace(0,100,1000);
             elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-                resultsFolder = 'Data/Simulation_4_15/Results/';
+                resultsFolder = 'Data/Results/matFiles/Simulation/';
                 
                 AbsoluteErrorFiles = dir([resultsFolder 'AbsError*']);
                 CubeSatDataFiles = dir([resultsFolder 'CSData*']);
@@ -371,7 +371,7 @@ classdef Validate
                 end
                 
                 mkdir(dataFolder)
-                save([pwd '/' dataFolder testNumber Model.Deployer.testScenario '.mat'],'dataStruct');
+                save([pwd '/' dataFolder testNumber '_' Model.Deployer.testScenario 'dataStruct.mat'],'dataStruct');
                 
 %                 CubeSats = CS.CubeSatFitted;
                 
@@ -500,66 +500,71 @@ classdef Validate
         %
         % @author Dylan Bossie
         % @date   11-Apr-2019
-        function PlotResults(~,t_fit,CubeSatFitted,TruthFitted,AbsoluteError,ModelRef)
-            warning('off','MATLAB:MKDIR:DirectoryExists');
-            mkdir('./Data/ErrorOut')
+        function PlotResults(~,ModelRef)
             
-            tmp = split(ModelRef.Deployer.TruthFileName,'/');
-            TestNum = tmp{3};
+            TestType = ModelRef.Deployer.testScenario;
             
-            figure
-            hold on
-            plot(t_fit,CubeSatFitted{1}(:,3))
-            plot(t_fit,TruthFitted{1}(:,3))
-            legend('Measured Range (m)','True Range (m)','Location','SouthEast')
-            title('Downrange Distance of CubeSat Measured and True Values - Fusion')
-            ylabel('Range (m)')
-            outFile = [pwd '/Data/ErrorOut/CubeSat1_DownrangeErrorFusion' TestNum];
-            export_fig(sprintf('%s',outFile),'-png');
-            
-            figure
-            hold on
-            plot(t_fit,CubeSatFitted{1}(:,1))
-            plot(t_fit,TruthFitted{1}(:,1))
-            legend('Measured Horizontal (m)','True Horizontal (m)','Location','SouthEast')
-            title('Horizontal Distance of CubeSat Measured and True Values - Fusion')
-            ylabel('Distance (m)')
-            outFile = [pwd '/Data/ErrorOut/CubeSat1_HorizontalErrorFusion' TestNum];
-            export_fig(sprintf('%s',outFile),'-png');
-            
-            figure
-            hold on
-            plot(t_fit,CubeSatFitted{1}(:,2))
-            plot(t_fit,TruthFitted{1}(:,2))
-            legend('Measured Vertical (m)','True Vertical (m)','Location','SouthEast')
-            title('Vertical Distance of CubeSat Measured and True Values - Fusion')
-            ylabel('Distance (m)')
-            outFile = [pwd '/Data/ErrorOut/CubeSat1_VerticalErrorFusion' TestNum];
-            export_fig(sprintf('%s',outFile),'-png');
-            
-            
-            figure
-            hold on
-            title('Absolute Error between CubeSat Measurements and True Values')
-            ylabel('Error (cm)')
-            xlabel('Range (m)')
-            for i = 1:length(CubeSatFitted)
-                CubeSat = CubeSatFitted{i};
-                Error = AbsoluteError{i};
-                plot(CubeSat(:,3),Error)
+            matFilesFolder = 'Data/Results/matFiles/';
+            switch TestType
+                case '100m'
+                    tmp = split(ModelRef.Deployer.TruthFileName,'/');
+                    TestNum = tmp{3};
+                    matFilesFolder = [matFilesFolder '100m/'];
+                case 'Simulation'
+                    warning('not implemented');
+                case 'Modular'
+                    tmp = split(ModelRef.Deployer.TruthFileName,'/');
+                    TestNum = tmp{3};
+                    matFilesFolder = [matFilesFolder 'ModularTest_4_9/'];
             end
             
-            legendEntries = cell(length(CubeSatFitted)+1,1);
-            for i = 1:length(CubeSatFitted)
-                legendEntries{i} = strcat('CubeSat ',num2str(i),' Error');
-            end
-            legendEntries{end} = 'Error Requirement';
-            errorReq = zeros(50,1) + 10;
-            errorReq_X = linspace(1,10,50);
-            plot(errorReq_X,errorReq,'LineWidth',2,'Color',[0.7 0 0])
-            legend(legendEntries,'Location','NorthWest');
-            outFile = [pwd '/Data/ErrorOut/CubeSat1_FullErrorFusion' TestNum];
-            export_fig(sprintf('%s',outFile),'-png');
+            AbsoluteErrorFiles = dir([matFilesFolder 'AbsErrorData*' num2str(TestNum) '.mat']);
+            CubeSatDataFiles = dir([matFilesFolder 'CSData*' num2str(TestNum) '.mat']);
+            TruthDataFiles = dir([matFilesFolder 'TruthData*' num2str(TestNum) '.mat']);
+            XErrorFiles = dir([matFilesFolder 'XError*' num2str(TestNum) '.mat']);
+            YErrorFiles = dir([matFilesFolder 'YError*' num2str(TestNum) '.mat']);
+            ZErrorFiles = dir([matFilesFolder 'ZError*' num2str(TestNum) '.mat']);
+            TimeFiles = dir([matFilesFolder 'CSTime*' num2str(TestNum) '.mat']);
+            
+            
+            absError = load([AbsoluteErrorFiles.folder '/' AbsoluteErrorFiles.name]);
+            CS = load([CubeSatDataFiles.folder '/' CubeSatDataFiles.name]);
+            Truth = load([TruthDataFiles.folder '/' TruthDataFiles.name]);
+            XError = load([XErrorFiles.folder '/' XErrorFiles.name]);
+            YError = load([YErrorFiles.folder '/' YErrorFiles.name]);
+            ZError = load([ZErrorFiles.folder '/' ZErrorFiles.name]);
+            Time = load([TimeFiles.folder '/' TimeFiles.name]);
+            
+            cs1 = CS.CubeSatFitted{1};
+            truth1 = Truth.TruthFitted{1};
+            absError1 = absError.AbsoluteError{1};
+            downrange1 = cs1(:,3);
+            
+            cs2 = CS.CubeSatFitted{2};
+            truth2 = Truth.TruthFitted{2};
+            absError2 = absError.AbsoluteError{2};
+            downrange2 = cs2(:,3);
+            
+            cs3 = CS.CubeSatFitted{3};
+            truth3 = Truth.TruthFitted{3};
+            absError3 = absError.AbsoluteError{3};
+            downrange3 = cs3(:,3);
+            
+            figure
+            hold on
+            plot(downrange1,absError1);
+            plot(downrange2,absError2);
+            plot(downrange3,absError3);
+            
+            xlabel('Range (m)');
+            ylabel('Absolute Error (cm)')
+            title([TestType ' Absolute Error - ' TestNum])
+            
+            figure
+            hold on
+            plot3(cs1(:,1),cs1(:,2),cs1(:,3));
+            plot3(truth1(:,1),truth1(:,2),truth1(:,3));
+            title([TestType ' 3D Position - ' TestNum])
         end
         
         
@@ -1324,7 +1329,7 @@ classdef Validate
                 %{
                 Now that that's done, we can blindly paste my algorith below!
                 %}
-                [dt(k),n_vec(k,:),theta(k),offset_vec(k,:)] = obj.CorrelationMachine(VANTAGE_Data,Truth_Data,1);
+                [dt(k),n_vec(k,:),theta(k),offset_vec(k,:)] = obj.CorrelationMachine(VANTAGE_Data,Truth_Data);
                 
             end
             

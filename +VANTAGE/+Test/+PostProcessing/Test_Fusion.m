@@ -1,6 +1,6 @@
 classdef Test_Fusion < matlab.unittest.TestCase
     properties
-        configDirecName = 'Config/Testing/Dylan';
+        configDirecName = 'Config/Final_Tests/ModularTest_4_9/Test11';
     end
     
     methods (TestClassSetup)
@@ -32,7 +32,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             % Compute results
             Model.ComputeStateOutput();
             
-            Validator = Validate(obj.configDirecName,Model);
+            Validator = Validate(obj.configDirecName,Model,true);
             
             CubeSatFitted = cell(Model.Deployer.numCubesats,1);
             TruthFitted = cell(Model.Deployer.numCubesats,1);
@@ -53,17 +53,17 @@ classdef Test_Fusion < matlab.unittest.TestCase
             
             % Save fitted results for error analysis later
             if strcmpi(Model.Deployer.testScenario,'Modular')
-                dataFolder = 'Data/ModularTest_4_9/Results';
+                dataFolder = 'Data/Results/matFiles/ModularTest_4_9';
                 folderString = Model.Deployer.TruthFileName;
                 tmp = split(folderString,'/');
                 testNumber = tmp{3};
             elseif strcmpi(Model.Deployer.testScenario,'100m')
-                dataFolder = 'Data/3_25_100m/Results';
+                dataFolder = 'Data/Results/matFiles/100m';
                 folderString = Model.Deployer.TruthFileName;
                 tmp = split(folderString,'/');
                 testNumber = tmp{3};
             elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-                dataFolder = 'Data/Simulation_4_15/Results';
+                dataFolder = 'Data/Results/matFiles/Simulation_4_15';
                 tmp = split(SensorData.TOFData,'/');
                 testNumber = tmp{4};
             else
@@ -78,15 +78,11 @@ classdef Test_Fusion < matlab.unittest.TestCase
             save([pwd '/' dataFolder '/YErrorData' testNumber '.mat'],'YError');
             save([pwd '/' dataFolder '/ZErrorData' testNumber '.mat'],'ZError');
             save([pwd '/' dataFolder '/CSTime' testNumber '.mat'],'t_fit');
-            
-            Validator.PlotResults(t_fit,CubeSatFitted,TruthFitted,AbsoluteError,Model);
         end
         
         function testError(obj)
-            return
             import VANTAGE.PostProcessing.Validate
             %%% Housekeeping and Allocation
-            close all;
             rng(99);
 
             %%% Filenames and Configurables
@@ -95,7 +91,9 @@ classdef Test_Fusion < matlab.unittest.TestCase
             
             Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName);
 
-            Validator = Validate(obj.configDirecName,Model);
+            Validator = Validate(obj.configDirecName,Model,false);
+            
+            Validator.PlotResults(Model);
             
             Validator.ErrorAnalysis(Model,SensorData);
 
