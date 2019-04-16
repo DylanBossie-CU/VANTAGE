@@ -48,7 +48,7 @@ classdef Model < handle
             obj.Deployer = Deployer(manifestFilename, strcat(configDirecName,'/Deployer.json'),obj);
             obj.Transform = Transform(strcat(configDirecName,'/Transform.json'));
             SensorData = jsondecode(fileread(strcat(configDirecName,'/Sensors.json')));
-            obj.TimeMan = TimeManager(SensorData);
+            obj.TimeMan = TimeManager(SensorData,obj.Deployer.testScenario);
             obj.Truth_VCF = obj.processTruthData(obj.Deployer.TruthFileName);
             obj.TimeMan.syncTruthData(obj);
             obj.Optical = Optical(obj,strcat(configDirecName,'/Optical.json'), obj.Deployer.GetNumCubesats());
