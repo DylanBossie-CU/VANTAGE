@@ -1112,6 +1112,9 @@ classdef Validate
                 % thanks josh!
                 VANTAGE_Data.d = CubeSatofInterest.TOFrange;
                 
+                V_d = sqrt( VANTAGE_Data.x.^2 + VANTAGE_Data.y.^2 + VANTAGE_Data.z.^2 );
+                VANTAGE_Data.d = [ min(V_d), max(V_d) ];
+                
                 CubeSatofInterest = TruthData.Cubesat(k);
                 N = length( TruthData.t );
                 [ Truth_Data.t, Truth_Data.x, Truth_Data.y, Truth_Data.z ] =...
