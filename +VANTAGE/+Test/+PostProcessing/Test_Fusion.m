@@ -11,7 +11,6 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function testFullSystem(obj)
-            return
             import VANTAGE.PostProcessing.Validate
             %%% Housekeeping and Allocation
             close all;
@@ -103,7 +102,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             %%% Housekeeping and Allocation
             close all;
             rng(99);
-            testType = 'Modular';
+            testType = '100m';
             simtube = 6;
 
             %%% Filenames and Configurables
