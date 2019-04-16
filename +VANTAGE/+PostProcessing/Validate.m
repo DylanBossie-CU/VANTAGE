@@ -282,116 +282,117 @@ classdef Validate
         % @author Dylan Bossie 
         % @date   14-Apr-2019
         function [] = ErrorAnalysis(obj,Model,SensorData)
-            if strcmpi(Model.Deployer.testScenario,'Modular')
-                resultsFolder = 'Data/Results/matFiles/ModularTest_4_9/';
-                
-                AbsoluteErrorFiles = dir([resultsFolder 'AbsError*']);
-                CubeSatDataFiles = dir([resultsFolder 'CSData*']);
-                TruthDataFiles = dir([resultsFolder 'TruthData*']);
-                XErrorFiles = dir([resultsFolder 'XError*']);
-                YErrorFiles = dir([resultsFolder 'YError*']);
-                ZErrorFiles = dir([resultsFolder 'ZError*']);
-                TimeFiles = dir([resultsFolder 'CSTime*']);
-                
-                interpolationPoints = linspace(0,10,1000);
-                
-            elseif strcmpi(Model.Deployer.testScenario,'100m')
-                resultsFolder = 'Data/Results/matFiles/100m/';
-                
-                AbsoluteErrorFiles = dir([resultsFolder 'AbsError*']);
-                CubeSatDataFiles = dir([resultsFolder 'CSData*']);
-                TruthDataFiles = dir([resultsFolder 'TruthData*']);
-                XErrorFiles = dir([resultsFolder 'XError*']);
-                YErrorFiles = dir([resultsFolder 'YError*']);
-                ZErrorFiles = dir([resultsFolder 'ZError*']);
-                TimeFiles = dir([resultsFolder 'CSTime*']);
-                
-                interpolationPoints = linspace(0,100,1000);
-            elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-                resultsFolder = 'Data/Results/matFiles/Simulation/';
-                
-                AbsoluteErrorFiles = dir([resultsFolder 'AbsError*']);
-                CubeSatDataFiles = dir([resultsFolder 'CSData*']);
-                TruthDataFiles = dir([resultsFolder 'TruthData*']);
-                XErrorFiles = dir([resultsFolder 'XError*']);
-                YErrorFiles = dir([resultsFolder 'YError*']);
-                ZErrorFiles = dir([resultsFolder 'ZError*']);
-                TimeFiles = dir([resultsFolder 'CSTime*']);
-                
-                interpolationPoints = linspace(0,100,1000);
-            else
-                error('not a valid test case')
-            end
-            
-            MeanErrorAllFiles = zeros(numel(AbsoluteErrorFiles),length(interpolationPoints));
-            MeanVelocityAllFiles = zeros(numel(AbsoluteErrorFiles),1);
-            for i = 1:numel(AbsoluteErrorFiles)
-                absError = load([AbsoluteErrorFiles(i).folder '/' AbsoluteErrorFiles(i).name]);
-                CS = load([CubeSatDataFiles(i).folder '/' CubeSatDataFiles(i).name]);
-                Truth = load([TruthDataFiles(i).folder '/' TruthDataFiles(i).name]);
-                XError = load([XErrorFiles(i).folder '/' XErrorFiles(i).name]);
-                YError = load([YErrorFiles(i).folder '/' YErrorFiles(i).name]);
-                ZError = load([ZErrorFiles(i).folder '/' ZErrorFiles(i).name]);
-                Time = load([TimeFiles(i).folder '/' TimeFiles(i).name]);
-                
-                % Defining properties to provide for output
-                meanvelocity = obj.ComputeMeanVelocity(CS,Time);
-                velocity = Model.Deployer.ExpectedVelocity;
-                
-                v_err = abs(meanvelocity-velocity);
-                
-                distance = obj.ComputeTruthDistance(Model);
-                
-                pos_err = absError.AbsoluteError;
-                
-                t_err = obj.ComputeLaunchTime(CS,Time,Model.Truth_VCF);
-                
-                % Output final results for this test
-                dataStruct = struct('distance',distance,'velocity',...
-                    velocity,'t_err',t_err,'v_err',v_err,'pos_err',pos_err);
-                
-                % Save fitted results for error analysis later
-                dataFolder = 'Data/Results/matFiles/';
+            if false
                 if strcmpi(Model.Deployer.testScenario,'Modular')
-                    dataFolder = [dataFolder 'Modular/'];
-                    folderString = Model.Deployer.TruthFileName;
-                    tmp = split(folderString,'/');
-                    testNumber = tmp{3};
+                    resultsFolder = 'Data/Results/matFiles/ModularTest_4_9/';
+
+                    AbsoluteErrorFiles = dir([resultsFolder 'AbsError*']);
+                    CubeSatDataFiles = dir([resultsFolder 'CSData*']);
+                    TruthDataFiles = dir([resultsFolder 'TruthData*']);
+                    XErrorFiles = dir([resultsFolder 'XError*']);
+                    YErrorFiles = dir([resultsFolder 'YError*']);
+                    ZErrorFiles = dir([resultsFolder 'ZError*']);
+                    TimeFiles = dir([resultsFolder 'CSTime*']);
+
+                    interpolationPoints = linspace(0,10,1000);
+
                 elseif strcmpi(Model.Deployer.testScenario,'100m')
-                    dataFolder = [dataFolder '100m/'];
-                    folderString = Model.Deployer.TruthFileName;
-                    tmp = split(folderString,'/');
-                    testNumber = tmp{3};
+                    resultsFolder = 'Data/Results/matFiles/100m/';
+
+                    AbsoluteErrorFiles = dir([resultsFolder 'AbsError*']);
+                    CubeSatDataFiles = dir([resultsFolder 'CSData*']);
+                    TruthDataFiles = dir([resultsFolder 'TruthData*']);
+                    XErrorFiles = dir([resultsFolder 'XError*']);
+                    YErrorFiles = dir([resultsFolder 'YError*']);
+                    ZErrorFiles = dir([resultsFolder 'ZError*']);
+                    TimeFiles = dir([resultsFolder 'CSTime*']);
+
+                    interpolationPoints = linspace(0,100,1000);
                 elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-                    dataFolder = [dataFolder 'Simulation/'];
-                    tmp = split(SensorData.TOFData,'/');
-                    testNumber = tmp{4};
+                    resultsFolder = 'Data/Results/matFiles/Simulation_4_15/';
+
+                    AbsoluteErrorFiles = dir([resultsFolder 'AbsError*']);
+                    CubeSatDataFiles = dir([resultsFolder 'CSData*']);
+                    TruthDataFiles = dir([resultsFolder 'TruthData*']);
+                    XErrorFiles = dir([resultsFolder 'XError*']);
+                    YErrorFiles = dir([resultsFolder 'YError*']);
+                    ZErrorFiles = dir([resultsFolder 'ZError*']);
+                    TimeFiles = dir([resultsFolder 'CSTime*']);
+
+                    interpolationPoints = linspace(0,100,1000);
                 else
-                    error('invalid test type in Deployer.TruthFileName')
+                    error('not a valid test case')
                 end
-                
-                mkdir(dataFolder)
-                save([pwd '/' dataFolder testNumber '_' Model.Deployer.testScenario 'dataStruct.mat'],'dataStruct');
-                
-%                 CubeSats = CS.CubeSatFitted;
-                
-                % Interpolate error for each CubeSat across the desired
-                % range for the given test
-%                 interpError = zeros(numel(CubeSats),length(interpolationPoints));
-%                 for j = 1:numel(CubeSats)
-%                     CubeSat = CubeSats{j};
-%                     CSAbsError = pos_err{j};
-%                     Z_points = CubeSat(:,3);
-%                     interpError(j,:) = interp1(Z_points,CSAbsError,interpolationPoints);
-%                 end
-%                 
-%                 % Compute the mean error
-%                 MeanError = zeros(length(interpolationPoints),1);
-%                 for j = 1:length(interpolationPoints)
-%                     MeanError(j) = mean(interpError(:,j));
-%                 end
-%                 MeanErrorAllFiles(i,:) = MeanError;
-            end
+
+                MeanErrorAllFiles = zeros(numel(AbsoluteErrorFiles),length(interpolationPoints));
+                MeanVelocityAllFiles = zeros(numel(AbsoluteErrorFiles),1);
+                for i = 1:numel(AbsoluteErrorFiles)
+                    absError = load([AbsoluteErrorFiles(i).folder '/' AbsoluteErrorFiles(i).name]);
+                    CS = load([CubeSatDataFiles(i).folder '/' CubeSatDataFiles(i).name]);
+                    Truth = load([TruthDataFiles(i).folder '/' TruthDataFiles(i).name]);
+                    XError = load([XErrorFiles(i).folder '/' XErrorFiles(i).name]);
+                    YError = load([YErrorFiles(i).folder '/' YErrorFiles(i).name]);
+                    ZError = load([ZErrorFiles(i).folder '/' ZErrorFiles(i).name]);
+                    Time = load([TimeFiles(i).folder '/' TimeFiles(i).name]);
+
+                    % Defining properties to provide for output
+                    meanvelocity = obj.ComputeMeanVelocity(CS,Time);
+                    velocity = Model.Deployer.ExpectedVelocity;
+
+                    v_err = abs(meanvelocity-velocity);
+
+                    distance = obj.ComputeTruthDistance(Model);
+
+                    pos_err = absError.AbsoluteError;
+
+                    t_err = obj.ComputeLaunchTime(CS,Time,Model.Truth_VCF);
+
+                    % Output final results for this test
+                    dataStruct = struct('distance',distance,'velocity',...
+                        velocity,'t_err',t_err,'v_err',v_err,'pos_err',pos_err);
+
+                    % Save fitted results for error analysis later
+                    dataFolder = 'Data/Results/matFiles/';
+                    if strcmpi(Model.Deployer.testScenario,'Modular')
+                        dataFolder = [dataFolder 'Modular/'];
+                        folderString = Model.Deployer.TruthFileName;
+                        tmp = split(folderString,'/');
+                        testNumber = tmp{3};
+                    elseif strcmpi(Model.Deployer.testScenario,'100m')
+                        dataFolder = [dataFolder '100m/'];
+                        folderString = Model.Deployer.TruthFileName;
+                        tmp = split(folderString,'/');
+                        testNumber = tmp{3};
+                    elseif strcmpi(Model.Deployer.testScenario,'Simulation')
+                        dataFolder = [dataFolder 'Simulation/'];
+                        tmp = split(SensorData.TOFData,'/');
+                        testNumber = tmp{4};
+                    else
+                        error('invalid test type in Deployer.TruthFileName')
+                    end
+
+                    mkdir(dataFolder)
+                    save([pwd '/' dataFolder testNumber '_' Model.Deployer.testScenario 'dataStruct.mat'],'dataStruct');
+
+    %                 CubeSats = CS.CubeSatFitted;
+
+                    % Interpolate error for each CubeSat across the desired
+                    % range for the given test
+    %                 interpError = zeros(numel(CubeSats),length(interpolationPoints));
+    %                 for j = 1:numel(CubeSats)
+    %                     CubeSat = CubeSats{j};
+    %                     CSAbsError = pos_err{j};
+    %                     Z_points = CubeSat(:,3);
+    %                     interpError(j,:) = interp1(Z_points,CSAbsError,interpolationPoints);
+    %                 end
+    %                 
+    %                 % Compute the mean error
+    %                 MeanError = zeros(length(interpolationPoints),1);
+    %                 for j = 1:length(interpolationPoints)
+    %                     MeanError(j) = mean(interpError(:,j));
+    %                 end
+    %                 MeanErrorAllFiles(i,:) = MeanError;
+                end
             
 %             % Process mean error across all test cases
 %             TotalMeanError = zeros(numel(interpolationPoints),1);
@@ -413,7 +414,7 @@ classdef Validate
 %             else
 %                 error('invalid test type in Deployer.TruthFileName')
 %             end
-            
+            end
             %{
    ______.........--=T=--.........______
       .             |:|
@@ -426,7 +427,7 @@ classdef Validate
             MARSHALL LANDING PAD ALERT
             
             
-            MAKE THE CALL TO YOUR FUNCTION HERE
+            MAKE THE CALL TO YOUR FUNCTION HERE AFTER FOLDER DEF
             %}
             matFileDirectory = [pwd 'Data/Results/matFiles'];
             
@@ -500,7 +501,7 @@ classdef Validate
         %
         % @author Dylan Bossie
         % @date   11-Apr-2019
-        function PlotResults(~,ModelRef)
+        function PlotResults(~,ModelRef,SensorData)
             
             TestType = ModelRef.Deployer.testScenario;
             
@@ -511,7 +512,9 @@ classdef Validate
                     TestNum = tmp{3};
                     matFilesFolder = [matFilesFolder '100m/'];
                 case 'Simulation'
-                    warning('not implemented');
+                    tmp = split(SensorData.TOFData,'/');
+                    TestNum = tmp{4};
+                    matFilesFolder = [matFilesFolder 'Simulation_4_15/'];
                 case 'Modular'
                     tmp = split(ModelRef.Deployer.TruthFileName,'/');
                     TestNum = tmp{3};

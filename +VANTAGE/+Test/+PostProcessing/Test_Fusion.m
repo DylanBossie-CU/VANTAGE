@@ -1,6 +1,6 @@
 classdef Test_Fusion < matlab.unittest.TestCase
     properties
-        configDirecName = 'Config/Final_Tests/ModularTest_4_9/Test11';
+        configDirecName = 'Config/Final_Tests/Simulation_4_15/Sample10';
     end
     
     methods (TestClassSetup)
@@ -11,6 +11,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function testFullSystem(obj)
+            return
             import VANTAGE.PostProcessing.Validate
             %%% Housekeeping and Allocation
             close all;
@@ -93,7 +94,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
 
             Validator = Validate(obj.configDirecName,Model,false);
             
-            Validator.PlotResults(Model);
+            Validator.PlotResults(Model,SensorData);
             
             Validator.ErrorAnalysis(Model,SensorData);
 
