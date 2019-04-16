@@ -364,9 +364,6 @@ classdef Validate
                 MeanErrorAllFiles(i,:) = MeanError;
             end
             
-            
-            matFileDirectory = [pwd 'Data/Results/matFiles'];
-            
 %             % Process mean error across all test cases
 %             TotalMeanError = zeros(numel(interpolationPoints),1);
 %             for i = 1:length(interpolationPoints)
@@ -402,7 +399,8 @@ classdef Validate
             
             MAKE THE CALL TO YOUR FUNCTION HERE
             %}
-            disp('THANOS COPTER THANOS COPTER')
+            matFileDirectory = [pwd 'Data/Results/matFiles'];
+            
         end
         
         function generateErrorPlot( r, mu, sigma )
@@ -1531,7 +1529,20 @@ classdef Validate
         %
         % This code shall produce an analysis plot
         % 
-        % @param   x   the independent variable of the plot vector
+        % @param   x_req   the independent variable of the plot vector
+        %                  associated to the req points
+        %
+        % @param   x_S   the independent variable of the plot vector
+        %                associated to the err_S points
+        %
+        % @param   x_M   the independent variable of the plot vector
+        %                associated to the err_M points
+        %
+        % @param   x_100m   the independent variable of the plot vector
+        %                   associated to the err_100m points
+        %
+        % @param   x_K   the independent variable of the plot vector
+        %                  associated to the err_K points
         %
         % @param   err_S   the simulated test error vector
         %
@@ -1553,7 +1564,7 @@ classdef Validate
         %
         % @author Marshall Herr
         % @date   16-Apr-2019
-        function [f] = errorPlot(~,x,req,err_S,err_M,err_100m,err_K,x_c,plotLabels,plotTitle)
+        function [f] = errorPlot(~,x_req,x_S,x_M,x_100m,x_K,req,err_S,err_M,err_100m,err_K,x_c,plotLabels,plotTitle)
             % Plotting parameters
             LINEWIDTH   = 2;
             FONTSIZE    = 20;
@@ -1586,15 +1597,15 @@ classdef Validate
             %}
             f = figure( 'Visible', 'off' );
             a = axes;
-            p(1) = plot( x, req, '--', 'color', colors(1,:), ...
+            p(1) = plot( x_req, req, '--', 'color', colors(1,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-            p(2) = plot( x, err_K, '+-', 'color', colors(2,:), ...
+            p(2) = plot( x_K, err_K, '+-', 'color', colors(2,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-            p(3) = plot( x, err_S, 'x-', 'color', colors(3,:), ...
+            p(3) = plot( x_S, err_S, 'x-', 'color', colors(3,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-            p(4) = plot( x, err_M, 's-', 'color', colors(4,:), ...
+            p(4) = plot( x_M, err_M, 's-', 'color', colors(4,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-            p(5) = plot( x, err_100m, 'd-', 'color', colors(5,:), ...
+            p(5) = plot( x_100m, err_100m, 'd-', 'color', colors(5,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
             
             % extract x and y limits
