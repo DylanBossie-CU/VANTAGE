@@ -364,6 +364,9 @@ classdef Validate
                 MeanErrorAllFiles(i,:) = MeanError;
             end
             
+            
+            matFileDirectory = [pwd 'Data/Results/matFiles'];
+            
 %             % Process mean error across all test cases
 %             TotalMeanError = zeros(numel(interpolationPoints),1);
 %             for i = 1:length(interpolationPoints)
