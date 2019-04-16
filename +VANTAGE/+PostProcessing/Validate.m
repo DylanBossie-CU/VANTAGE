@@ -177,7 +177,7 @@ classdef Validate
         %
         % @author Dylan Bossie 
         % @date   14-Apr-2019
-        function [Error,XError,YError,ZError] = ComputeMeanError(~,Model)
+        function [] = ComputeMeanError(~,Model)
             if strcmpi(Model.Deployer.testScenario,'Modular')
                 resultsFolder = 'Data/ModularTest_4_9/Results/';
                 
@@ -187,11 +187,47 @@ classdef Validate
                 XErrorFiles = dir([resultsFolder 'XError*']);
                 YErrorFiles = dir([resultsFolder 'YError*']);
                 ZErrorFiles = dir([resultsFolder 'ZError*']);
+                
+                interpolationPoints = linspace(0,10,1000);
+                
+            elseif strcmpi(Model.Deployer.testScenario,'100m')
+                error('notimplemented')
+                interpolationPoints = linspace(0,100,1000);
+            elseif strcmpi(Model.Deployer.testScenario,'Simulation')
+                error('notimplemented')
+                interpolationPoints = linspace(0,100,1000);
+            else
+                error('not a valid test case')
             end
             
+            MeanErrorAllFiles = cell(numel(AbsoluteErrorFiles),1);
             for i = 1:numel(AbsoluteErrorFiles)
                 absError = load([AbsoluteErrorFiles(i).folder '/' AbsoluteErrorFiles(i).name]);
+                CS = load([CubeSatDataFiles(i).folder '/' CubeSatDataFiles(i).name]);
+                Truth = load([TruthDataFiles(i).folder '/' TruthDataFiles(i).name]);
+                XError = load([XErrorFiles(i).folder '/' XErrorFiles(i).name]);
+                YError = load([YErrorFiles(i).folder '/' YErrorFiles(i).name]);
+                ZError = load([ZErrorFiles(i).folder '/' ZErrorFiles(i).name]);
                 
+                AbsoluteError = absError.AbsoluteError;
+                CubeSats = CS.CubeSatFitted;
+                
+                % Interpolate error for each CubeSat across the desired
+                % range for the given test
+                interpError = zeros(numel(CubeSats),length(interpolationPoints));
+                for j = 1:numel(CubeSats)
+                    CubeSat = CubeSats{j};
+                    CSAbsError = AbsoluteError{j};
+                    Z_points = CubeSat(:,3);
+                    interpError(j,:) = interp1(Z_points,CSAbsError,interpolationPoints);
+                end
+                
+                % Compute the mean error
+                MeanError = zeros(length(interpolationPoints),1);
+                for j = 1:length(interpolationPoints)
+                    MeanError(j) = mean(interpError(:,j));
+                end
+                MeanErrorAllFiles{i} = MeanError;
             end
         end
         

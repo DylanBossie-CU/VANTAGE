@@ -11,6 +11,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function testFullSystem(obj)
+            return
             import VANTAGE.PostProcessing.Validate
             %%% Housekeeping and Allocation
             close all;
@@ -97,6 +98,38 @@ classdef Test_Fusion < matlab.unittest.TestCase
             Validator.PlotResults(t_fit,CubeSatFitted,TruthFitted,AbsoluteError,Model);
         end
         
+        function testError(obj)
+            import VANTAGE.PostProcessing.Validate
+            %%% Housekeeping and Allocation
+            close all;
+            rng(99);
+            testType = 'Modular';
+            simtube = 6;
+
+            %%% Filenames and Configurables
+            if strcmpi(testType,'Simulation')
+                switch simtube
+                    case 1
+                        manifestFilename = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube1/Manifest_TOFdev.json';
+                    case 6
+                        manifestFilename = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube6/Manifest_TOFdev.json';
+                    otherwise
+                        error('unimplemented tube requested')
+                end
+            elseif strcmpi(testType,'Modular')
+                manifestFilename = strcat(obj.configDirecName,'/Manifest.json');
+            elseif strcmpi(testType,'100m')
+                manifestFilename = strcat(obj.configDirecName,'/Manifest.json');
+            else
+                error('Invalid testType')
+            end
+            
+            Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName);
+
+            Validator = Validate(obj.configDirecName,Model);
+            
+            Validator.ComputeMeanError(Model);
+        end
     end
     
     
