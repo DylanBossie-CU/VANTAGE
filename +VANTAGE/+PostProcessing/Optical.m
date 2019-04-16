@@ -161,15 +161,17 @@ classdef Optical
             filenames{i} = direc(i).name;
         end
         
-        switch obj.TestType
-            case {'100m','Modular'}
-              timing = Model.TimeMan.VantageTime(filenames,'Optical',Model.Deployer.testScenario);
-            case 'Simulation'
-                timing = zeros(numel(direc),1);
-                for i = 1:numel(direc)
-                    timing(i) = i;
-                end
-        end
+        timing = Model.TimeMan.VantageTime(filenames,'Optical',Model.Deployer.testScenario);
+        
+%         switch obj.TestType
+%             case {'100m','Modular'}
+%               timing = Model.TimeMan.VantageTime(filenames,'Optical',Model.Deployer.testScenario);
+%             case 'Simulation'
+%                 timing = zeros(numel(direc),1);
+%                 for i = 1:numel(direc)
+%                     timing(i) = i;
+%                 end
+%         end
     end
 
 
