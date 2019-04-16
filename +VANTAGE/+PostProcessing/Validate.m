@@ -4,6 +4,8 @@ classdef Validate
         % Boolean for whether or not to auto update truth data
         CorrelateTruthData
         
+        ComputingResults
+        
         % Model handle class
         ModelRef
     end
@@ -25,6 +27,7 @@ classdef Validate
             configFilename = [configFilename '/Validate.json'];
             parameters = jsondecode(fileread(configFilename));
             obj.CorrelateTruthData = parameters.CorrelateTruthData;
+            obj.ComputingResults = parameters.ComputingResults;
             obj.ModelRef = ModelRef;
             
             % If user chooses to update truth data with corrections
@@ -278,7 +281,7 @@ classdef Validate
         %
         % @author Dylan Bossie 
         % @date   14-Apr-2019
-        function [] = ErrorAnalysis(obj,Model)
+        function [] = ErrorAnalysis(obj,Model,SensorData)
             if strcmpi(Model.Deployer.testScenario,'Modular')
                 resultsFolder = 'Data/ModularTest_4_9/Results/';
                 
@@ -343,25 +346,51 @@ classdef Validate
                 
                 t_err = obj.ComputeLaunchTime(CS,Time,Model.Truth_VCF);
                 
+                % Output final results for this test
+                dataStruct = struct('distance',distance,'velocity',...
+                    velocity,'t_err',t_err,'v_err',v_err,'pos_err',pos_err);
                 
-                CubeSats = CS.CubeSatFitted;
+                % Save fitted results for error analysis later
+                dataFolder = 'Data/Results/matFiles/';
+                if strcmpi(Model.Deployer.testScenario,'Modular')
+                    dataFolder = [dataFolder 'Modular/'];
+                    folderString = Model.Deployer.TruthFileName;
+                    tmp = split(folderString,'/');
+                    testNumber = tmp{3};
+                elseif strcmpi(Model.Deployer.testScenario,'100m')
+                    dataFolder = [dataFolder '100m/'];
+                    folderString = Model.Deployer.TruthFileName;
+                    tmp = split(folderString,'/');
+                    testNumber = tmp{3};
+                elseif strcmpi(Model.Deployer.testScenario,'Simulation')
+                    dataFolder = [dataFolder 'Simulation/'];
+                    tmp = split(SensorData.TOFData,'/');
+                    testNumber = tmp{4};
+                else
+                    error('invalid test type in Deployer.TruthFileName')
+                end
+                
+                mkdir(dataFolder)
+                save([pwd '/' dataFolder testNumber Model.Deployer.testScenario '.mat'],'dataStruct');
+                
+%                 CubeSats = CS.CubeSatFitted;
                 
                 % Interpolate error for each CubeSat across the desired
                 % range for the given test
-                interpError = zeros(numel(CubeSats),length(interpolationPoints));
-                for j = 1:numel(CubeSats)
-                    CubeSat = CubeSats{j};
-                    CSAbsError = pos_err{j};
-                    Z_points = CubeSat(:,3);
-                    interpError(j,:) = interp1(Z_points,CSAbsError,interpolationPoints);
-                end
-                
-                % Compute the mean error
-                MeanError = zeros(length(interpolationPoints),1);
-                for j = 1:length(interpolationPoints)
-                    MeanError(j) = mean(interpError(:,j));
-                end
-                MeanErrorAllFiles(i,:) = MeanError;
+%                 interpError = zeros(numel(CubeSats),length(interpolationPoints));
+%                 for j = 1:numel(CubeSats)
+%                     CubeSat = CubeSats{j};
+%                     CSAbsError = pos_err{j};
+%                     Z_points = CubeSat(:,3);
+%                     interpError(j,:) = interp1(Z_points,CSAbsError,interpolationPoints);
+%                 end
+%                 
+%                 % Compute the mean error
+%                 MeanError = zeros(length(interpolationPoints),1);
+%                 for j = 1:length(interpolationPoints)
+%                     MeanError(j) = mean(interpError(:,j));
+%                 end
+%                 MeanErrorAllFiles(i,:) = MeanError;
             end
             
             

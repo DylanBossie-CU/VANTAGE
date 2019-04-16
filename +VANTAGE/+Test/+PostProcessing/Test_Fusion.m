@@ -84,6 +84,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
         end
         
         function testError(obj)
+            
             import VANTAGE.PostProcessing.Validate
             %%% Housekeeping and Allocation
             close all;
@@ -91,12 +92,13 @@ classdef Test_Fusion < matlab.unittest.TestCase
 
             %%% Filenames and Configurables
             manifestFilename = strcat(obj.configDirecName,'/Manifest.json');
+            SensorData = jsondecode(fileread(strcat(obj.configDirecName,'/Sensors.json')));
             
             Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName);
 
             Validator = Validate(obj.configDirecName,Model);
             
-            Validator.ErrorAnalysis(Model);
+            Validator.ErrorAnalysis(Model,SensorData);
 
         end
     end
