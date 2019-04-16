@@ -163,7 +163,7 @@ classdef Optical
         
         switch obj.TestType
             case {'100m','Modular'}
-              timing = Model.TimeMan.VantageTime(filenames,'Optical');
+              timing = Model.TimeMan.VantageTime(filenames,'Optical',Model.Deployer.testScenario);
             case 'Simulation'
                 timing = zeros(numel(direc),1);
                 for i = 1:numel(direc)

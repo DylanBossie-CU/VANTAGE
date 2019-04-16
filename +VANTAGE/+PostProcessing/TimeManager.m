@@ -21,6 +21,8 @@ classdef TimeManager
         
         % Datevec corresponding to t=0s
         DatevecZero
+        
+        ModelRef
     end
     
     %% Methods
@@ -33,11 +35,12 @@ classdef TimeManager
         % 
         % @author   Joshua Kirby
         % @date     06-Apr-2019
-        function obj = TimeManager(SensorData)
+        function obj = TimeManager(SensorData,testType,ModelRef)
             % Get DateVecZero
             ls = dir(SensorData.TOFData);
             ls = ls([ls.bytes]~=0);
-            obj.DatevecZero = obj.datevecFromTofFilename(ls(1).name);
+            obj.DatevecZero = obj.datevecFromTofFilename(ls(1).name,testType);
+            obj.ModelRef = ModelRef;
         end
         
         %
@@ -70,9 +73,13 @@ classdef TimeManager
         %
         % @author   Joshua Kirby
         % @date     06-Apr-2019
-        function [dv] = datevecFromTofFilename(obj,TOF_filename)
+        function [dv] = datevecFromTofFilename(obj,TOF_filename,testType)
             TOF_filename = char(TOF_filename);
-            ds = TOF_filename(12:end-4);
+            if strcmpi(testType,'Simulation')
+                ds = '0000_00_00_00_00_00.000';
+            else
+                ds = TOF_filename(12:end-4);
+            end
             dv = datevec(ds,obj.TofDateFormat);
         end
         
@@ -85,9 +92,13 @@ classdef TimeManager
         %
         % @author   Joshua Kirby
         % @date     06-Apr-2019
-        function [dv] = datevecFromOpticalFilename(obj,Opt_filename)
+        function [dv] = datevecFromOpticalFilename(obj,Opt_filename,TestType)
             Opt_filename = char(Opt_filename);
-            ds = [Opt_filename(10:13),'_',Opt_filename(14:end-4)];
+            if strcmpi(TestType,'Simulation')
+                ds = '0000_0_00_00_00_0_000';
+            else
+                ds = [Opt_filename(10:13),'_',Opt_filename(14:end-4)];
+            end
             dv = datevec(ds,obj.OpticalDateFormat);
         end
         
@@ -103,18 +114,36 @@ classdef TimeManager
         %
         % @author   Joshua Kirby
         % @date     06-Apr-2019
-        function [t] = VantageTime(obj,filenames,filetype)
+        function [t] = VantageTime(obj,filenames,filetype,TestType)
             filenames = string(filenames);
             t = zeros(length(filenames),1);
-            for i = 1:length(filenames)
-                if strcmpi(filetype,'TOF')
-                    dv = obj.datevecFromTofFilename(filenames(i));
-                elseif strcmpi(filetype,'Optical')
-                    dv = obj.datevecFromOpticalFilename(filenames(i));
-                else
-                    error('filetype must be ''TOF'' or ''Optical''')
+            if ~strcmpi(TestType,'simulation')
+                for i = 1:length(filenames)
+                    if strcmpi(filetype,'TOF')
+                        dv = obj.datevecFromTofFilename(filenames(i),TestType);
+                    elseif strcmpi(filetype,'Optical')
+                        dv = obj.datevecFromOpticalFilename(filenames(i),TestType);
+                    else
+                        error('filetype must be ''TOF'' or ''Optical''')
+                    end
+                    t(i) = etime(dv,obj.DatevecZero);
                 end
-                t(i) = etime(dv,obj.DatevecZero);
+            else
+                for i = 1:length(filenames)
+                    if strcmpi(filetype,'TOF')
+                        tmp = char(filenames(i));
+                        filenum = str2num(tmp(end-8:end-4));
+                        tofFps = 10;
+                        t(i) = filenum/tofFps;
+                    elseif strcmpi(filetype,'Optical')
+                        tmp = char(filenames(i));
+                        filenum = str2num(tmp(end-7:end-4));
+                        opticalFps = 2;
+                        t(i) = filenum/opticalFps;
+                    else
+                        error('filetype must be ''TOF'' or ''Optical''')
+                    end
+                end
             end
         end
         
