@@ -1129,7 +1129,7 @@ classdef Validate
                 %{
                 Now that that's done, we can blindly paste my algorith below!
                 %}
-                [dt(k),n_vec(k,:),theta(k),offset_vec(k,:)] = obj.CorrelationMachine(VANTAGE_Data,Truth_Data);
+                [dt(k),n_vec(k,:),theta(k),offset_vec(k,:)] = obj.CorrelationMachine(VANTAGE_Data,Truth_Data,1);
                 
             end
             

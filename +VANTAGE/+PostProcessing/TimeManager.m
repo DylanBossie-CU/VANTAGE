@@ -33,11 +33,11 @@ classdef TimeManager
         % 
         % @author   Joshua Kirby
         % @date     06-Apr-2019
-        function obj = TimeManager(SensorData)
+        function obj = TimeManager(SensorData,testType)
             % Get DateVecZero
             ls = dir(SensorData.TOFData);
             ls = ls([ls.bytes]~=0);
-            obj.DatevecZero = obj.datevecFromTofFilename(ls(1).name);
+            obj.DatevecZero = obj.datevecFromTofFilename(ls(1).name,testType);
         end
         
         %
@@ -70,7 +70,7 @@ classdef TimeManager
         %
         % @author   Joshua Kirby
         % @date     06-Apr-2019
-        function [dv] = datevecFromTofFilename(obj,TOF_filename)
+        function [dv] = datevecFromTofFilename(obj,TOF_filename,testType)
             TOF_filename = char(TOF_filename);
             ds = TOF_filename(12:end-4);
             dv = datevec(ds,obj.TofDateFormat);
