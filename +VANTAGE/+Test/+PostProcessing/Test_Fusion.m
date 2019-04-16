@@ -11,7 +11,6 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function testFullSystem(obj)
-            return
             import VANTAGE.PostProcessing.Validate
             %%% Housekeeping and Allocation
             close all;
@@ -84,7 +83,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
         end
         
         function testError(obj)
-            
+            return
             import VANTAGE.PostProcessing.Validate
             %%% Housekeeping and Allocation
             close all;
