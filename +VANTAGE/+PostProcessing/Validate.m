@@ -346,7 +346,7 @@ classdef Validate
             
             MAKE THE CALL TO YOUR FUNCTION HERE
             %}
-            
+            disp('THANOS COPTER THANOS COPTER')
         end
         
         function generateErrorPlot( r, mu, sigma )
@@ -1405,6 +1405,8 @@ classdef Validate
             fileSearch = [ dataDirectory, '/100m/', fileType ];
             fileStruct = dir( fileSearch );
             [m100] = obj.extractMatFileData(fileStruct);
+            
+            
             
         end
         
