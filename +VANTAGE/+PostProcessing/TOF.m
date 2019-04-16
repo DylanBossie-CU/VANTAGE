@@ -3,7 +3,7 @@ classdef TOF
     % A class representing the Time of Flight Camera used by VANTAGE
     %
     %% Properties       
-    properties (Access = private)
+    properties (Access = public)
         %
         % Maximum range within which TOF data is considered valid, m
         maxAllowableRange
@@ -306,7 +306,9 @@ classdef TOF
                 % Ensure range ordering (first-out to last-out) of newly identified centroids
                 tmp = [CubeSats_TOF(ItofFoundCentroids).centroid_TCF];
                 [~,Irngorder] = sort(tmp(3,:),'descend');
+                static_Irngorder = Irngorder;
                 Irngorder = ItofFoundCentroids(Irngorder);
+                static_centroid_VCF = centroid_VCF;
                 centroid_VCF = centroid_VCF(:,Irngorder);
                 % Determine which CubeSats already have firstNmeas measurements
                 IsatsWithEnoughMeas = find(cellfun(@length,{CubeSats.time})>=firstNmeas);
@@ -316,8 +318,12 @@ classdef TOF
                 if numel(IsatsWithEnoughMeas) < length(CubeSats)
                     ItofUsedCentroids = setdiff(ItofFoundCentroids,IsatsWithEnoughMeas);
                     for ii = ItofUsedCentroids
-                        CubeSats(ii).centroids_VCF = [CubeSats(ii).centroids_VCF,centroid_VCF(:,ii-min(Irngorder)+1)];
-                        CubeSats(ii).time = [CubeSats(ii).time,CubeSats_TOF(ii-min(Irngorder)+1).time];
+                        try
+                        CubeSats(ii).centroids_VCF = [CubeSats(ii).centroids_VCF,centroid_VCF(:,ii==Irngorder)];
+                        catch
+                            h=1;
+                        end
+                        CubeSats(ii).time = [CubeSats(ii).time,CubeSats_TOF(ii==Irngorder).time];
                     end
                 end
                 % Obtain predicted point and outlierThresholds for each
