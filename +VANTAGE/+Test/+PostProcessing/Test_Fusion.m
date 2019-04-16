@@ -11,6 +11,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function testFullSystem(obj)
+            return
             import VANTAGE.PostProcessing.Validate
             %%% Housekeeping and Allocation
             close all;
@@ -56,11 +57,6 @@ classdef Test_Fusion < matlab.unittest.TestCase
             
             Validator = Validate(obj.configDirecName,Model);
             
-%             getResults = true;
-%             if getResults
-%                 Validator.ComputeMeanError(Model);
-%             end
-            
             CubeSatFitted = cell(Model.Deployer.numCubesats,1);
             TruthFitted = cell(Model.Deployer.numCubesats,1);
             AbsoluteError = cell(Model.Deployer.numCubesats,1);
@@ -73,7 +69,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             for i=1:Model.Deployer.numCubesats
                CubeSat = Model.Deployer.CubesatArray(i);
                CubeSatFitted{i} = Validator.fitCubeSatTraj(CubeSat.centroids_VCF,CubeSat.time,'CS',t_fit,Model);
-               TruthFitted{i} = interp1(Model.Truth_VCF.t,Truth.Cubesat(i).pos,t_fit,'linear');
+               TruthFitted{i} = interp1(Model.Truth_VCF.t,Model.Truth_VCF.Cubesat(i).pos,t_fit,'linear');
                [AbsoluteError{i},XError{i},YError{i},ZError{i}] = ...
                    Validator.ProcessError(CubeSatFitted{i},TruthFitted{i});
             end
@@ -99,13 +95,41 @@ classdef Test_Fusion < matlab.unittest.TestCase
             save([pwd '/' dataFolder '/YErrorData' testNumber '.mat'],'YError');
             save([pwd '/' dataFolder '/ZErrorData' testNumber '.mat'],'ZError');
             
-            %Validator.ComputeMeanError();
-            
-            Validator.morshol();
-            
-            %Validator.PlotResults(t_fit,CubeSatFitted,TruthFitted,AbsoluteError);
+            Validator.PlotResults(t_fit,CubeSatFitted,TruthFitted,AbsoluteError,Model);
         end
         
+        function testError(obj)
+            import VANTAGE.PostProcessing.Validate
+            %%% Housekeeping and Allocation
+            close all;
+            rng(99);
+            testType = 'Modular';
+            simtube = 6;
+
+            %%% Filenames and Configurables
+            if strcmpi(testType,'Simulation')
+                switch simtube
+                    case 1
+                        manifestFilename = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube1/Manifest_TOFdev.json';
+                    case 6
+                        manifestFilename = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube6/Manifest_TOFdev.json';
+                    otherwise
+                        error('unimplemented tube requested')
+                end
+            elseif strcmpi(testType,'Modular')
+                manifestFilename = strcat(obj.configDirecName,'/Manifest.json');
+            elseif strcmpi(testType,'100m')
+                manifestFilename = strcat(obj.configDirecName,'/Manifest.json');
+            else
+                error('Invalid testType')
+            end
+            
+            Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName);
+
+            Validator = Validate(obj.configDirecName,Model);
+            
+            Validator.ComputeMeanError(Model);
+        end
     end
     
     
