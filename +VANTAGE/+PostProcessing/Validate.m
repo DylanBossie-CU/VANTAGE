@@ -167,6 +167,57 @@ classdef Validate
             
         end
         
+        %% Compute truth distance vector
+        %
+        % 
+        % @param    
+        %
+        % @return 
+        %
+        % @author Dylan Bossie 
+        % @date   11-Apr-2019
+        function [distance] = ComputeTruthDistance(~, Model)
+            positions = Model.Truth_VCF.Cubesat;
+            distance = cell(numel(positions),1);
+            for i = 1:numel(positions)
+                cubesat = positions(i).pos;
+                distance_cs = zeros(length(cubesat),1);
+                for j = 1:length(cubesat)
+                    distance_cs(j) = sqrt(cubesat(j,1).^2+cubesat(j,2).^2+cubesat(j,3).^2);
+                end
+                distance{i} = distance_cs;
+            end
+        end
+        
+        %% Compute time of cs launch
+        %
+        % 
+        % @param    
+        %
+        % @return 
+        %
+        % @author Dylan Bossie 
+        % @date   11-Apr-2019
+        function [launch_time_diff] = ComputeLaunchTime(~, CubeSat,Time,Truth)
+            CubeSat = CubeSat.CubeSatFitted;
+            % Find first valid data point for CubeSat 1
+            CS1 = CubeSat{1};
+            for i = 1:length(CS1)
+                if ~isnan(CS1(i,3))
+                    break
+                end
+            end
+            firstIndex = i;
+            % Find measured launch time
+            launch_time = interp1(Time.t_fit,CS1(:,3),0,'linear','extrap');
+            
+            % Find actual launch time
+            CS1_Truth_Z = Truth.Cubesat(1).pos(:,3);
+            true_launch_time = interp1(Truth.t,CS1_Truth_Z,0,'linear','extrap');
+            
+            launch_time_diff = abs(true_launch_time-launch_time);
+        end
+        
         %% Compute mean velocity
         %
         % Compute mean velocity of all cubesats in current file
@@ -280,10 +331,19 @@ classdef Validate
                 ZError = load([ZErrorFiles(i).folder '/' ZErrorFiles(i).name]);
                 Time = load([TimeFiles(i).folder '/' TimeFiles(i).name]);
                 
-                velocity = obj.ComputeMeanVelocity(CS,Time);
-                expectedvelocity = Model.Deployer.ExpectedVelocity;
+                % Defining properties to provide for output
+                meanvelocity = obj.ComputeMeanVelocity(CS,Time);
+                velocity = Model.Deployer.ExpectedVelocity;
                 
-                AbsoluteError = absError.AbsoluteError;
+                v_err = abs(meanvelocity-velocity);
+                
+                distance = obj.ComputeTruthDistance(Model);
+                
+                pos_err = absError.AbsoluteError;
+                
+                t_err = obj.ComputeLaunchTime(CS,Time,Model.Truth_VCF);
+                
+                
                 CubeSats = CS.CubeSatFitted;
                 
                 % Interpolate error for each CubeSat across the desired
@@ -291,7 +351,7 @@ classdef Validate
                 interpError = zeros(numel(CubeSats),length(interpolationPoints));
                 for j = 1:numel(CubeSats)
                     CubeSat = CubeSats{j};
-                    CSAbsError = AbsoluteError{j};
+                    CSAbsError = pos_err{j};
                     Z_points = CubeSat(:,3);
                     interpError(j,:) = interp1(Z_points,CSAbsError,interpolationPoints);
                 end
@@ -304,33 +364,26 @@ classdef Validate
                 MeanErrorAllFiles(i,:) = MeanError;
             end
             
-            % Process mean error across all test cases
-            TotalMeanError = zeros(numel(interpolationPoints),1);
-            for i = 1:length(interpolationPoints)
-                TotalMeanError(i) = mean(MeanErrorAllFiles(:,i));
-            end
-
-            % Construct necessary inputs to .mat
-            finalOutput = struct('type',' ','d',[0 1],'mu',interpolationPoints,'sigma',interpolationPoints);
-            
-            finalOutput.type = Model.Deployer.testScenario;
-            finalOutput.mu = TotalMeanError;
-            
-            
-            % Output final .mat file
-            if strcmpi(Model.Deployer.testScenario,'Modular')
-                dataFolder = 'Data/ModularTest_4_9/Results';
-                folderString = Model.Deployer.TruthFileName;
-                save([pwd '/' dataFolder '/FINALERROR_Modular.mat'],'TotalMeanError');
-            elseif strcmpi(Model.Deployer.testScenario,'100m')
-                dataFolder = 'Data/3_25_100m/Results';
-                folderString = Model.Deployer.TruthFileName;
-                save([pwd '/' dataFolder '/FINALERROR_100m.mat'],'TotalMeanError');
-            elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-                testNumber = 'notimplemented';
-            else
-                error('invalid test type in Deployer.TruthFileName')
-            end
+%             % Process mean error across all test cases
+%             TotalMeanError = zeros(numel(interpolationPoints),1);
+%             for i = 1:length(interpolationPoints)
+%                 TotalMeanError(i) = mean(MeanErrorAllFiles(:,i));
+%             end
+% 
+%             % Output final .mat file
+%             if strcmpi(Model.Deployer.testScenario,'Modular')
+%                 dataFolder = 'Data/ModularTest_4_9/Results';
+%                 folderString = Model.Deployer.TruthFileName;
+%                 save([pwd '/' dataFolder '/FINALERROR_Modular.mat'],'TotalMeanError');
+%             elseif strcmpi(Model.Deployer.testScenario,'100m')
+%                 dataFolder = 'Data/3_25_100m/Results';
+%                 folderString = Model.Deployer.TruthFileName;
+%                 save([pwd '/' dataFolder '/FINALERROR_100m.mat'],'TotalMeanError');
+%             elseif strcmpi(Model.Deployer.testScenario,'Simulation')
+%                 testNumber = 'notimplemented';
+%             else
+%                 error('invalid test type in Deployer.TruthFileName')
+%             end
             
             %{
    ______.........--=T=--.........______

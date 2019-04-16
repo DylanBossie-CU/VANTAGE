@@ -58,6 +58,10 @@ classdef TimeManager
             if offset_sec < 0
                 warning('Truth data starts after TOF data')
             end
+            
+            if offset_sec > 1000000
+                offset_sec = 0;
+            end
             ModelRef.Truth_VCF.t = ModelRef.Truth_VCF.t - offset_sec;
             dv0_updated = dv0_truth;
             dv0_updated(6) = dv0_truth(6) + offset_sec;
