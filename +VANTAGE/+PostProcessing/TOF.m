@@ -121,7 +121,7 @@ classdef TOF
             for i = 1:length(ls)
                 filenames(i) = string(ls(i).name);
             end
-            time = obj.ModelRef.TimeMan.VantageTime(filenames,'TOF');
+            time = obj.ModelRef.TimeMan.VantageTime(filenames,'TOF',obj.ModelRef.Deployer.testScenario);
             
             % Initialize varargin mutable parameters
             fileLims = [1,length(ls)];

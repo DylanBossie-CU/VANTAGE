@@ -72,7 +72,11 @@ classdef TimeManager
         % @date     06-Apr-2019
         function [dv] = datevecFromTofFilename(obj,TOF_filename,testType)
             TOF_filename = char(TOF_filename);
-            ds = TOF_filename(12:end-4);
+            if strcmpi(testType,'Simulation')
+                ds = '0000_00_00_00_00_00.000';
+            else
+                ds = TOF_filename(12:end-4);
+            end
             dv = datevec(ds,obj.TofDateFormat);
         end
         
@@ -85,9 +89,13 @@ classdef TimeManager
         %
         % @author   Joshua Kirby
         % @date     06-Apr-2019
-        function [dv] = datevecFromOpticalFilename(obj,Opt_filename)
+        function [dv] = datevecFromOpticalFilename(obj,Opt_filename,TestType)
             Opt_filename = char(Opt_filename);
-            ds = [Opt_filename(10:13),'_',Opt_filename(14:end-4)];
+            if strcmpi(TestType,'Simulation')
+                ds = '0000_0_00_00_00_0_000';
+            else
+                ds = [Opt_filename(10:13),'_',Opt_filename(14:end-4)];
+            end
             dv = datevec(ds,obj.OpticalDateFormat);
         end
         
@@ -103,14 +111,14 @@ classdef TimeManager
         %
         % @author   Joshua Kirby
         % @date     06-Apr-2019
-        function [t] = VantageTime(obj,filenames,filetype)
+        function [t] = VantageTime(obj,filenames,filetype,TestType)
             filenames = string(filenames);
             t = zeros(length(filenames),1);
             for i = 1:length(filenames)
                 if strcmpi(filetype,'TOF')
-                    dv = obj.datevecFromTofFilename(filenames(i));
+                    dv = obj.datevecFromTofFilename(filenames(i),TestType);
                 elseif strcmpi(filetype,'Optical')
-                    dv = obj.datevecFromOpticalFilename(filenames(i));
+                    dv = obj.datevecFromOpticalFilename(filenames(i),TestType);
                 else
                     error('filetype must be ''TOF'' or ''Optical''')
                 end
