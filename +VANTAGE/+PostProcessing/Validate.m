@@ -200,7 +200,7 @@ classdef Validate
                 error('not a valid test case')
             end
             
-            MeanErrorAllFiles = cell(numel(AbsoluteErrorFiles),1);
+            MeanErrorAllFiles = zeros(numel(AbsoluteErrorFiles),length(interpolationPoints));
             for i = 1:numel(AbsoluteErrorFiles)
                 absError = load([AbsoluteErrorFiles(i).folder '/' AbsoluteErrorFiles(i).name]);
                 CS = load([CubeSatDataFiles(i).folder '/' CubeSatDataFiles(i).name]);
@@ -227,7 +227,13 @@ classdef Validate
                 for j = 1:length(interpolationPoints)
                     MeanError(j) = mean(interpError(:,j));
                 end
-                MeanErrorAllFiles{i} = MeanError;
+                MeanErrorAllFiles(i,:) = MeanError;
+            end
+            
+            % Process mean error across all test cases
+            TotalMeanError = zeros(numel(interpolationPoints),1);
+            for i = 1:length(interpolationPoints)
+                TotalMeanError(i) = mean(MeanErrorAllFiles(:,i));
             end
         end
         
