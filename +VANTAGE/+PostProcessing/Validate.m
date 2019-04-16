@@ -179,12 +179,42 @@ classdef Validate
         % @date   11-Apr-2019
         function [meanvelocity] = ComputeMeanVelocity(obj,CubeSats,time)
             TestType = obj.ModelRef.Deployer.testScenario;
+            Time = time.t_fit;
+            finalIndex = length(Time);
             if strcmpi(TestType,'Simulation')
-                for i = 1:numel(CubeSats.CubeSatFitted)
-                    CubeSat = CubeSats.CubeSatFitted{i};
-                    
+                CS1_Z = CubeSats.CubeSatFitted{1}(:,3);
+                for i = 1:length(CS1_Z)
+                    if CS1_Z(i) >= 100
+                        break
+                    end
                 end
+                finalIndex = i;
             end
+            
+            V_X = zeros(finalIndex-1,1);
+            V_Y = zeros(finalIndex-1,1);
+            V_Z = zeros(finalIndex-1,1);
+            
+            CubeSats = CubeSats.CubeSatFitted;
+            
+            V_Xmean = [];
+            V_Ymean = [];
+            V_Zmean = [];
+            for i = 1:numel(CubeSats)
+                CubeSat = CubeSats{i};
+                X = CubeSat(1:finalIndex,1);
+                Y = CubeSat(1:finalIndex,2);
+                Z = CubeSat(1:finalIndex,3);
+                for j = 1:finalIndex-1
+                    V_X(j) = (X(j+1)-X(j))/(Time(j+1)-Time(j)) ;
+                    V_Y(j) = (Y(j+1)-Y(j))/(Time(j+1)-Time(j)) ;
+                    V_Z(j) = (Z(j+1)-Z(j))/(Time(j+1)-Time(j)) ;
+                end
+                V_Xmean = [V_Xmean mean(V_X)];
+                V_Ymean = [V_Ymean mean(V_Y)];
+                V_Zmean = [V_Zmean mean(V_Z)];
+            end
+            meanvelocity = [mean(V_Xmean) mean(V_Ymean) mean(V_Zmean)];
         end
         
         %% Compute mean error
@@ -207,6 +237,7 @@ classdef Validate
                 XErrorFiles = dir([resultsFolder 'XError*']);
                 YErrorFiles = dir([resultsFolder 'YError*']);
                 ZErrorFiles = dir([resultsFolder 'ZError*']);
+                TimeFiles = dir([resultsFolder 'CSTime*']);
                 
                 interpolationPoints = linspace(0,10,1000);
                 
@@ -219,6 +250,7 @@ classdef Validate
                 XErrorFiles = dir([resultsFolder 'XError*']);
                 YErrorFiles = dir([resultsFolder 'YError*']);
                 ZErrorFiles = dir([resultsFolder 'ZError*']);
+                TimeFiles = dir([resultsFolder 'CSTime*']);
                 
                 interpolationPoints = linspace(0,100,1000);
             elseif strcmpi(Model.Deployer.testScenario,'Simulation')
@@ -230,6 +262,7 @@ classdef Validate
                 XErrorFiles = dir([resultsFolder 'XError*']);
                 YErrorFiles = dir([resultsFolder 'YError*']);
                 ZErrorFiles = dir([resultsFolder 'ZError*']);
+                TimeFiles = dir([resultsFolder 'CSTime*']);
                 
                 interpolationPoints = linspace(0,100,1000);
             else
@@ -245,8 +278,9 @@ classdef Validate
                 XError = load([XErrorFiles(i).folder '/' XErrorFiles(i).name]);
                 YError = load([YErrorFiles(i).folder '/' YErrorFiles(i).name]);
                 ZError = load([ZErrorFiles(i).folder '/' ZErrorFiles(i).name]);
+                Time = load([TimeFiles(i).folder '/' TimeFiles(i).name]);
                 
-                velocity = obj.ComputeMeanVelocity(CS);
+                velocity = obj.ComputeMeanVelocity(CS,Time);
                 
                 AbsoluteError = absError.AbsoluteError;
                 CubeSats = CS.CubeSatFitted;
@@ -274,9 +308,7 @@ classdef Validate
             for i = 1:length(interpolationPoints)
                 TotalMeanError(i) = mean(MeanErrorAllFiles(:,i));
             end
-            
-            % Compute mu (
-            
+
             % Construct necessary inputs to .mat
             finalOutput = struct('type',' ','d',[0 1],'mu',interpolationPoints,'sigma',interpolationPoints);
             
@@ -299,6 +331,20 @@ classdef Validate
                 error('invalid test type in Deployer.TruthFileName')
             end
             
+            %{
+   ______.........--=T=--.........______
+      .             |:|
+ :-. //           /""""""-.
+ ': '-._____..--""(""""""()`---.__
+  /:   _..__   ''  ":""""'[] |""`\\
+  ': :'     `-.     _:._     '"""" :
+   ::          '--=:____:.___....-"
+                     O"       O" 
+            MARSHALL LANDING PAD ALERT
+            
+            
+            MAKE THE CALL TO YOUR FUNCTION HERE
+            %}
             
         end
         

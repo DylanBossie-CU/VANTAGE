@@ -11,6 +11,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function testFullSystem(obj)
+            return
             import VANTAGE.PostProcessing.Validate
             %%% Housekeeping and Allocation
             close all;
@@ -77,13 +78,12 @@ classdef Test_Fusion < matlab.unittest.TestCase
             save([pwd '/' dataFolder '/XErrorData' testNumber '.mat'],'XError');
             save([pwd '/' dataFolder '/YErrorData' testNumber '.mat'],'YError');
             save([pwd '/' dataFolder '/ZErrorData' testNumber '.mat'],'ZError');
-            %save([pwd '/' dataFolder '/CSTime' testNumber '.mat'],'
+            save([pwd '/' dataFolder '/CSTime' testNumber '.mat'],'t_fit');
             
             Validator.PlotResults(t_fit,CubeSatFitted,TruthFitted,AbsoluteError,Model);
         end
         
         function testError(obj)
-            return
             import VANTAGE.PostProcessing.Validate
             %%% Housekeeping and Allocation
             close all;
@@ -97,6 +97,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             Validator = Validate(obj.configDirecName,Model);
             
             Validator.ErrorAnalysis(Model);
+
         end
     end
     
