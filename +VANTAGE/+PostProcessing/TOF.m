@@ -208,7 +208,7 @@ classdef TOF
                         % used for propagation
                         CubeSats(ii).TOFfit_VCF = obj.produceFinalTOFfit(CubeSats(ii));
                         % Save range over which TOF centroiding was used
-                        CubeSats(ii).TOFrange   = [min(vecnorm(CubeSats(ii).centroids_VCF),2) max(vecnorm(CubeSats(ii).centroids_VCF),2)];
+                        CubeSats(ii).TOFrange   = [min(vecnorm(CubeSats(ii).centroids_VCF,2)) max(vecnorm(CubeSats(ii).centroids_VCF,2))];
                     end
                     stopProcessing = 1;
                 end
