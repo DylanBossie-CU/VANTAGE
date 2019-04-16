@@ -167,6 +167,26 @@ classdef Validate
             
         end
         
+        %% Compute mean velocity
+        %
+        % Compute mean velocity of all cubesats in current file
+        % 
+        % @param    
+        %
+        % @return 
+        %
+        % @author Dylan Bossie 
+        % @date   11-Apr-2019
+        function [meanvelocity] = ComputeMeanVelocity(obj,CubeSats,time)
+            TestType = obj.ModelRef.Deployer.testScenario;
+            if strcmpi(TestType,'Simulation')
+                for i = 1:numel(CubeSats.CubeSatFitted)
+                    CubeSat = CubeSats.CubeSatFitted{i};
+                    
+                end
+            end
+        end
+        
         %% Compute mean error
         %
         % Compute mean error for all tests and assimilate cubesat results
@@ -177,7 +197,7 @@ classdef Validate
         %
         % @author Dylan Bossie 
         % @date   14-Apr-2019
-        function [] = ErrorAnalysis(~,Model)
+        function [] = ErrorAnalysis(obj,Model)
             if strcmpi(Model.Deployer.testScenario,'Modular')
                 resultsFolder = 'Data/ModularTest_4_9/Results/';
                 
@@ -202,13 +222,22 @@ classdef Validate
                 
                 interpolationPoints = linspace(0,100,1000);
             elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-                error('notimplemented')
+                resultsFolder = 'Data/Simulation_4_15/Results/';
+                
+                AbsoluteErrorFiles = dir([resultsFolder 'AbsError*']);
+                CubeSatDataFiles = dir([resultsFolder 'CSData*']);
+                TruthDataFiles = dir([resultsFolder 'TruthData*']);
+                XErrorFiles = dir([resultsFolder 'XError*']);
+                YErrorFiles = dir([resultsFolder 'YError*']);
+                ZErrorFiles = dir([resultsFolder 'ZError*']);
+                
                 interpolationPoints = linspace(0,100,1000);
             else
                 error('not a valid test case')
             end
             
             MeanErrorAllFiles = zeros(numel(AbsoluteErrorFiles),length(interpolationPoints));
+            MeanVelocityAllFiles = zeros(numel(AbsoluteErrorFiles),1);
             for i = 1:numel(AbsoluteErrorFiles)
                 absError = load([AbsoluteErrorFiles(i).folder '/' AbsoluteErrorFiles(i).name]);
                 CS = load([CubeSatDataFiles(i).folder '/' CubeSatDataFiles(i).name]);
@@ -216,6 +245,8 @@ classdef Validate
                 XError = load([XErrorFiles(i).folder '/' XErrorFiles(i).name]);
                 YError = load([YErrorFiles(i).folder '/' YErrorFiles(i).name]);
                 ZError = load([ZErrorFiles(i).folder '/' ZErrorFiles(i).name]);
+                
+                velocity = obj.ComputeMeanVelocity(CS);
                 
                 AbsoluteError = absError.AbsoluteError;
                 CubeSats = CS.CubeSatFitted;

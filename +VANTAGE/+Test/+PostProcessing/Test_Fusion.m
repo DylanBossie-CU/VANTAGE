@@ -11,37 +11,14 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function testFullSystem(obj)
-            return
             import VANTAGE.PostProcessing.Validate
             %%% Housekeeping and Allocation
             close all;
             rng(99);
-            testType = '100m';
-            simtube = 6;
 
             %%% Filenames and Configurables
-            if strcmpi(testType,'Simulation')
-                switch simtube
-                    case 1
-                        configDirecName = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube1';
-                        manifestFilename = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube1/Manifest_TOFdev.json';
-                        SensorData = jsondecode(fileread('config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube1/Sensors.json'));
-                    case 6
-                        configDirecName = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube6';
-                        manifestFilename = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube6/Manifest_TOFdev.json';
-                        SensorData = jsondecode(fileread('config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube6/Sensors.json'));
-                    otherwise
-                        error('unimplemented tube requested')
-                end
-            elseif strcmpi(testType,'Modular')
-                manifestFilename = strcat(obj.configDirecName,'/Manifest.json');
-                SensorData = jsondecode(fileread(strcat(obj.configDirecName,'/Sensors.json')));
-            elseif strcmpi(testType,'100m')
-                manifestFilename = strcat(obj.configDirecName,'/Manifest.json');
-                SensorData = jsondecode(fileread(strcat(obj.configDirecName,'/Sensors.json')));
-            else
-                error('Invalid testType')
-            end
+            manifestFilename = strcat(obj.configDirecName,'/Manifest.json');
+            SensorData = jsondecode(fileread(strcat(obj.configDirecName,'/Sensors.json')));
             
             Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName);
             
@@ -86,7 +63,9 @@ classdef Test_Fusion < matlab.unittest.TestCase
                 tmp = split(folderString,'/');
                 testNumber = tmp{3};
             elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-                testNumber = 'notimplemented';
+                dataFolder = 'Data/Simulation_4_15/Results';
+                tmp = split(SensorData.TOFData,'/');
+                testNumber = tmp{4};
             else
                 error('invalid test type in Deployer.TruthFileName')
             end
@@ -98,35 +77,20 @@ classdef Test_Fusion < matlab.unittest.TestCase
             save([pwd '/' dataFolder '/XErrorData' testNumber '.mat'],'XError');
             save([pwd '/' dataFolder '/YErrorData' testNumber '.mat'],'YError');
             save([pwd '/' dataFolder '/ZErrorData' testNumber '.mat'],'ZError');
+            %save([pwd '/' dataFolder '/CSTime' testNumber '.mat'],'
             
             Validator.PlotResults(t_fit,CubeSatFitted,TruthFitted,AbsoluteError,Model);
         end
         
         function testError(obj)
+            return
             import VANTAGE.PostProcessing.Validate
             %%% Housekeeping and Allocation
             close all;
             rng(99);
-            testType = '100m';
-            simtube = 6;
 
             %%% Filenames and Configurables
-            if strcmpi(testType,'Simulation')
-                switch simtube
-                    case 1
-                        manifestFilename = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube1/Manifest_TOFdev.json';
-                    case 6
-                        manifestFilename = 'Config/Testing/TOF/Simulation_TOF-Truth_3-3-19_Tube6/Manifest_TOFdev.json';
-                    otherwise
-                        error('unimplemented tube requested')
-                end
-            elseif strcmpi(testType,'Modular')
-                manifestFilename = strcat(obj.configDirecName,'/Manifest.json');
-            elseif strcmpi(testType,'100m')
-                manifestFilename = strcat(obj.configDirecName,'/Manifest.json');
-            else
-                error('Invalid testType')
-            end
+            manifestFilename = strcat(obj.configDirecName,'/Manifest.json');
             
             Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName);
 
