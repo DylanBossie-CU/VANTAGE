@@ -2,6 +2,7 @@
 	"DeploymentTube": 1,
 	"VantageTube": 8,
 	"expectedRelease": [2019,2,12,13,46,20,536],
+	"expectedVelocity": 0.85,
 	"CubesatArray": 
 		[
 			{

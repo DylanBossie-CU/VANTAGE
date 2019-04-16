@@ -281,6 +281,7 @@ classdef Validate
                 Time = load([TimeFiles(i).folder '/' TimeFiles(i).name]);
                 
                 velocity = obj.ComputeMeanVelocity(CS,Time);
+                expectedvelocity = Model.Deployer.ExpectedVelocity;
                 
                 AbsoluteError = absError.AbsoluteError;
                 CubeSats = CS.CubeSatFitted;

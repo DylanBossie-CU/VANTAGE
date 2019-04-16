@@ -18,6 +18,9 @@ classdef Deployer
         % Array of expected release time for each cubesat
         ExpectedRelease
         
+        % Velocit
+        ExpectedVelocity
+        
         % Truth data file location
         TruthFileName
         
@@ -86,6 +89,8 @@ classdef Deployer
             
             % Assign CubeSat number
             obj.numCubesats = length(obj.CubesatArray);
+            
+            obj.ExpectedVelocity = manifestData.expectedVelocity;
         end
 
         % A method for getting the initial states of all cubesats.
