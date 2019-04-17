@@ -473,7 +473,7 @@ classdef Validate
             
         end
         
-        function generateErrorPlot( r, mu, sigma )
+        function [p1,p2] = generateErrorPlot(~,d,mu,sigma,color)
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%% Author: Marshall Herr
             %%%
@@ -493,19 +493,25 @@ classdef Validate
             %%% Last Editted: 22 March 2019
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-            % % Testing
-            % r = linspace(0,100,100);
-            % mu = r.^2 ./ 100;
-            % sigma = r.^(1.5) ./ 50 + 1;
+%             % Testing
+%             d = linspace(0,100,100);
+%             mu = d.^2 ./ 100;
+%             sigma = d.^(1.5) ./ 50 + 1;
+            
+            if nargin < 4
+                
+                color = 'flat';
+                
+            end
 
             n = 1000;
             s = 10;
-            [ x, y1, y2, c1 ] = deal( zeros( n, length(r) ) );
+            [ x, y1, y2, c1 ] = deal( zeros( n, length(d) ) );
 
-            for i = 1 : length(r)
+            for i = 1 : length(d)
 
                 idx = ( (i-1)*n + 1 ) : ( i*n );
-                x(idx) = r(i) .* ones(1,n)';
+                x(idx) = d(i) .* ones(1,n)';
                 y1(idx) = mu(i)+linspace(0,s*sigma(i),n)';
                 y2(idx) = mu(i)-linspace(0,s*sigma(i),n)';
                 c1(idx) = exp( -linspace(0,s*sigma(i),n) ./ sigma(i) );
@@ -513,16 +519,10 @@ classdef Validate
             end
 
             hold on
-            p1 = surf( x, y1, 0.*x, 'FaceAlpha', 'flat', ...
+            p1 = surf( x, y1, 0.*x, 'FaceAlpha', 'flat', 'FaceColor', color, ...
                 'AlphaDataMapping', 'scaled', 'AlphaData', c1, 'LineStyle', 'None' );
-            surf( x, y2, 0.*x, 'FaceAlpha', 'flat', 'AlphaDataMapping', 'scaled', ...
-                'AlphaData', c1, 'LineStyle', 'None' )
-            p2 = plot( r, mu, '-k', 'LineWidth', 2 );
-            p3 = plot( r, mu+sigma, '-r', 'LineWidth', 2 );
-            ylim( [ min(mu-3.*sigma), max(mu+3.*sigma) ] )
-            legend( [ p1, p2, p3 ], ...
-                { 'Likelyhood of Error', 'Mean Error', '1\sigma Upper Error Bound' }...
-                , 'location', 'best' )
+            p2 = surf( x, y2, 0.*x, 'FaceAlpha', 'flat', 'FaceColor', color, ...
+                'AlphaDataMapping', 'scaled', 'AlphaData', c1, 'LineStyle', 'None' );
 
             end
         
@@ -1547,14 +1547,19 @@ classdef Validate
             
             req_distance = [ 0.1, 10, 10, 100 ];
             req_error = [ 0.1, 0.1, 1, 10 ];
+            fittedPerformanceDistance = req_distance;
+            fittedPerformanceMeanError = req_error;
+            fittedPerformanceSTDError = req_error;
             plotLabels = { 'Distance [m]', 'Error [m]' };
             plotTitle = '';
             
             [f] = obj.errorPlot(req_distance,Simulation.distance_final,...
-                Modular.distance_final,m100.distance_final,NaN,...
+                Modular.distance_final,m100.distance_final,fittedPerformanceDistance,...
                 req_error,Simulation.mu_pos_err_final./100,...
-                Modular.mu_pos_err_final./100,m100.mu_pos_err_final./100,NaN,[],...
-                plotLabels,plotTitle);
+                Modular.mu_pos_err_final./100,m100.mu_pos_err_final./100,...
+                fittedPerformanceMeanError,Simulation.std_pos_err_final,...
+                Modular.std_pos_err_final,m100.std_pos_err_final,...
+                fittedPerformanceSTDError,[],plotLabels,plotTitle);
             
         end
         
@@ -1730,11 +1735,14 @@ classdef Validate
         %
         % @author Marshall Herr
         % @date   16-Apr-2019
-        function [f] = errorPlot(~,x_req,x_S,x_M,x_100m,x_K,req,err_S,err_M,err_100m,err_K,x_c,plotLabels,plotTitle)
+        function [f] = errorPlot(obj,x_req,x_S,x_M,x_100m,x_K,req,...
+                mu_err_S,mu_err_M,mu_err_100m,mu_err_K,sigma_err_S,...
+                sigma_err_M,sigma_err_100m,sigma_err_K,x_c,plotLabels,plotTitle)
             % Plotting parameters
             LINEWIDTH   = 2;
-            FONTSIZE    = 20;
+            FONTSIZE    = 24;
             MARKERSIZE  = 6;
+            NumPlotsDefault = 9;
             %{
             colors:
             [ req;
@@ -1750,12 +1758,12 @@ classdef Validate
                        111, 155, 117; ...
                        192, 174, 109; ...
                        091, 097, 103 ] ./ 255;
-            legend_str = { 'Requirements', 'Simulated Tests', ...
-                'Modular Tests', '100m Tests' };%'Variance Weighted Error' };
+            legend_str = { 'Requirements', 'Variance Weighted Error', ...
+                'Simulated Tests', 'Modular Tests', '100m Tests' };
             set(0, 'defaulttextInterpreter', 'latex')
             set(0, 'DefaultAxesLineStyleOrder', 'default')
             
-            p = gobjects(4 + length(x_c),1);
+            p = gobjects(NumPlotsDefault + length(x_c),1);
             
             %{
             plot order:
@@ -1766,35 +1774,43 @@ classdef Validate
             p(1) = loglog( x_req, req, '--', 'color', colors(1,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
             hold on
-%             p(2) = loglog( x_K, err_K, '+-', 'color', colors(2,:), ...
-%                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-            p(2) = loglog( x_S, err_S, 'x-', 'color', colors(3,:), ...
+            p(2) = loglog( x_K, mu_err_K, '+-', 'color', colors(2,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-            p(3) = loglog( x_M, err_M, 's-', 'color', colors(4,:), ...
+            p(3) = loglog( x_S, mu_err_S, 'x-', 'color', colors(3,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-            p(4) = loglog( x_100m, err_100m, 'd-', 'color', colors(5,:), ...
+            p(4) = loglog( x_M, mu_err_M, 's-', 'color', colors(4,:), ...
+                'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
+            p(5) = loglog( x_100m, mu_err_100m, 'd-', 'color', colors(5,:), ...
+                'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
+            p(6) = loglog( x_K, mu_err_K + sigma_err_K, '+-', 'color', colors(2,:), ...
+                'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
+            p(7) = loglog( x_S, mu_err_S + sigma_err_S, 'x-', 'color', colors(3,:), ...
+                'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
+            p(8) = loglog( x_M, mu_err_M + sigma_err_M, 's-', 'color', colors(4,:), ...
+                'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
+            p(9) = loglog( x_100m, mu_err_100m + sigma_err_100m, 'd-', 'color', colors(5,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
             
             % extract x and y limits
-            x_range = get(gca,'XLim');
+            x_range = [1,100];
             y_range = get(gca,'YLim');
             
             % plot x_c lines
             for i = 1 : length(x_c)
                 
-                p(4+i) = loglog( x_c(i).*[1,1], y_range, '--', ...
+                p(NumPlotsDefault+i) = loglog( x_c(i).*[1,1], y_range, '--', ...
                     'color', colors(6,:), 'LineWidth', LINEWIDTH, ...
                     'MarkerSize', MARKERSIZE );
                 
             end
             
-%             % reorder lines correctly
-%             for i = 1 : length(x_c)+4
-%                 a.Children(i) = p( length(x_c)+4 + ( 1 - i ) );
-%             end
+            % reorder lines correctly
+            a.Children = p(:);
             
             a.XLim = x_range;
             a.YLim = y_range;
+            a.TickLabelInterpreter = 'latex';
+            a.FontSize = FONTSIZE;
             a.XLabel.FontSize = FONTSIZE;
             a.YLabel.FontSize = FONTSIZE;
             a.XLabel.String = plotLabels{1};
@@ -1802,9 +1818,11 @@ classdef Validate
             a.Title.FontSize = FONTSIZE;
             a.Title.String = plotTitle;
             
-            legend( legend_str, 'interpreter', 'latex', ...  
-                'location', 'northwest', 'fontsize', FONTSIZE * 0.9)
+            legend( p(1:NumPlotsDefault), legend_str, 'interpreter', 'latex', ...  
+                'location', 'southeast', 'fontsize', FONTSIZE * 0.9)
             
+            grid on
+            grid minor
             f.Visible = 'on';
             
         end
