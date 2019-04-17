@@ -468,7 +468,7 @@ classdef Validate
             
             MAKE THE CALL TO YOUR FUNCTION HERE AFTER FOLDER DEF
             %}
-            matFileDirectory = [pwd 'Data/Results/matFiles'];
+            matFileDirectory = [pwd '/Data/Results/matFiles'];
             obj.masterPlotter(matFileDirectory);
             
         end
@@ -1325,7 +1325,7 @@ classdef Validate
                 First thing is first, I am going to unpackage TruthData into
                 the variables I used when I originally wrote this code. They
                 are:
-
+                
                 - VANTAGE_Data: a struct with the following fields as they
                                 pertain to the VANTAGE measurements
                     > t: Time column vector
@@ -1524,20 +1524,106 @@ classdef Validate
             
             % Simulation Data Extraction
             fileSearch = [ dataDirectory, '/Simulation/', fileType ];
-            fileStruct = dir( fileSearch );
+            fileStruct = dir(fileSearch);
+            numFilesS = length(fileStruct);
             [Simulation] = obj.extractMatFileData(fileStruct);
             
             % Modular Data Extraction
             fileSearch = [ dataDirectory, '/Modular/', fileType ];
-            fileStruct = dir( fileSearch );
+            fileStruct = dir(fileSearch);
+            numFilesM = length(fileStruct);
             [Modular] = obj.extractMatFileData(fileStruct);
             
             % 100m Data Extraction
             fileSearch = [ dataDirectory, '/100m/', fileType ];
-            fileStruct = dir( fileSearch );
+            fileStruct = dir(fileSearch);
+            numFiles100m = length(fileStruct);
             [m100] = obj.extractMatFileData(fileStruct);
             
+            % convolve measurements
+            [Simulation] = obj.convolveMeasurements(Simulation,numFilesS);
+            [Modular] = obj.convolveMeasurements(Modular,numFilesM);
+            [m100] = obj.convolveMeasurements(m100,numFiles100m);
             
+            req_distance = [ 0.1, 10, 10, 100 ];
+            req_error = [ 0.1, 0.1, 1, 10 ];
+            plotLabels = { 'Distance [m]', 'Error [m]' };
+            plotTitle = '';
+            
+            [f] = obj.errorPlot(req_distance,Simulation.distance_final,...
+                Modular.distance_final,m100.distance_final,NaN,...
+                req_error,Simulation.mu_pos_err_final./100,...
+                Modular.mu_pos_err_final./100,m100.mu_pos_err_final./100,NaN,[],...
+                plotLabels,plotTitle);
+            
+        end
+        
+        %% Convolves stuff
+        %
+        % This code shall produce things
+        %
+        % @author Marshall Herr
+        % @date   16-Apr-2019
+        function [structure] = convolveMeasurements(~,structure,numElements)
+            
+            % initialization
+            [ structure.mean_distance, structure.mu_pos_err, ...
+                structure.std_pos_err, structure.weights_pos_err ] = ...
+                deal( cell( numElements, 1 ) );
+            max_distance = Inf;
+            min_distance = -Inf;
+            num_Points = 0;
+            
+            % averaging across cubesats during each test
+            for i = 1 : numElements
+                structure.mean_distance{i} = ...
+                    mean([structure.distance{i}{:}],2);
+                max_distance = min( max_distance, ...
+                    max( structure.mean_distance{i} ) );
+                min_distance = max( min_distance, ...
+                    min( structure.mean_distance{i} ) );
+                num_Points = max( num_Points, ...
+                    length( structure.mean_distance{i} ) );
+                
+                structure.mu_pos_err{i} = ...
+                    mean([structure.pos_err{i}{:}],2);
+                structure.std_pos_err{i} = ...
+                    std([structure.pos_err{i}{:}],0,2);
+                structure.weights_pos_err{i} = ...
+                    structure.std_pos_err{i}.^(-2);
+                
+            end
+            
+            % variance weighted averaging across tests
+            structure.distance_final = linspace( min_distance, ...
+                max_distance, num_Points )';
+            structure.mu_pos_err_final = 0;
+            structure.std_pos_err_final = 0;
+            
+            for i = 1 : numElements
+                
+                structure.mu_pos_err_final = ...
+                    structure.mu_pos_err_final + ...
+                    interp1( structure.mean_distance{i}, ...
+                    structure.mu_pos_err{i}, structure.distance_final, ...
+                    'pchip' ) .* interp1( structure.mean_distance{i}, ...
+                    structure.weights_pos_err{i}, structure.distance_final, ...
+                    'pchip' );
+                
+                structure.std_pos_err_final = ...
+                    structure.std_pos_err_final + ...
+                    interp1( structure.mean_distance{i}, ...
+                    structure.weights_pos_err{i}, ...
+                    structure.distance_final, 'pchip' );
+                
+            end
+            
+            structure.mu_pos_err_final = ...
+                structure.mu_pos_err_final ./ ...
+                structure.std_pos_err_final;
+            
+            structure.std_pos_err_final = ...
+                structure.std_pos_err_final.^(-1/2);
             
         end
         
@@ -1553,10 +1639,10 @@ classdef Validate
         %                          distance = a cell array into which the
         %                          ith mat files distance cell goes
         %                          (cubesats are listed as farthest to
-        %                          nearest), velocity = a vector into which
+        %                          nearest), velocity = a cell into which
         %                          the ith mat files velocity goes, t_err =
         %                          a vector into which the ith mat files
-        %                          t_err goes, v_err = a vector into which
+        %                          t_err goes, v_err = a cell into which
         %                          the ith mat files v_err goes, pos_err =
         %                          a cell array into which the ith mat
         %                          files pos_err cell goes (cubesats are
@@ -1573,27 +1659,30 @@ classdef Validate
             % preallocation
             intermediary = cell(nFiles,1);
             outputStruct.distance = intermediary;
+            outputStruct.velocity = intermediary;
+            outputStruct.v_err = intermediary;
             outputStruct.pos_err = intermediary;
             intermediary = NaN .* ones(nFiles,1);
-            outputStruct.velocity = intermediary;
             outputStruct.t_err = intermediary;
-            outputStruct.v_err = intermediary;
             
             for i = 1 : nFiles
                 
                 fileName = [ fileStruct(i).folder, '/', ...
                     fileStruct(i).name ];
                 dataStruct = load( fileName );
-                outputStruct.distance(i) = dataStruct.distance;
-                outputStruct.velocity(i) = dataStruct.velocity;
+                % lol
+                dataStruct = dataStruct.dataStruct;
+                outputStruct.distance(i) = {dataStruct.distance(:)};
+                outputStruct.velocity(i) = {dataStruct.velocity};
                 outputStruct.t_err(i) = dataStruct.t_err;
-                outputStruct.v_err(i) = dataStruct.v_err;
-                outputStruct.pos_err(i) = dataStruct.pos_err;
+                outputStruct.v_err(i) = {dataStruct.v_err};
+                outputStruct.pos_err(i) = {dataStruct.pos_err(:)};
                 
             end
             
-            % sort in ascending order by velocity
-            [ ~, sortedIndexes ] = sort( outputStruct.velocity );
+            % sort in ascending order by magnitude of velocity
+            [ ~, sortedIndexes ] = ...
+                sort( vecnorm( [ outputStruct.velocity{:} ] ) );
             outputStruct.distance = outputStruct.distance( sortedIndexes );
             outputStruct.velocity = outputStruct.velocity( sortedIndexes );
             outputStruct.t_err = outputStruct.t_err( sortedIndexes );
@@ -1660,29 +1749,30 @@ classdef Validate
                        063, 064, 124; ...
                        111, 155, 117; ...
                        192, 174, 109; ...
-                       091, 097, 103 ];
+                       091, 097, 103 ] ./ 255;
             legend_str = { 'Requirements', 'Simulated Tests', ...
-                'Modular Tests', '100m Tests', 'Variance Weighted Error' };
+                'Modular Tests', '100m Tests' };%'Variance Weighted Error' };
             set(0, 'defaulttextInterpreter', 'latex')
             set(0, 'DefaultAxesLineStyleOrder', 'default')
             
-            p = gobjects(5 + length(x_c),1);
+            p = gobjects(4 + length(x_c),1);
             
             %{
             plot order:
             everything but x_c, then x_c last
             %}
-            f = figure( 'Visible', 'off' );
+            f = figure();% 'Visible', 'off' );
             a = axes;
-            p(1) = plot( x_req, req, '--', 'color', colors(1,:), ...
+            p(1) = loglog( x_req, req, '--', 'color', colors(1,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-            p(2) = plot( x_K, err_K, '+-', 'color', colors(2,:), ...
+            hold on
+%             p(2) = loglog( x_K, err_K, '+-', 'color', colors(2,:), ...
+%                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
+            p(2) = loglog( x_S, err_S, 'x-', 'color', colors(3,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-            p(3) = plot( x_S, err_S, 'x-', 'color', colors(3,:), ...
+            p(3) = loglog( x_M, err_M, 's-', 'color', colors(4,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-            p(4) = plot( x_M, err_M, 's-', 'color', colors(4,:), ...
-                'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-            p(5) = plot( x_100m, err_100m, 'd-', 'color', colors(5,:), ...
+            p(4) = loglog( x_100m, err_100m, 'd-', 'color', colors(5,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
             
             % extract x and y limits
@@ -1692,16 +1782,16 @@ classdef Validate
             % plot x_c lines
             for i = 1 : length(x_c)
                 
-                p(5+i) = plot( x_c(i).*[1,1], y_range, '--', ...
+                p(4+i) = loglog( x_c(i).*[1,1], y_range, '--', ...
                     'color', colors(6,:), 'LineWidth', LINEWIDTH, ...
                     'MarkerSize', MARKERSIZE );
                 
             end
             
-            % reorder lines correctly
-            for i = 1 : length(x_c)+5
-                a.Children(i) = p( length(x_c)+5 + ( 1 - i ) );
-            end
+%             % reorder lines correctly
+%             for i = 1 : length(x_c)+4
+%                 a.Children(i) = p( length(x_c)+4 + ( 1 - i ) );
+%             end
             
             a.XLim = x_range;
             a.YLim = y_range;
@@ -1712,7 +1802,7 @@ classdef Validate
             a.Title.FontSize = FONTSIZE;
             a.Title.String = plotTitle;
             
-            legend( p(1:5), legend_str, 'interpreter', 'latex', ...  
+            legend( legend_str, 'interpreter', 'latex', ...  
                 'location', 'northwest', 'fontsize', FONTSIZE * 0.9)
             
             f.Visible = 'on';
