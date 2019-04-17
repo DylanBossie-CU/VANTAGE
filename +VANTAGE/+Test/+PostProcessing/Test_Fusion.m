@@ -1,6 +1,17 @@
 classdef Test_Fusion < matlab.unittest.TestCase
     properties
-        configDirecName = 'Config/Final_Tests/ModularTest_4_9/Test18';
+        %configDirecName = 'Config/Final_Tests/Simulation_4_15/140/Sample3';
+        configDirecName = {
+            'Config/Final_Tests/Simulation_4_15/140/Sample1',...
+            'Config/Final_Tests/Simulation_4_15/140/Sample2',...
+            'Config/Final_Tests/Simulation_4_15/140/Sample3',...
+            'Config/Final_Tests/Simulation_4_15/140/Sample4',...
+            'Config/Final_Tests/Simulation_4_15/140/Sample5',...
+            'Config/Final_Tests/Simulation_4_15/140/Sample6',...
+            'Config/Final_Tests/Simulation_4_15/140/Sample7',...
+            'Config/Final_Tests/Simulation_4_15/140/Sample8',...
+            'Config/Final_Tests/Simulation_4_15/140/Sample9',...
+            'Config/Final_Tests/Simulation_4_15/140/Sample10'};
     end
     
     methods (TestClassSetup)
@@ -13,15 +24,16 @@ classdef Test_Fusion < matlab.unittest.TestCase
         function testFullSystem(obj)
             return
             import VANTAGE.PostProcessing.Validate
+            for iter = 1:numel(obj.configDirecName)
             %%% Housekeeping and Allocation
             close all;
             rng(99);
 
             %%% Filenames and Configurables
-            manifestFilename = strcat(obj.configDirecName,'/Manifest.json');
-            SensorData = jsondecode(fileread(strcat(obj.configDirecName,'/Sensors.json')));
+            manifestFilename = strcat(obj.configDirecName{iter},'/Manifest.json');
+            SensorData = jsondecode(fileread(strcat(obj.configDirecName{iter},'/Sensors.json')));
             
-            Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName);
+            Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName{iter});
             
             fileLims = [1 inf];
             Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
@@ -33,7 +45,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             % Compute results
             Model.ComputeStateOutput();
             
-            Validator = Validate(obj.configDirecName,Model,true);
+            Validator = Validate(obj.configDirecName{iter},Model,true);
             
             CubeSatFitted = cell(Model.Deployer.numCubesats,1);
             TruthFitted = cell(Model.Deployer.numCubesats,1);
@@ -64,7 +76,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
                 tmp = split(folderString,'/');
                 testNumber = tmp{3};
             elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-                dataFolder = 'Data/Results/matFiles/Simulation_4_15';
+                dataFolder = 'Data/Results/matFiles/Simulation_4_15_140';
                 tmp = split(SensorData.TOFData,'/');
                 testNumber = tmp{4};
             else
@@ -79,25 +91,27 @@ classdef Test_Fusion < matlab.unittest.TestCase
             save([pwd '/' dataFolder '/YErrorData' testNumber '.mat'],'YError');
             save([pwd '/' dataFolder '/ZErrorData' testNumber '.mat'],'ZError');
             save([pwd '/' dataFolder '/CSTime' testNumber '.mat'],'t_fit');
+            end
         end
         
         function testError(obj)
             import VANTAGE.PostProcessing.Validate
+            for iter = 1:numel(obj.configDirecName)
             %%% Housekeeping and Allocation
             rng(99);
 
             %%% Filenames and Configurables
-            manifestFilename = strcat(obj.configDirecName,'/Manifest.json');
-            SensorData = jsondecode(fileread(strcat(obj.configDirecName,'/Sensors.json')));
+            manifestFilename = strcat(obj.configDirecName{iter},'/Manifest.json');
+            SensorData = jsondecode(fileread(strcat(obj.configDirecName{iter},'/Sensors.json')));
             
-            Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName);
+            Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName{iter});
 
-            Validator = Validate(obj.configDirecName,Model,false);
+            Validator = Validate(obj.configDirecName{iter},Model,false);
             
-            Validator.PlotResults(Model,SensorData);
+            %Validator.PlotResults(Model,SensorData);
             
             Validator.ErrorAnalysis(Model,SensorData);
-
+            end
         end
     end
     
