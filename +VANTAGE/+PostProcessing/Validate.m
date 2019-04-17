@@ -221,6 +221,35 @@ classdef Validate
             launch_time_diff = abs(true_launch_time-launch_time);
         end
         
+        %% Interpolate cubesats to truth dat apositions
+        %
+        % 
+        % @param    
+        %
+        % @return 
+        
+        % @author Dylan Bossie 
+        % @date   11-Apr-2019
+        function [pos_err] = InterpolateDistance(~, CSArray,timefitted,time,distance)
+            CubeSats = CSArray.CubeSatFitted;
+            CubeSatTime = timefitted.t_fit;
+            pos_err = cell(numel(CubeSats),1);
+            for i = 1:numel(CubeSats)
+                CubeSat = CubeSats{i};
+                distancecs = distance{i};
+                X = CubeSat(:,1);
+                Y = CubeSat(:,2);
+                Z = CubeSat(:,3);
+                X_interp = interp1(CubeSatTime,X',time);
+                Y_interp = interp1(CubeSatTime,Y',time);
+                Z_interp = interp1(CubeSatTime,Z',time);
+                
+                absdistance = sqrt(X_interp.^2+Y_interp.^2+Z_interp.^2);
+                
+                pos_err{i} = abs(absdistance-distancecs');
+            end
+        end
+        
         %% Compute mean velocity
         %
         % Compute mean velocity of all cubesats in current file
@@ -282,7 +311,6 @@ classdef Validate
         % @author Dylan Bossie 
         % @date   14-Apr-2019
         function [] = ErrorAnalysis(obj,Model,SensorData)
-            if false
                 if strcmpi(Model.Deployer.testScenario,'Modular')
                     resultsFolder = 'Data/Results/matFiles/ModularTest_4_9/';
 
@@ -309,7 +337,7 @@ classdef Validate
 
                     interpolationPoints = linspace(0,100,1000);
                 elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-                    resultsFolder = 'Data/Results/matFiles/Simulation_4_15/';
+                    resultsFolder = 'Data/Results/matFiles/Simulation_4_15_140/';
 
                     AbsoluteErrorFiles = dir([resultsFolder 'AbsError*']);
                     CubeSatDataFiles = dir([resultsFolder 'CSData*']);
@@ -339,20 +367,31 @@ classdef Validate
                     meanvelocity = obj.ComputeMeanVelocity(CS,Time);
                     velocity = Model.Deployer.ExpectedVelocity;
 
-                    v_err = abs(meanvelocity-velocity);
+                    v_err = abs(meanvelocity-velocity');
 
                     distance = obj.ComputeTruthDistance(Model);
 
-                    pos_err = absError.AbsoluteError;
+                    % Interpolate cubesats to the truth distances for
+                    % pos_err
+                    pos_err = obj.InterpolateDistance(CS,Time,Model.Truth_VCF.t,distance);
 
                     t_err = obj.ComputeLaunchTime(CS,Time,Model.Truth_VCF);
 
+                    if t_err > 5
+                        error('Time manager generated incorrect time offset');
+                    end
+                    
+                    
                     % Output final results for this test
-                    dataStruct = struct('distance',distance,'velocity',...
-                        velocity,'t_err',t_err,'v_err',v_err,'pos_err',pos_err);
+                    dataStruct = struct();
+                    dataStruct.distance = distance;
+                    dataStruct.velocity = velocity;
+                    dataStruct.t_err = t_err;
+                    dataStruct.v_err = v_err;
+                    dataStruct.pos_err = pos_err;
 
                     % Save fitted results for error analysis later
-                    dataFolder = 'Data/Results/matFiles/';
+                    dataFolder = resultsFolder;
                     if strcmpi(Model.Deployer.testScenario,'Modular')
                         dataFolder = [dataFolder 'Modular/'];
                         folderString = Model.Deployer.TruthFileName;
@@ -414,7 +453,6 @@ classdef Validate
 %             else
 %                 error('invalid test type in Deployer.TruthFileName')
 %             end
-            end
             %{
    ______.........--=T=--.........______
       .             |:|
