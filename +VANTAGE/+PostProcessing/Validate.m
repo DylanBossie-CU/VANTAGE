@@ -66,7 +66,7 @@ classdef Validate
             rng(99);
             %testType = 'Simulation';
             %testType = 'Modular';
-            testType = '100m';
+            testType = 'Modular';
             simtube = 6;
 
             %%% Filenames and Configurables
@@ -247,6 +247,7 @@ classdef Validate
                 absdistance = sqrt(X_interp.^2+Y_interp.^2+Z_interp.^2);
                 
                 pos_err{i} = abs(absdistance-distancecs');
+                pos_err{i} = pos_err{i}';
             end
         end
         
@@ -337,7 +338,7 @@ classdef Validate
 
                     interpolationPoints = linspace(0,100,1000);
                 elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-                    resultsFolder = 'Data/Results/matFiles/Simulation_4_15_140/';
+                    resultsFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
 
                     AbsoluteErrorFiles = dir([resultsFolder 'AbsError*']);
                     CubeSatDataFiles = dir([resultsFolder 'CSData*']);
