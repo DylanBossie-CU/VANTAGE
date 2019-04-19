@@ -1545,21 +1545,82 @@ classdef Validate
             [Modular] = obj.convolveMeasurements(Modular,numFilesM);
             [m100] = obj.convolveMeasurements(m100,numFiles100m);
             
+            %%% Contour Plot of Error VS Distance & Velocity
+            
+            
+            %%% Reduced Master Error VS Distance Plot
             req_distance = [ 0.1, 10, 10, 100 ];
             req_error = [ 0.1, 0.1, 1, 10 ];
-            fittedPerformanceDistance = req_distance;
-            fittedPerformanceMeanError = req_error;
-            fittedPerformanceSTDError = req_error;
-            plotLabels = { 'Distance [m]', 'Error [m]' };
-            plotTitle = '';
+            pointsOfInterest = [];
             
-            [f] = obj.errorPlot(req_distance,Simulation.distance_final,...
-                Modular.distance_final,m100.distance_final,fittedPerformanceDistance,...
-                req_error,Simulation.mu_pos_err_final./100,...
-                Modular.mu_pos_err_final./100,m100.mu_pos_err_final./100,...
-                fittedPerformanceMeanError,Simulation.std_pos_err_final,...
-                Modular.std_pos_err_final,m100.std_pos_err_final,...
-                fittedPerformanceSTDError,[],plotLabels,plotTitle);
+            % Fitted Curve to be representative of VANTAGE's performance
+            % I will have to do this last, if at all
+            fittedPositionDistance = req_distance;
+            fittedPositionMeanError = req_error;
+            fittedPositionSTDError = req_error;
+            
+            plotLabels = { 'Distance [m]', ...
+                'Position Measurement Error [m]' };
+            plotTitle = 'Position Measurement Error Versus Distance';
+            distance_range = [1,100];
+            
+            [f_Master] = ...
+                obj.errorPlot(req_distance,Simulation.distance_final,...
+                Modular.distance_final,m100.distance_final,...
+                fittedPositionDistance,req_error,...
+                Simulation.mu_pos_err_final,Modular.mu_pos_err_final,...
+                m100.mu_pos_err_final,fittedPositionMeanError,...
+                Simulation.std_pos_err_final,Modular.std_pos_err_final,...
+                m100.std_pos_err_final,fittedPositionSTDError,...
+                pointsOfInterest,plotLabels,plotTitle,distance_range);
+            
+            %%% Velocity Error VS Velocity Plot
+            req_distance = [ 0.1, 10, 10, 100 ];
+            req_error = [ 0.1, 0.1, 1, 10 ];
+            pointsOfInterest = [];
+            
+            % Fitted Curve to be representative of VANTAGE's performance
+            % I will have to do this last, if at all
+            fittedVelocityVelocity = req_distance;
+            fittedVelocityMeanError = req_error;
+            
+            plotLabels = { 'Average Velocity [m/s]', ...
+                'Average Velocity Measurement Error [m/s]' };
+            plotTitle = 'Average Velocity Measurement Error Versus Average Velocity';
+            velocity_range = [ -Inf, Inf ];
+            
+            [f_Velocity] = ...
+                obj.errorPlot(req_distance,Simulation.mag_velocity,...
+                Modular.mag_velocity,m100.mag_velocity,...
+                fittedVelocityVelocity,req_error,...
+                Simulation.mag_v_err,Modular.mag_v_err,...
+                m100.mag_v_err,fittedVelocityMeanError,...
+                {},{},{},{},pointsOfInterest,plotLabels,plotTitle,...
+                velocity_range);
+            
+            %%% Launch Time Error VS Velocity Plot
+            req_distance = [ 0.1, 10, 10, 100 ];
+            req_error = [ 0.1, 0.1, 1, 10 ];
+            pointsOfInterest = [];
+            
+            % Fitted Curve to be representative of VANTAGE's performance
+            % I will have to do this last, if at all
+            fittedTimeVelocity = req_distance;
+            fittedTimeMeanError = req_error;
+            
+            plotLabels = { 'Average Velocity [m/s]', ...
+                'Launch Time Measurement Error [m/s]' };
+            plotTitle = 'Launch Time Measurement Error Versus Average Velocity';
+            velocity_range = [ -Inf, Inf ];
+            
+            [f_Time] = ...
+                obj.errorPlot(req_distance,Simulation.mag_velocity,...
+                Modular.mag_velocity,m100.mag_velocity,...
+                fittedTimeVelocity,req_error,...
+                Simulation.t_err,Modular.t_err,...
+                m100.t_err,fittedTimeMeanError,...
+                {},{},{},{},pointsOfInterest,plotLabels,plotTitle,...
+                velocity_range);
             
         end
         
@@ -1577,17 +1638,17 @@ classdef Validate
                 deal( cell( numElements, 1 ) );
             max_distance = Inf;
             min_distance = -Inf;
-            num_Points = 0;
+            num_Points = Inf;
             
             % averaging across cubesats during each test
             for i = 1 : numElements
                 structure.mean_distance{i} = ...
                     mean([structure.distance{i}{:}],2);
-                max_distance = min( max_distance, ...
-                    max( structure.mean_distance{i} ) );
-                min_distance = max( min_distance, ...
-                    min( structure.mean_distance{i} ) );
-                num_Points = max( num_Points, ...
+                max_distance = min( [ max_distance, ...
+                    max( structure.mean_distance{i} ) ] );
+                min_distance = max( [ min_distance, ...
+                    min( structure.mean_distance{i} ) ] );
+                num_Points = min( num_Points, ...
                     length( structure.mean_distance{i} ) );
                 
                 structure.mu_pos_err{i} = ...
@@ -1662,6 +1723,7 @@ classdef Validate
             nFiles = length( fileStruct );
             
             % preallocation
+            cm_to_m = 1 / 100; % m cm^-1
             intermediary = cell(nFiles,1);
             outputStruct.distance = intermediary;
             outputStruct.velocity = intermediary;
@@ -1669,6 +1731,8 @@ classdef Validate
             outputStruct.pos_err = intermediary;
             intermediary = NaN .* ones(nFiles,1);
             outputStruct.t_err = intermediary;
+            outputStruct.mag_velocity = intermediary;
+            outputStruct.mag_v_err = intermediary;
             
             for i = 1 : nFiles
                 
@@ -1679,9 +1743,19 @@ classdef Validate
                 dataStruct = dataStruct.dataStruct;
                 outputStruct.distance(i) = {dataStruct.distance(:)};
                 outputStruct.velocity(i) = {dataStruct.velocity};
+                outputStruct.mag_velocity(i) = norm(dataStruct.velocity);
                 outputStruct.t_err(i) = dataStruct.t_err;
                 outputStruct.v_err(i) = {dataStruct.v_err};
+                outputStruct.mag_v_err(i) = norm(dataStruct.v_err);
                 outputStruct.pos_err(i) = {dataStruct.pos_err(:)};
+                
+                % turns out the position error is given in cm not m
+                for j = 1 : length(outputStruct.pos_err{i})
+                    
+                    outputStruct.pos_err{i}{j} = ...
+                        outputStruct.pos_err{i}{j} .* cm_to_m;
+                    
+                end
                 
             end
             
@@ -1735,9 +1809,10 @@ classdef Validate
         %
         % @author Marshall Herr
         % @date   16-Apr-2019
-        function [f] = errorPlot(obj,x_req,x_S,x_M,x_100m,x_K,req,...
+        function [f] = errorPlot(~,x_req,x_S,x_M,x_100m,x_K,req,...
                 mu_err_S,mu_err_M,mu_err_100m,mu_err_K,sigma_err_S,...
-                sigma_err_M,sigma_err_100m,sigma_err_K,x_c,plotLabels,plotTitle)
+                sigma_err_M,sigma_err_100m,sigma_err_K,x_c,plotLabels,...
+                plotTitle,x_range)
             % Plotting parameters
             LINEWIDTH   = 2;
             FONTSIZE    = 24;
@@ -1774,25 +1849,39 @@ classdef Validate
             p(1) = loglog( x_req, req, '--', 'color', colors(1,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
             hold on
-            p(2) = loglog( x_K, mu_err_K, '+-', 'color', colors(2,:), ...
+            p(2) = loglog( x_K, mu_err_K, '*-', 'color', colors(2,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-            p(3) = loglog( x_S, mu_err_S, 'x-', 'color', colors(3,:), ...
+            p(3) = loglog( x_S, mu_err_S, 'o-', 'color', colors(3,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
             p(4) = loglog( x_M, mu_err_M, 's-', 'color', colors(4,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
             p(5) = loglog( x_100m, mu_err_100m, 'd-', 'color', colors(5,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-            p(6) = loglog( x_K, mu_err_K + sigma_err_K, '+-', 'color', colors(2,:), ...
-                'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-            p(7) = loglog( x_S, mu_err_S + sigma_err_S, 'x-', 'color', colors(3,:), ...
-                'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-            p(8) = loglog( x_M, mu_err_M + sigma_err_M, 's-', 'color', colors(4,:), ...
-                'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-            p(9) = loglog( x_100m, mu_err_100m + sigma_err_100m, 'd-', 'color', colors(5,:), ...
-                'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
+            index = 5;
+            if ~isempty(sigma_err_K)
+                p(index+1) = loglog( x_K, mu_err_K + sigma_err_K, '*-', 'color', colors(2,:), ...
+                    'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
+                index = index + 1;
+            end
+            if ~isempty(sigma_err_S)
+                p(index+1) = loglog( x_S, mu_err_S + sigma_err_S, 'o-', 'color', colors(3,:), ...
+                    'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
+                index = index + 1;
+            end
+            if ~isempty(sigma_err_M)
+                p(index+1) = loglog( x_M, mu_err_M + sigma_err_M, 's-', 'color', colors(4,:), ...
+                    'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
+                index = index + 1;
+            end
+            if ~isempty(sigma_err_100m)
+                p(index+1) = loglog( x_100m, mu_err_100m + sigma_err_100m, 'd-', 'color', colors(5,:), ...
+                    'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
+                index = index + 1;
+            end
+            
+            NumPlotsDefault = index;
             
             % extract x and y limits
-            x_range = [1,100];
             y_range = get(gca,'YLim');
             
             % plot x_c lines
@@ -1803,6 +1892,9 @@ classdef Validate
                     'MarkerSize', MARKERSIZE );
                 
             end
+            
+            % in case one is missing above
+            p = p(1:NumPlotsDefault+length(x_c));
             
             % reorder lines correctly
             a.Children = p(:);
