@@ -10,7 +10,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
         configDirecNameSim140 = 'Config/Final_Tests/Simulation/_140/Sample*';
         configDirecNameSim195 = 'Config/Final_Tests/Simulation/_195/Sample*';
          
-        testType = 'Simulation_195';
+        testType = 'Simulation_085';
         
         configDirecName
     end
@@ -23,7 +23,6 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function testFullSystem(obj)
-            return
             import VANTAGE.PostProcessing.Validate
             switch obj.testType
                 case 'Modular'
@@ -134,6 +133,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
         end
         
         function testError(obj)
+            return
             import VANTAGE.PostProcessing.Validate
             
             switch obj.testType
