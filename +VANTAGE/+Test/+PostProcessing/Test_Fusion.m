@@ -112,7 +112,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_140/';
                 tmp = split(SensorData.TOFData,'/');
                 testNumber = tmp{4};
-            elseif strcmpi(obj.testType,'Simulation_140')
+            elseif strcmpi(obj.testType,'Simulation_195')
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
                 tmp = split(SensorData.TOFData,'/');
                 testNumber = tmp{4};
@@ -121,6 +121,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             end
             
             mkdir(dataFolder)
+            mkdir([dataFolder 'data/']);
             save([pwd '/' dataFolder 'data/CSData' testNumber '.mat'],'CubeSatFitted');
             save([pwd '/' dataFolder 'data/TruthData' testNumber '.mat'],'TruthFitted');
             save([pwd '/' dataFolder 'data/AbsErrorData' testNumber '.mat'],'AbsoluteError');
