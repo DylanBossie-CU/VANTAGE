@@ -261,9 +261,19 @@ classdef Validate
         %
         % @author Dylan Bossie 
         % @date   11-Apr-2019
-        function [meanvelocity] = ComputeMeanVelocity(obj,CubeSats,time)
+        function [meanvelocity] = ComputeMeanVelocity(obj,CubeSats,time,type)
             TestType = obj.ModelRef.Deployer.testScenario;
-            Time = time.t_fit;
+            if strcmpi(type,'cs')
+                Time = time.t_fit;
+                CubeSats = CubeSats.CubeSatFitted;
+            elseif strcmpi(type,'truth')
+                Time = time;
+                tmp = cell(numel(CubeSats),1);
+                for i = 1:numel(CubeSats)
+                    tmp{i} = CubeSats(i).pos;
+                end
+                CubeSats = tmp;
+            end
             finalIndex = length(Time);
             if strcmpi(TestType,'Simulation')
                 CS1_Z = CubeSats.CubeSatFitted{1}(:,3);
@@ -279,7 +289,7 @@ classdef Validate
             V_Y = zeros(finalIndex-1,1);
             V_Z = zeros(finalIndex-1,1);
             
-            CubeSats = CubeSats.CubeSatFitted;
+            
             
             V_Xmean = [];
             V_Ymean = [];
@@ -314,47 +324,45 @@ classdef Validate
         function [] = ErrorAnalysis(obj,Model,SensorData)
                 if strcmpi(Model.Deployer.testScenario,'Modular')
                     resultsFolder = 'Data/Results/matFiles/ModularTest_4_9/';
-
-                    AbsoluteErrorFiles = dir([resultsFolder 'AbsError*']);
-                    CubeSatDataFiles = dir([resultsFolder 'CSData*']);
-                    TruthDataFiles = dir([resultsFolder 'TruthData*']);
-                    XErrorFiles = dir([resultsFolder 'XError*']);
-                    YErrorFiles = dir([resultsFolder 'YError*']);
-                    ZErrorFiles = dir([resultsFolder 'ZError*']);
-                    TimeFiles = dir([resultsFolder 'CSTime*']);
+                    matResults = [resultsFolder 'data/'];
+                    AbsoluteErrorFiles = dir([matResults 'AbsError*']);
+                    CubeSatDataFiles = dir([matResults 'CSData*']);
+                    TruthDataFiles = dir([matResults 'TruthData*']);
+                    XErrorFiles = dir([matResults 'XError*']);
+                    YErrorFiles = dir([matResults 'YError*']);
+                    ZErrorFiles = dir([matResults 'ZError*']);
+                    TimeFiles = dir([matResults 'CSTime*']);
 
                     interpolationPoints = linspace(0,10,1000);
 
                 elseif strcmpi(Model.Deployer.testScenario,'100m')
                     resultsFolder = 'Data/Results/matFiles/100m/';
-
-                    AbsoluteErrorFiles = dir([resultsFolder 'AbsError*']);
-                    CubeSatDataFiles = dir([resultsFolder 'CSData*']);
-                    TruthDataFiles = dir([resultsFolder 'TruthData*']);
-                    XErrorFiles = dir([resultsFolder 'XError*']);
-                    YErrorFiles = dir([resultsFolder 'YError*']);
-                    ZErrorFiles = dir([resultsFolder 'ZError*']);
-                    TimeFiles = dir([resultsFolder 'CSTime*']);
+                    matResults = [resultsFolder 'data/'];
+                    AbsoluteErrorFiles = dir([matResults 'AbsError*']);
+                    CubeSatDataFiles = dir([matResults 'CSData*']);
+                    TruthDataFiles = dir([matResults 'TruthData*']);
+                    XErrorFiles = dir([matResults 'XError*']);
+                    YErrorFiles = dir([matResults 'YError*']);
+                    ZErrorFiles = dir([matResults 'ZError*']);
+                    TimeFiles = dir([matResults 'CSTime*']);
 
                     interpolationPoints = linspace(0,100,1000);
                 elseif strcmpi(Model.Deployer.testScenario,'Simulation')
                     resultsFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
-
-                    AbsoluteErrorFiles = dir([resultsFolder 'AbsError*']);
-                    CubeSatDataFiles = dir([resultsFolder 'CSData*']);
-                    TruthDataFiles = dir([resultsFolder 'TruthData*']);
-                    XErrorFiles = dir([resultsFolder 'XError*']);
-                    YErrorFiles = dir([resultsFolder 'YError*']);
-                    ZErrorFiles = dir([resultsFolder 'ZError*']);
-                    TimeFiles = dir([resultsFolder 'CSTime*']);
+                    matResults = [resultsFolder 'data/'];
+                    AbsoluteErrorFiles = dir([matResults 'AbsError*']);
+                    CubeSatDataFiles = dir([matResults 'CSData*']);
+                    TruthDataFiles = dir([matResults 'TruthData*']);
+                    XErrorFiles = dir([matResults 'XError*']);
+                    YErrorFiles = dir([matResults 'YError*']);
+                    ZErrorFiles = dir([matResults 'ZError*']);
+                    TimeFiles = dir([matResults 'CSTime*']);
 
                     interpolationPoints = linspace(0,100,1000);
                 else
                     error('not a valid test case')
                 end
 
-                MeanErrorAllFiles = zeros(numel(AbsoluteErrorFiles),length(interpolationPoints));
-                MeanVelocityAllFiles = zeros(numel(AbsoluteErrorFiles),1);
                 for i = 1:numel(AbsoluteErrorFiles)
                     absError = load([AbsoluteErrorFiles(i).folder '/' AbsoluteErrorFiles(i).name]);
                     CS = load([CubeSatDataFiles(i).folder '/' CubeSatDataFiles(i).name]);
@@ -365,8 +373,8 @@ classdef Validate
                     Time = load([TimeFiles(i).folder '/' TimeFiles(i).name]);
 
                     % Defining properties to provide for output
-                    meanvelocity = obj.ComputeMeanVelocity(CS,Time);
-                    velocity = Model.Deployer.ExpectedVelocity;
+                    meanvelocity = obj.ComputeMeanVelocity(CS,Time,'cs');
+                    velocity = obj.ComputeMeanVelocity(Model.Truth_VCF.Cubesat,Model.Truth_VCF.t,'truth');
 
                     v_err = abs(meanvelocity-velocity');
 
@@ -1740,6 +1748,7 @@ classdef Validate
                     fileStruct(i).name ];
                 dataStruct = load( fileName );
                 % lol
+                try
                 dataStruct = dataStruct.dataStruct;
                 outputStruct.distance(i) = {dataStruct.distance(:)};
                 outputStruct.velocity(i) = {dataStruct.velocity};
@@ -1748,6 +1757,9 @@ classdef Validate
                 outputStruct.v_err(i) = {dataStruct.v_err};
                 outputStruct.mag_v_err(i) = norm(dataStruct.v_err);
                 outputStruct.pos_err(i) = {dataStruct.pos_err(:)};
+                catch
+                    disp('fuckin hell yea break my shit')
+                end
                 
                 % turns out the position error is given in cm not m
                 for j = 1 : length(outputStruct.pos_err{i})

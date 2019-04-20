@@ -33,6 +33,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function testFullSystem(obj)
+            return
             import VANTAGE.PostProcessing.Validate
             for iter = 1:numel(obj.configDirecName)
             %%% Housekeeping and Allocation
@@ -94,18 +95,17 @@ classdef Test_Fusion < matlab.unittest.TestCase
             end
             
             mkdir(dataFolder)
-            save([pwd '/' dataFolder '/CSData' testNumber '.mat'],'CubeSatFitted');
-            save([pwd '/' dataFolder '/TruthData' testNumber '.mat'],'TruthFitted');
-            save([pwd '/' dataFolder '/AbsErrorData' testNumber '.mat'],'AbsoluteError');
-            save([pwd '/' dataFolder '/XErrorData' testNumber '.mat'],'XError');
-            save([pwd '/' dataFolder '/YErrorData' testNumber '.mat'],'YError');
-            save([pwd '/' dataFolder '/ZErrorData' testNumber '.mat'],'ZError');
-            save([pwd '/' dataFolder '/CSTime' testNumber '.mat'],'t_fit');
+            save([pwd '/' dataFolder 'data/CSData' testNumber '.mat'],'CubeSatFitted');
+            save([pwd '/' dataFolder 'data/TruthData' testNumber '.mat'],'TruthFitted');
+            save([pwd '/' dataFolder 'data/AbsErrorData' testNumber '.mat'],'AbsoluteError');
+            save([pwd '/' dataFolder 'data/XErrorData' testNumber '.mat'],'XError');
+            save([pwd '/' dataFolder 'data/YErrorData' testNumber '.mat'],'YError');
+            save([pwd '/' dataFolder 'data/ZErrorData' testNumber '.mat'],'ZError');
+            save([pwd '/' dataFolder 'data/CSTime' testNumber '.mat'],'t_fit');
             end
         end
         
         function testError(obj)
-            return
             import VANTAGE.PostProcessing.Validate
             for iter = 1:numel(obj.configDirecName)
             %%% Housekeeping and Allocation
