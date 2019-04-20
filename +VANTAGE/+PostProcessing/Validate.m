@@ -477,7 +477,7 @@ classdef Validate
             MAKE THE CALL TO YOUR FUNCTION HERE AFTER FOLDER DEF
             %}
             matFileDirectory = [pwd '/Data/Results/matFiles'];
-            obj.masterPlotter(matFileDirectory);
+            %obj.masterPlotter(matFileDirectory);
             
         end
         

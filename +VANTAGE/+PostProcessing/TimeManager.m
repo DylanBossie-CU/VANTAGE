@@ -39,7 +39,11 @@ classdef TimeManager
             % Get DateVecZero
             ls = dir(SensorData.TOFData);
             ls = ls([ls.bytes]~=0);
+            try
             obj.DatevecZero = obj.datevecFromTofFilename(ls(1).name,testType);
+            catch
+                disp('go fuck urself')
+            end
             obj.ModelRef = ModelRef;
         end
         

@@ -1,28 +1,18 @@
 classdef Test_Fusion < matlab.unittest.TestCase
     properties
-        %configDirecName = 'Config/Final_Tests/ModularTest_4_9';
         %%%%%% Modular config direcs
-        configDirecName = {
-            'Config/Final_Tests/ModularTest_4_9/Test5',...
-            'Config/Final_Tests/ModularTest_4_9/Test8',...
-            'Config/Final_Tests/ModularTest_4_9/Test9',...
-            'Config/Final_Tests/ModularTest_4_9/Test10',...
-            'Config/Final_Tests/ModularTest_4_9/Test11',...
-            'Config/Final_Tests/ModularTest_4_9/Test12',...
-            'Config/Final_Tests/ModularTest_4_9/Test13',...
-            'Config/Final_Tests/ModularTest_4_9/Test14',...
-            'Config/Final_Tests/ModularTest_4_9/Test15',...
-            'Config/Final_Tests/ModularTest_4_9/Test16',...
-            'Config/Final_Tests/ModularTest_4_9/Test17',...
-            'Config/Final_Tests/ModularTest_4_9/Test18',...
-            'Config/Final_Tests/ModularTest_4_9/Test19',...
-            'Config/Final_Tests/ModularTest_4_9/Test20'
-            };
-%         configDirecName = {
-%             'Config/Final_Tests/3_25_100m/Test1',...
-%             'Config/Final_Tests/3_25_100m/Test2',...
-%             'Config/Final_Tests/3_25_100m/Test7'};
-        %configDirecName = {'Config/Final_Tests/ModularTest_4_9/Test18'};
+        configDirecNameModular = 'Config/Final_Tests/ModularTest_4_9/Test*'
+        %%%%%% 100m config direcs
+        configDirecName100m = 'Config/Final_Tests/3_25_100m/Test*';
+        %%%%%% Simulation config direcs
+        configDirecNameSim085 = 'Config/Final_Tests/Simulation/_085/Sample*';
+        configDirecNameSim030 = 'Config/Final_Tests/Simulation/_030/Sample*';
+        configDirecNameSim140 = 'Config/Final_Tests/Simulation/_140/Sample*';
+        configDirecNameSim195 = 'Config/Final_Tests/Simulation/_195/Sample*';
+         
+        testType = 'Simulation_085';
+        
+        configDirecName
     end
     
     methods (TestClassSetup)
@@ -33,18 +23,42 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function testFullSystem(obj)
-            return
             import VANTAGE.PostProcessing.Validate
-            for iter = 1:numel(obj.configDirecName)
+            switch obj.testType
+                case 'Modular'
+                    obj.configDirecName = obj.configDirecNameModular;
+                    testType = 'ModularTest_4_9';
+                case '100m'
+                    obj.configDirecName = obj.configDirecName100m;
+                    testType = '3_25_100m';
+                case 'Simulation_085'
+                    obj.configDirecName = obj.configDirecNameSim085;
+                    testType = 'Simulation/_085';
+                case 'Simulation_030'
+                    obj.configDirecName = obj.configDirecNameSim030;
+                    testType = 'Simulation/_030';
+                case 'Simulation_140'
+                    obj.configDirecName = obj.configDirecNameSim140;
+                    testType = 'Simulation/_140';
+                case 'Simulation_195'
+                    obj.configDirecName = obj.configDirecNameSim195;
+                    testType = 'Simulation/_195';
+            end
+
+            configfiles = dir(obj.configDirecName);
+            
+            for iter = 1:numel(configfiles)
             %%% Housekeeping and Allocation
             close all;
             rng(99);
 
-            %%% Filenames and Configurables
-            manifestFilename = strcat(obj.configDirecName{iter},'/Manifest.json');
-            SensorData = jsondecode(fileread(strcat(obj.configDirecName{iter},'/Sensors.json')));
+            configfile = [pwd '/config/Final_Tests/' testType '/' configfiles(iter).name];
             
-            Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName{iter});
+            %%% Filenames and Configurables
+            manifestFilename = strcat(configfile,'/Manifest.json');
+            SensorData = jsondecode(fileread(strcat(configfile,'/Sensors.json')));
+            
+            Model = VANTAGE.PostProcessing.Model(manifestFilename,configfile);
             
             fileLims = [1 inf];
             Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
@@ -56,7 +70,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             % Compute results
             Model.ComputeStateOutput();
             
-            Validator = Validate(obj.configDirecName{iter},Model,true);
+            Validator = Validate(configfile,Model,true);
             
             CubeSatFitted = cell(Model.Deployer.numCubesats,1);
             TruthFitted = cell(Model.Deployer.numCubesats,1);
@@ -77,17 +91,25 @@ classdef Test_Fusion < matlab.unittest.TestCase
             
             % Save fitted results for error analysis later
             if strcmpi(Model.Deployer.testScenario,'Modular')
-                dataFolder = 'Data/Results/matFiles/ModularTest_4_9';
+                dataFolder = 'Data/Results/matFiles/ModularTest_4_9/';
                 folderString = Model.Deployer.TruthFileName;
                 tmp = split(folderString,'/');
                 testNumber = tmp{3};
             elseif strcmpi(Model.Deployer.testScenario,'100m')
-                dataFolder = 'Data/Results/matFiles/100m';
+                dataFolder = 'Data/Results/matFiles/100m/';
                 folderString = Model.Deployer.TruthFileName;
                 tmp = split(folderString,'/');
                 testNumber = tmp{3};
             elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-                dataFolder = 'Data/Results/matFiles/Simulation_4_15_195';
+                dataFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
+                tmp = split(SensorData.TOFData,'/');
+                testNumber = tmp{4};
+            elseif strcmpi(Model.Deployer.testScenario,'Simulation')
+                dataFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
+                tmp = split(SensorData.TOFData,'/');
+                testNumber = tmp{4};
+            elseif strcmpi(Model.Deployer.testScenario,'Simulation')
+                dataFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
                 tmp = split(SensorData.TOFData,'/');
                 testNumber = tmp{4};
             else
@@ -107,17 +129,33 @@ classdef Test_Fusion < matlab.unittest.TestCase
         
         function testError(obj)
             import VANTAGE.PostProcessing.Validate
-            for iter = 1:numel(obj.configDirecName)
+            
+            switch obj.testType
+                case 'Modular'
+                    obj.configDirecName = obj.configDirecNameModular;
+                    testType = 'ModularTest_4_9';
+                case '100m'
+                    obj.configDirecName = obj.configDirecName100m;
+                    testType = '3_25_100m';
+                case 'Simulation'
+                    obj.configDirecName = obj.configDirecNameSim;
+                    testType = 'Simulation';
+            end
+            
+            configfiles = dir(obj.configDirecName);
+            
+            for iter = 1:numel(configfiles)
             %%% Housekeeping and Allocation
             rng(99);
 
             %%% Filenames and Configurables
-            manifestFilename = strcat(obj.configDirecName{iter},'/Manifest.json');
-            SensorData = jsondecode(fileread(strcat(obj.configDirecName{iter},'/Sensors.json')));
+            configfolder = [configfiles(iter).folder '/' configfiles(iter).name];
+            manifestFilename = [configfolder '/Manifest.json'];
+            SensorData = jsondecode(fileread(strcat(configfolder,'/Sensors.json')));
             
-            Model = VANTAGE.PostProcessing.Model(manifestFilename,obj.configDirecName{iter});
+            Model = VANTAGE.PostProcessing.Model(manifestFilename,configfolder);
 
-            Validator = Validate(obj.configDirecName{iter},Model,false);
+            Validator = Validate(configfolder,Model,false);
             
             %Validator.PlotResults(Model,SensorData);
             

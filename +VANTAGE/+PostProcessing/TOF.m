@@ -292,7 +292,9 @@ classdef TOF
             if isempty(hadOutlier)
                 hadOutlier = zeros(1,length(CubeSats));
             end
-            hadOutlier = hadOutlier(1:length(CubeSats));
+            if ~strcmpi(obj.ModelRef.Deployer.testScenario,'Simulation')
+                hadOutlier = hadOutlier(1:length(CubeSats));
+            end
             hasOutlier = false(1,length(CubeSats));
             firstNmeas = 10;
             % Determine populated indices of CubeSats_TOF
