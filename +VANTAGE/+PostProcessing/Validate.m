@@ -276,7 +276,7 @@ classdef Validate
             end
             finalIndex = length(Time);
             if strcmpi(TestType,'Simulation')
-                CS1_Z = CubeSats.CubeSatFitted{1}(:,3);
+                CS1_Z = CubeSats{1}(:,3);
                 for i = 1:length(CS1_Z)
                     if CS1_Z(i) >= 100
                         break
@@ -402,19 +402,19 @@ classdef Validate
                     % Save fitted results for error analysis later
                     dataFolder = resultsFolder;
                     if strcmpi(Model.Deployer.testScenario,'Modular')
-                        dataFolder = [dataFolder 'Modular/'];
+                        %dataFolder = [dataFolder 'Modular/'];
                         folderString = Model.Deployer.TruthFileName;
                         tmp = split(folderString,'/');
                         testNumber = tmp{3};
                     elseif strcmpi(Model.Deployer.testScenario,'100m')
-                        dataFolder = [dataFolder '100m/'];
+                        %dataFolder = [dataFolder '100m/'];
                         folderString = Model.Deployer.TruthFileName;
                         tmp = split(folderString,'/');
                         testNumber = tmp{3};
                     elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-                        dataFolder = [dataFolder 'Simulation/'];
+                        %dataFolder = [dataFolder 'Simulation/'];
                         tmp = split(SensorData.TOFData,'/');
-                        testNumber = tmp{4};
+                        testNumber = tmp{5};
                     else
                         error('invalid test type in Deployer.TruthFileName')
                     end
@@ -477,7 +477,7 @@ classdef Validate
             MAKE THE CALL TO YOUR FUNCTION HERE AFTER FOLDER DEF
             %}
             matFileDirectory = [pwd '/Data/Results/matFiles'];
-            %obj.masterPlotter(matFileDirectory);
+            obj.masterPlotter(matFileDirectory);
             
         end
         

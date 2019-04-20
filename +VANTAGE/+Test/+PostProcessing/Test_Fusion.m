@@ -10,7 +10,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
         configDirecNameSim140 = 'Config/Final_Tests/Simulation/_140/Sample*';
         configDirecNameSim195 = 'Config/Final_Tests/Simulation/_195/Sample*';
          
-        testType = 'Simulation_085';
+        testType = 'Simulation_195';
         
         configDirecName
     end
@@ -23,6 +23,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function testFullSystem(obj)
+            return
             import VANTAGE.PostProcessing.Validate
             switch obj.testType
                 case 'Modular'
@@ -103,19 +104,19 @@ classdef Test_Fusion < matlab.unittest.TestCase
             elseif strcmpi(obj.testType,'Simulation_030')
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_030/';
                 tmp = split(SensorData.TOFData,'/');
-                testNumber = tmp{4};
+                testNumber = tmp{5};
             elseif strcmpi(obj.testType,'Simulation_085')
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_085/';
                 tmp = split(SensorData.TOFData,'/');
-                testNumber = tmp{4};
+                testNumber = tmp{5};
             elseif strcmpi(obj.testType,'Simulation_140')
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_140/';
                 tmp = split(SensorData.TOFData,'/');
-                testNumber = tmp{4};
+                testNumber = tmp{5};
             elseif strcmpi(obj.testType,'Simulation_195')
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
                 tmp = split(SensorData.TOFData,'/');
-                testNumber = tmp{4};
+                testNumber = tmp{5};
             else
                 error('invalid test type in Deployer.TruthFileName')
             end
@@ -142,9 +143,18 @@ classdef Test_Fusion < matlab.unittest.TestCase
                 case '100m'
                     obj.configDirecName = obj.configDirecName100m;
                     testType = '3_25_100m';
-                case 'Simulation'
-                    obj.configDirecName = obj.configDirecNameSim;
-                    testType = 'Simulation';
+                case 'Simulation_085'
+                    obj.configDirecName = obj.configDirecNameSim085;
+                    testType = 'Simulation/_085';
+                case 'Simulation_030'
+                    obj.configDirecName = obj.configDirecNameSim030;
+                    testType = 'Simulation/_030';
+                case 'Simulation_140'
+                    obj.configDirecName = obj.configDirecNameSim140;
+                    testType = 'Simulation/_140';
+                case 'Simulation_195'
+                    obj.configDirecName = obj.configDirecNameSim195;
+                    testType = 'Simulation/_195';
             end
             
             configfiles = dir(obj.configDirecName);
