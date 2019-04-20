@@ -90,25 +90,29 @@ classdef Test_Fusion < matlab.unittest.TestCase
             end
             
             % Save fitted results for error analysis later
-            if strcmpi(Model.Deployer.testScenario,'Modular')
+            if strcmpi(obj.testType,'Modular')
                 dataFolder = 'Data/Results/matFiles/ModularTest_4_9/';
                 folderString = Model.Deployer.TruthFileName;
                 tmp = split(folderString,'/');
                 testNumber = tmp{3};
-            elseif strcmpi(Model.Deployer.testScenario,'100m')
+            elseif strcmpi(obj.testType,'100m')
                 dataFolder = 'Data/Results/matFiles/100m/';
                 folderString = Model.Deployer.TruthFileName;
                 tmp = split(folderString,'/');
                 testNumber = tmp{3};
-            elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-                dataFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
+            elseif strcmpi(obj.testType,'Simulation_030')
+                dataFolder = 'Data/Results/matFiles/Simulation_4_15_030/';
                 tmp = split(SensorData.TOFData,'/');
                 testNumber = tmp{4};
-            elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-                dataFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
+            elseif strcmpi(obj.testType,'Simulation_085')
+                dataFolder = 'Data/Results/matFiles/Simulation_4_15_085/';
                 tmp = split(SensorData.TOFData,'/');
                 testNumber = tmp{4};
-            elseif strcmpi(Model.Deployer.testScenario,'Simulation')
+            elseif strcmpi(obj.testType,'Simulation_140')
+                dataFolder = 'Data/Results/matFiles/Simulation_4_15_140/';
+                tmp = split(SensorData.TOFData,'/');
+                testNumber = tmp{4};
+            elseif strcmpi(obj.testType,'Simulation_140')
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
                 tmp = split(SensorData.TOFData,'/');
                 testNumber = tmp{4};
