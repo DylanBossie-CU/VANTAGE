@@ -11,7 +11,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
         configDirecNameSim195 = 'Config/Final_Tests/Simulation/_195/Sample*';
         configDirecNameSim250 = 'Config/Final_Tests/Simulation/_250/Sample*';
          
-        testType = 'Simulation_030';
+        testType = 'Simulation_085';
         
         configDirecName
     end
@@ -24,6 +24,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function testFullSystem(obj)
+            return
             import VANTAGE.PostProcessing.Validate
             switch obj.testType
                 case 'Modular'
@@ -59,7 +60,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             manifestFilename = strcat(configfile,'/Manifest.json');
             SensorData = jsondecode(fileread(strcat(configfile,'/Sensors.json')));
             
-            Model = VANTAGE.PostProcessing.Model(manifestFilename,configfile);
+            Model = VANTAGE.PostProcessing.Model(manifestFilename,configfile,true);
             
             fileLims = [1 inf];
             Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
@@ -134,28 +135,33 @@ classdef Test_Fusion < matlab.unittest.TestCase
         end
         
         function testError(obj)
-            return
             import VANTAGE.PostProcessing.Validate
             
             switch obj.testType
                 case 'Modular'
                     obj.configDirecName = obj.configDirecNameModular;
                     testType = 'ModularTest_4_9';
+                    testDef = 'Modular';
                 case '100m'
                     obj.configDirecName = obj.configDirecName100m;
                     testType = '3_25_100m';
+                    testDef = '100m';
                 case 'Simulation_085'
                     obj.configDirecName = obj.configDirecNameSim085;
                     testType = 'Simulation/_085';
+                    testDef = 'Sim085';
                 case 'Simulation_030'
                     obj.configDirecName = obj.configDirecNameSim030;
                     testType = 'Simulation/_030';
+                    testDef = 'Sim030';
                 case 'Simulation_140'
                     obj.configDirecName = obj.configDirecNameSim140;
                     testType = 'Simulation/_140';
+                    testDef = 'Sim140';
                 case 'Simulation_195'
                     obj.configDirecName = obj.configDirecNameSim195;
                     testType = 'Simulation/_195';
+                    testDef = 'Sim195';
             end
             
             configfiles = dir(obj.configDirecName);
@@ -169,13 +175,13 @@ classdef Test_Fusion < matlab.unittest.TestCase
             manifestFilename = [configfolder '/Manifest.json'];
             SensorData = jsondecode(fileread(strcat(configfolder,'/Sensors.json')));
             
-            Model = VANTAGE.PostProcessing.Model(manifestFilename,configfolder);
+            Model = VANTAGE.PostProcessing.Model(manifestFilename,configfolder,false);
 
             Validator = Validate(configfolder,Model,false);
             
             %Validator.PlotResults(Model,SensorData);
             
-            Validator.ErrorAnalysis(Model,SensorData);
+            Validator.ErrorAnalysis(Model,SensorData,testDef);
             end
         end
     end

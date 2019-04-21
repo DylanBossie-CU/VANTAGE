@@ -34,7 +34,7 @@ classdef Model < handle
         %
         % @return     A reference to an initialized Model object
         %
-        function obj = Model(manifestFilename,configDirecName)
+        function obj = Model(manifestFilename,configDirecName,dataprocessing)
             
         	% Import child classes
         	import VANTAGE.PostProcessing.Deployer
@@ -43,20 +43,25 @@ classdef Model < handle
         	import VANTAGE.PostProcessing.TOF
             import VANTAGE.PostProcessing.TimeManager
 
-        	% Construct child classes and process truth data
-            % NOTE: The order of these lines is very important
-            obj.Deployer = Deployer(manifestFilename, strcat(configDirecName,'/Deployer.json'),obj);
-            obj.Transform = Transform(strcat(configDirecName,'/Transform.json'));
-            SensorData = jsondecode(fileread(strcat(configDirecName,'/Sensors.json')));
-            obj.TimeMan = TimeManager(SensorData,obj.Deployer.testScenario,obj);
-            obj.Truth_VCF = obj.processTruthData(obj.Deployer.TruthFileName);
-            obj.TimeMan.syncTruthData(obj);
-            obj.Optical = Optical(obj,strcat(configDirecName,'/Optical.json'), obj.Deployer.GetNumCubesats());
-            obj.TOF = TOF(obj,strcat(configDirecName,'/TOF.json'));
-            
-            % Error catching
-            if obj.Deployer.numCubesats ~= obj.Truth_VCF.numCubeSats
-                error('Truth data and manifest do not agree on the number of Cubesats')
+            if dataprocessing
+                % Construct child classes and process truth data
+                % NOTE: The order of these lines is very important
+                obj.Deployer = Deployer(manifestFilename, strcat(configDirecName,'/Deployer.json'),obj);
+                obj.Transform = Transform(strcat(configDirecName,'/Transform.json'));
+                SensorData = jsondecode(fileread(strcat(configDirecName,'/Sensors.json')));
+                obj.TimeMan = TimeManager(SensorData,obj.Deployer.testScenario,obj);
+                obj.Truth_VCF = obj.processTruthData(obj.Deployer.TruthFileName);
+                obj.TimeMan.syncTruthData(obj);
+                obj.Optical = Optical(obj,strcat(configDirecName,'/Optical.json'), obj.Deployer.GetNumCubesats());
+                obj.TOF = TOF(obj,strcat(configDirecName,'/TOF.json'));
+
+                % Error catching
+                if obj.Deployer.numCubesats ~= obj.Truth_VCF.numCubeSats
+                    error('Truth data and manifest do not agree on the number of Cubesats')
+                end
+            else
+                obj.Deployer = Deployer(manifestFilename, strcat(configDirecName,'/Deployer.json'),obj);
+                obj.Truth_VCF = obj.processTruthData(obj.Deployer.TruthFileName);
             end
         end
 
