@@ -11,7 +11,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
         configDirecNameSim195 = 'Config/Final_Tests/Simulation/_195/Sample*';
         configDirecNameSim250 = 'Config/Final_Tests/Simulation/_250/Sample*';
          
-        testType = 'Simulation_250';
+        testType = 'Simulation_195';
         
         configDirecName
     end
@@ -24,6 +24,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function testFullSystem(obj)
+            return
             import VANTAGE.PostProcessing.Validate
             switch obj.testType
                 case 'Modular'
@@ -191,7 +192,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             
             %Validator.PlotResults(Model,SensorData);
             
-            Validator.ErrorAnalysis(Model,SensorData,testDef);
+%             Validator.ErrorAnalysis(Model,SensorData,testDef);
             end
             %{
            ______.........--=T=--.........______
@@ -207,9 +208,9 @@ classdef Test_Fusion < matlab.unittest.TestCase
             
             MAKE THE CALL TO YOUR FUNCTION HERE AFTER FOLDER DEF
             %}
-            
+            %Validator.ErrorAnalysis(Model,SensorData,testDef);
             matFileDirectory = [pwd '/Data/Results/matFiles'];
-            %Validator.masterPlotter(matFileDirectory);
+            Validator.masterPlotter(matFileDirectory);
             
         end
     end

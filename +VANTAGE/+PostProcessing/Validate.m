@@ -467,8 +467,11 @@ classdef Validate
                         testNumber = tmp{3};
                     elseif strcmpi(Model.Deployer.testScenario,'Simulation')
                         %dataFolder = [dataFolder 'Simulation/'];
-                        tmp = split(SensorData.TOFData,'/');
-                        testNumber = tmp{5};
+                        name = AbsoluteErrorFiles(i).name;
+                        tmp = split(name,'AbsErrorData');
+                        tmp = tmp{2};
+                        tmp = split(tmp,'.');
+                        testNumber = tmp{1};
                     else
                         error('invalid test type in Deployer.TruthFileName')
                     end
