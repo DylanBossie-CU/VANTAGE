@@ -1551,38 +1551,40 @@ classdef Validate
             
             % Fitted Curve to be representative of VANTAGE's performance
             % I will have to do this last, if at all
-            fittedPositionDistance = req_distance;
-            fittedPositionMeanError = req_error;
-            fittedPositionSTDError = req_error;
+            fittedPositionDistance = NaN;
+            fittedPositionMeanError = NaN;
+            fittedPositionSTDError = NaN;
             
             plotLabels = { 'Distance [m]', ...
-                'Position Measurement Error [m]' };
-            plotTitle = 'Position Measurement Error Versus Distance';
+                'Error [m]' };
+            plotTitle = 'Position Measurement Error Mean + 1 SD';
             distance_range = [1,100];
             
             [f_Master] = ...
                 obj.errorPlot(req_distance,Simulation.distance_final,...
                 Modular.distance_final,m100.distance_final,...
                 fittedPositionDistance,req_error,...
-                Simulation.mu_pos_err_final,Modular.mu_pos_err_final,...
-                m100.mu_pos_err_final,fittedPositionMeanError,...
-                Simulation.std_pos_err_final,Modular.std_pos_err_final,...
-                m100.std_pos_err_final,fittedPositionSTDError,...
+                Simulation.mu_pos_err_final+Simulation.std_pos_err_final,...
+                Modular.mu_pos_err_final+Modular.std_pos_err_final,...
+                m100.mu_pos_err_final+m100.std_pos_err_final,fittedPositionSTDError,...
+                fittedPositionMeanError,...
+                [],[],...
+                [],...
                 pointsOfInterest,plotLabels,plotTitle,distance_range);
             
             %%% Velocity Error VS Velocity Plot
             req_distance = [ 0.1, 10, 10, 100 ];
-            req_error = [ 0.01, 0.01, 0.1, 0.1 ];
+            req_error = [ 0.01, 0.01, 0.01, 0.01 ];
             pointsOfInterest = [];
             
             % Fitted Curve to be representative of VANTAGE's performance
             % I will have to do this last, if at all
             fittedVelocityVelocity = req_distance;
-            fittedVelocityMeanError = req_error;
+            fittedVelocityMeanError = 10 .* req_error;
             
             plotLabels = { 'Average Velocity [m/s]', ...
-                'Average Velocity Measurement Error [m/s]' };
-            plotTitle = 'Average Velocity Measurement Error Versus Average Velocity';
+                'Error [m/s]' };
+            plotTitle = 'Average Velocity Measurement Error';
             velocity_range = [ -Inf, Inf ];
             
             [f_Velocity] = ...
@@ -1601,12 +1603,12 @@ classdef Validate
             
             % Fitted Curve to be representative of VANTAGE's performance
             % I will have to do this last, if at all
-            fittedTimeVelocity = req_distance;
-            fittedTimeMeanError = req_error;
+            fittedTimeVelocity = NaN;
+            fittedTimeMeanError = NaN;
             
             plotLabels = { 'Average Velocity [m/s]', ...
-                'Launch Time Measurement Error [m/s]' };
-            plotTitle = 'Launch Time Measurement Error Versus Average Velocity';
+                'Error [s]' };
+            plotTitle = 'Launch Time Measurement Error';
             velocity_range = [ -Inf, Inf ];
             
             [f_Time] = ...
@@ -1736,8 +1738,11 @@ classdef Validate
                     fileStruct(i).name ];
                 dataStruct = load( fileName );
                 % lol
-                try
                 dataStruct = dataStruct.dataStruct;
+                isColumn = size( dataStruct.velocity );
+                if isColumn(2) ~= 1
+                    error( 'Velocity data is not a column vector. ' )
+                end
                 outputStruct.distance(i) = {dataStruct.distance(:)};
                 outputStruct.velocity(i) = {dataStruct.velocity};
                 outputStruct.mag_velocity(i) = norm(dataStruct.velocity);
@@ -1755,10 +1760,6 @@ classdef Validate
                 end
                 
                 outputStruct.mag_v_err(i) = norm(outputStruct.v_err{i});
-                
-                catch
-                    disp('fuckin hell yea break my shit')
-                end
                 
             end
             
@@ -1838,8 +1839,8 @@ classdef Validate
                        111, 155, 117; ...
                        192, 174, 109; ...
                        091, 097, 103 ] ./ 255;
-            legend_str = { 'Requirements', 'Variance Weighted Error', ...
-                'Simulated Tests', 'Modular Tests', '100m Tests' };
+            legend_str = { 'Requirements', 'Simulated Tests', ...
+                'Modular Tests', '100m Tests' };
             set(0, 'defaulttextInterpreter', 'latex')
             set(0, 'DefaultAxesLineStyleOrder', 'default')
             
@@ -1854,7 +1855,7 @@ classdef Validate
             p(1) = loglog( x_req, req, '--', 'color', colors(1,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
             hold on
-            p(2) = loglog( x_K, mu_err_K, '*-', 'color', colors(2,:), ...
+            p(2) = loglog( x_K, mu_err_K, '--', 'color', colors(1,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
             p(3) = loglog( x_S, mu_err_S, 'o-', 'color', colors(3,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
@@ -1863,11 +1864,6 @@ classdef Validate
             p(5) = loglog( x_100m, mu_err_100m, 'd-', 'color', colors(5,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
             index = 5;
-            if ~isempty(sigma_err_K)
-                p(index+1) = loglog( x_K, mu_err_K + sigma_err_K, '*-', 'color', colors(2,:), ...
-                    'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-                index = index + 1;
-            end
             if ~isempty(sigma_err_S)
                 p(index+1) = loglog( x_S, mu_err_S + sigma_err_S, 'o-', 'color', colors(3,:), ...
                     'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
@@ -1915,7 +1911,7 @@ classdef Validate
             a.Title.FontSize = FONTSIZE;
             a.Title.String = plotTitle;
             
-            legend( p(1:NumPlotsDefault), legend_str, 'interpreter', 'latex', ...  
+            legend( p([1,3:NumPlotsDefault]), legend_str, 'interpreter', 'latex', ...  
                 'location', 'southeast', 'fontsize', FONTSIZE * 0.9)
             
             grid on
