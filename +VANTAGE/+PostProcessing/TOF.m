@@ -110,7 +110,7 @@ classdef TOF
             CubeSats = Deployer.CubesatArray;
             
             % Obtain filenames from SensorData TOFData dir
-            ls = dir(SensorData.TOFData);
+            ls = dir([SensorData.TOFData '*.pcd']);
             ls = ls([ls.bytes]~=0);
             % Error check data against truth
             if length(obj.ModelRef.Truth_VCF.t) < length(ls)

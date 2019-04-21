@@ -9,8 +9,9 @@ classdef Test_Fusion < matlab.unittest.TestCase
         configDirecNameSim030 = 'Config/Final_Tests/Simulation/_030/Sample*';
         configDirecNameSim140 = 'Config/Final_Tests/Simulation/_140/Sample*';
         configDirecNameSim195 = 'Config/Final_Tests/Simulation/_195/Sample*';
+        configDirecNameSim250 = 'Config/Final_Tests/Simulation/_250/Sample*';
          
-        testType = 'Simulation_085';
+        testType = 'Simulation_030';
         
         configDirecName
     end

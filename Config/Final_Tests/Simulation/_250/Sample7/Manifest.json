@@ -1,0 +1,47 @@
+{
+	"DeploymentTube": 3,
+	"VantageTube": 4,
+	"expectedRelease": [2019,2,12,13,46,20,536],
+	"expectedVelocity": [0, 0, 1.95],
+	"CubesatArray": 
+		[
+			{
+				"name": "TOF TestSat 1U 1",
+				"rangeOrder": 1,
+				"expectedU": 1,
+				"actualDims": [0.1,0.1,0.1225]
+			},
+			{
+				"name": "TOF TestSat 1U 2", 
+				"rangeOrder": 2,
+				"expectedU": 1,
+				"actualDims": [0.1,0.1,0.1225]
+			},
+			{
+				"name": "TOF TestSat 1U 3",
+				"rangeOrder": 3,
+				"expectedU": 1,
+				"actualDims": [0.1,0.1,0.1225]
+			},
+			{
+				"name": "TOF TestSat 1U 4",
+				"rangeOrder": 4,
+				"expectedU": 1,
+				"actualDims": [0.1,0.1,0.1225]
+			},
+			{
+				"name": "TOF TestSat 1U 5", 
+				"rangeOrder": 5,
+				"expectedU": 1,
+				"actualDims": [0.1,0.1,0.1225]
+			},
+			{
+				"name": "TOF TestSat 1U 6",
+				"rangeOrder": 6,
+				"expectedU": 1,
+				"actualDims": [0.1,0.1,0.1225]
+			}
+		],
+    "TruthDataFile": "Data/Simulation/Simulation_4_15_250/truth.json",
+	"testScenario": "Simulation"
+}
