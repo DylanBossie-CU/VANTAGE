@@ -662,16 +662,16 @@ classdef Validate
             title([TestType ' 3D Position - ' TestNum])
         end
         
-        %% Compute mean velocity
+        %% Generate output report
         %
-        % Compute mean velocity of all cubesats in current file
+        % Generate output report to transmit back to deployer system
         % 
-        % @param    
+        % @param    matFileDirectory        Directory containing mat files
         %
         % @return 
         %
         % @author Dylan Bossie 
-        % @date   11-Apr-2019
+        % @date   21-Apr-2019
         function [] = GenerateOutputFiles(obj,matFileDirectory)
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %Modular data output files
