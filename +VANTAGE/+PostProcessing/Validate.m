@@ -398,6 +398,19 @@ classdef Validate
                     TimeFiles = dir([matResults 'CSTime*']);
 
                     interpolationPoints = linspace(0,100,1000);
+                    
+                    elseif strcmpi(testDef,'Sim250')
+                    resultsFolder = 'Data/Results/matFiles/Simulation_4_15_250/';
+                    matResults = [resultsFolder 'data/'];
+                    AbsoluteErrorFiles = dir([matResults 'AbsError*']);
+                    CubeSatDataFiles = dir([matResults 'CSData*']);
+                    TruthDataFiles = dir([matResults 'TruthData*']);
+                    XErrorFiles = dir([matResults 'XError*']);
+                    YErrorFiles = dir([matResults 'YError*']);
+                    ZErrorFiles = dir([matResults 'ZError*']);
+                    TimeFiles = dir([matResults 'CSTime*']);
+
+                    interpolationPoints = linspace(0,100,1000);
                 else
                     error('not a valid test case')
                 end

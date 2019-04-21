@@ -11,7 +11,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
         configDirecNameSim195 = 'Config/Final_Tests/Simulation/_195/Sample*';
         configDirecNameSim250 = 'Config/Final_Tests/Simulation/_250/Sample*';
          
-        testType = 'Simulation_140';
+        testType = 'Simulation_250';
         
         configDirecName
     end
@@ -44,6 +44,9 @@ classdef Test_Fusion < matlab.unittest.TestCase
                 case 'Simulation_195'
                     obj.configDirecName = obj.configDirecNameSim195;
                     testType = 'Simulation/_195';
+                case 'Simulation_250'
+                    obj.configDirecName = obj.configDirecNameSim250;
+                    testType = 'Simulation/_250';
             end
 
             configfiles = dir(obj.configDirecName);
@@ -117,6 +120,10 @@ classdef Test_Fusion < matlab.unittest.TestCase
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
                 tmp = split(SensorData.TOFData,'/');
                 testNumber = tmp{5};
+            elseif strcmpi(obj.testType,'Simulation_250')
+                dataFolder = 'Data/Results/matFiles/Simulation_4_15_250/';
+                tmp = split(SensorData.TOFData,'/');
+                testNumber = tmp{5};
             else
                 error('invalid test type in Deployer.TruthFileName')
             end
@@ -161,6 +168,10 @@ classdef Test_Fusion < matlab.unittest.TestCase
                     obj.configDirecName = obj.configDirecNameSim195;
                     testType = 'Simulation/_195';
                     testDef = 'Sim195';
+                case 'Simulation_250'
+                    obj.configDirecName = obj.configDirecNameSim195;
+                    testType = 'Simulation/_250';
+                    testDef = 'Sim250';
             end
             
             configfiles = dir(obj.configDirecName);
@@ -182,21 +193,23 @@ classdef Test_Fusion < matlab.unittest.TestCase
             
             Validator.ErrorAnalysis(Model,SensorData,testDef);
             end
-%            ______.........--=T=--.........______
-%               .             |:|
-%          :-. //           /""""""-.
-%          ': '-._____..--""(""""""()`---.__
-%           /:   _..__   ''  ":""""'[] |""`\\
-%           ': :'     `-.     _:._     '"""" :
-%            ::          '--=:____:.___....-"
-%                              O"       O" 
-%             MARSHALL LANDING PAD ALERT
-%             
-%             
-%             MAKE THE CALL TO YOUR FUNCTION HERE AFTER FOLDER DEF
+            %{
+           ______.........--=T=--.........______
+              .             |:|
+         :-. //           /""""""-.
+         ': '-._____..--""(""""""()`---.__
+          /:   _..__   ''  ":""""'[] |""`\\
+          ': :'     `-.     _:._     '"""" :
+           ::          '--=:____:.___....-"
+                             O"       O" 
+            MARSHALL LANDING PAD ALERT
+            
+            
+            MAKE THE CALL TO YOUR FUNCTION HERE AFTER FOLDER DEF
+            %}
             
             matFileDirectory = [pwd '/Data/Results/matFiles'];
-            Validator.masterPlotter(matFileDirectory);
+            %Validator.masterPlotter(matFileDirectory);
             
         end
     end
