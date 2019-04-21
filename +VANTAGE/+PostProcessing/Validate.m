@@ -1556,7 +1556,7 @@ classdef Validate
             
             %%% Velocity Error VS Velocity Plot
             req_distance = [ 0.1, 10, 10, 100 ];
-            req_error = [ 0.1, 0.1, 1, 10 ];
+            req_error = [ 0.01, 0.01, 0.1, 0.1 ];
             pointsOfInterest = [];
             
             % Fitted Curve to be representative of VANTAGE's performance
@@ -1580,7 +1580,7 @@ classdef Validate
             
             %%% Launch Time Error VS Velocity Plot
             req_distance = [ 0.1, 10, 10, 100 ];
-            req_error = [ 0.1, 0.1, 1, 10 ];
+            req_error = [ 0.5, 0.5, 0.5, 0.5 ];
             pointsOfInterest = [];
             
             % Fitted Curve to be representative of VANTAGE's performance
@@ -1726,12 +1726,9 @@ classdef Validate
                 outputStruct.velocity(i) = {dataStruct.velocity};
                 outputStruct.mag_velocity(i) = norm(dataStruct.velocity);
                 outputStruct.t_err(i) = dataStruct.t_err;
-                outputStruct.v_err(i) = {dataStruct.v_err};
-                outputStruct.mag_v_err(i) = norm(dataStruct.v_err);
+                % turns out the velocity error is given in cm not m
+                outputStruct.v_err(i) = {dataStruct.v_err .* cm_to_m};
                 outputStruct.pos_err(i) = {dataStruct.pos_err(:)};
-                catch
-                    disp('fuckin hell yea break my shit')
-                end
                 
                 % turns out the position error is given in cm not m
                 for j = 1 : length(outputStruct.pos_err{i})
@@ -1739,6 +1736,12 @@ classdef Validate
                     outputStruct.pos_err{i}{j} = ...
                         outputStruct.pos_err{i}{j} .* cm_to_m;
                     
+                end
+                
+                outputStruct.mag_v_err(i) = norm(outputStruct.v_err{i});
+                
+                catch
+                    disp('fuckin hell yea break my shit')
                 end
                 
             end
@@ -1751,6 +1754,8 @@ classdef Validate
             outputStruct.t_err = outputStruct.t_err( sortedIndexes );
             outputStruct.v_err = outputStruct.v_err( sortedIndexes );
             outputStruct.pos_err = outputStruct.pos_err( sortedIndexes );
+            outputStruct.mag_velocity = outputStruct.mag_velocity( sortedIndexes );
+            outputStruct.mag_v_err = outputStruct.mag_v_err( sortedIndexes );
             
         end
         
