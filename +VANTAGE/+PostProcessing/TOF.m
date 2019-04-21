@@ -189,7 +189,7 @@ classdef TOF
                     outOfRange = 1;
                 end
                 % Associate with known cubesats within Deployer
-                [CubeSats,numConsOutliers] = obj.associateCentroids(CubeSats_TOF,CubeSats,numConsOutliers);
+                [CubeSats,numConsOutliers] = obj.associateCentroids(CubeSats_TOF,CubeSats,numConsOutliers,SensorData);
                 % Determine if all of the CubeSats have too many
                 % consecutive outliers
                 if ~any(numConsOutliers < obj.maxConsOutliers)
@@ -289,7 +289,7 @@ classdef TOF
         %
         % @author   Joshua Kirby
         % @date     10-Mar-2019
-        function [CubeSats,numConsOutliers] = associateCentroids(obj,CubeSats_TOF,CubeSats,numConsOutliers)
+        function [CubeSats,numConsOutliers] = associateCentroids(obj,CubeSats_TOF,CubeSats,numConsOutliers,SensorData)
             try
             % Define persistent variable to save whether the last file
             % contained outliers for each CubeSat

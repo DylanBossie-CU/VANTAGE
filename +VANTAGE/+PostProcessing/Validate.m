@@ -441,12 +441,14 @@ classdef Validate
                     % Save fitted results for error analysis later
                     dataFolder = resultsFolder;
                     if strcmpi(Model.Deployer.testScenario,'Modular')
+                        dataStruct.velocity = dataStruct.velocity';
                         %dataFolder = [dataFolder 'Modular/'];
                         folderString = Model.Deployer.TruthFileName;
                         tmp = split(folderString,'/');
                         testNumber = tmp{3};
                     elseif strcmpi(Model.Deployer.testScenario,'100m')
                         %dataFolder = [dataFolder '100m/'];
+                        dataStruct.velocity = dataStruct.velocity';
                         folderString = Model.Deployer.TruthFileName;
                         tmp = split(folderString,'/');
                         testNumber = tmp{3};
@@ -502,21 +504,8 @@ classdef Validate
 %                 error('invalid test type in Deployer.TruthFileName')
 %             end
             %{
-   ______.........--=T=--.........______
-      .             |:|
- :-. //           /""""""-.
- ': '-._____..--""(""""""()`---.__
-  /:   _..__   ''  ":""""'[] |""`\\
-  ': :'     `-.     _:._     '"""" :
-   ::          '--=:____:.___....-"
-                     O"       O" 
-            MARSHALL LANDING PAD ALERT
-            
-            
-            MAKE THE CALL TO YOUR FUNCTION HERE AFTER FOLDER DEF
-            %}
-            matFileDirectory = [pwd '/Data/Results/matFiles'];
-            obj.masterPlotter(matFileDirectory);
+
+%}
             
         end
         
