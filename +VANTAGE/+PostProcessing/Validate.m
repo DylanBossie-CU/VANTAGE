@@ -440,17 +440,17 @@ classdef Validate
 
                     % Save fitted results for error analysis later
                     dataFolder = resultsFolder;
-                    if strcmpi(testDef,'Modular')
+                    if strcmpi(Model.Deployer.testScenario,'Modular')
                         %dataFolder = [dataFolder 'Modular/'];
                         folderString = Model.Deployer.TruthFileName;
                         tmp = split(folderString,'/');
                         testNumber = tmp{3};
-                    elseif strcmpi(testDef,'100m')
+                    elseif strcmpi(Model.Deployer.testScenario,'100m')
                         %dataFolder = [dataFolder '100m/'];
                         folderString = Model.Deployer.TruthFileName;
                         tmp = split(folderString,'/');
                         testNumber = tmp{3};
-                    elseif strcmpi(testDef,'Simulation')
+                    elseif strcmpi(Model.Deployer.testScenario,'Simulation')
                         %dataFolder = [dataFolder 'Simulation/'];
                         tmp = split(SensorData.TOFData,'/');
                         testNumber = tmp{5};
@@ -516,7 +516,7 @@ classdef Validate
             MAKE THE CALL TO YOUR FUNCTION HERE AFTER FOLDER DEF
             %}
             matFileDirectory = [pwd '/Data/Results/matFiles'];
-            %obj.masterPlotter(matFileDirectory);
+            obj.masterPlotter(matFileDirectory);
             
         end
         
