@@ -210,8 +210,8 @@ classdef Test_Fusion < matlab.unittest.TestCase
             %}
             %Validator.ErrorAnalysis(Model,SensorData,testDef);
             matFileDirectory = [pwd '/Data/Results/matFiles'];
+            Validator.GenerateOutputFiles(matFileDirectory);
             Validator.masterPlotter(matFileDirectory);
-            
         end
     end
     

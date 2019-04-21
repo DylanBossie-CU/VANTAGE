@@ -662,6 +662,116 @@ classdef Validate
             title([TestType ' 3D Position - ' TestNum])
         end
         
+        %% Compute mean velocity
+        %
+        % Compute mean velocity of all cubesats in current file
+        % 
+        % @param    
+        %
+        % @return 
+        %
+        % @author Dylan Bossie 
+        % @date   11-Apr-2019
+        function [] = GenerateOutputFiles(obj,matFileDirectory)
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %Modular data output files
+            modularMatFileDirectory = [matFileDirectory '/Modular/'];
+            modularMatFiles = dir([modularMatFileDirectory '*.mat']);
+            
+            %Iterate mat files and produce an output
+            mkdir([modularMatFileDirectory 'jsonOut']);
+            for i = 1:numel(modularMatFiles)
+                matData = load([modularMatFileDirectory modularMatFiles(i).name]);
+                matData = matData.dataStruct;
+                
+                %Detect off-nominal vel
+                velocity = norm(matData.velocity);
+                if velocity > 2.1 || velocity < 0.49
+                    isNominalDeployment = false;
+                else
+                    isNominalDeployment = true;
+                end
+                
+                matData.isNominalDeployment = isNominalDeployment;
+                
+                matjsonData = jsonencode(matData);
+                tmp = split(modularMatFiles(i).name,'dataStruct');
+                filename = [modularMatFileDirectory 'jsonOut/' tmp{1} '.json'];
+                fid = fopen(filename, 'w+');
+                if fid == -1
+                    error('Cannot create JSON file');
+                end
+                
+                fwrite(fid, matjsonData, 'char');
+                fclose(fid);
+            end
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %100m data output files
+            matFileDirectory100m = [matFileDirectory '/100m/'];
+            matFiles100m = dir([matFileDirectory100m '*.mat']);
+            
+            %Iterate mat files and produce an output
+            mkdir([matFileDirectory100m 'jsonOut']);
+            for i = 1:numel(matFiles100m)
+                matData = load([matFileDirectory100m matFiles100m(i).name]);
+                matData = matData.dataStruct;
+                
+                %Detect off-nominal vel
+                velocity = norm(matData.velocity);
+                if velocity > 2.1 || velocity < 0.49
+                    isNominalDeployment = false;
+                else
+                    isNominalDeployment = true;
+                end
+                
+                matData.isNominalDeployment = isNominalDeployment;
+                
+                matjsonData = jsonencode(matData);
+                tmp = split(matFiles100m(i).name,'dataStruct');
+                filename = [matFileDirectory100m 'jsonOut/' tmp{1} '.json'];
+                fid = fopen(filename, 'w+');
+                if fid == -1
+                    error('Cannot create JSON file');
+                end
+                
+                fwrite(fid, matjsonData, 'char');
+                fclose(fid);
+            end
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %Simulation data output files
+            simulationFileDirectory = [matFileDirectory '/Simulation/'];
+            simulationMatFiles = dir([simulationFileDirectory '*.mat']);
+            
+            %Iterate mat files and produce an output
+            mkdir([simulationFileDirectory 'jsonOut']);
+            for i = 1:numel(simulationMatFiles)
+                matData = load([simulationFileDirectory simulationMatFiles(i).name]);
+                matData = matData.dataStruct;
+                
+                %Detect off-nominal vel
+                velocity = norm(matData.velocity);
+                if velocity > 2.1 || velocity < 0.49
+                    isNominalDeployment = false;
+                else
+                    isNominalDeployment = true;
+                end
+                
+                matData.isNominalDeployment = isNominalDeployment;
+                
+                matjsonData = jsonencode(matData);
+                tmp = split(simulationMatFiles(i).name,'dataStruct');
+                filename = [simulationFileDirectory 'jsonOut/' tmp{1} '.json'];
+                fid = fopen(filename, 'w+');
+                if fid == -1
+                    error('Cannot create JSON file');
+                end
+                
+                fwrite(fid, matjsonData, 'char');
+                fclose(fid);
+            end
+        end
+        
+        
         %% Correlate the truth data of a single, most trusted CubeSat
         %
         % Preforms timestamp corrections, data rotation, and data
