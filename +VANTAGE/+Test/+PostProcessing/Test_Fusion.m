@@ -9,8 +9,9 @@ classdef Test_Fusion < matlab.unittest.TestCase
         configDirecNameSim030 = 'Config/Final_Tests/Simulation/_030/Sample*';
         configDirecNameSim140 = 'Config/Final_Tests/Simulation/_140/Sample*';
         configDirecNameSim195 = 'Config/Final_Tests/Simulation/_195/Sample*';
+        configDirecNameSim250 = 'Config/Final_Tests/Simulation/_250/Sample*';
          
-        testType = 'Simulation_085';
+        testType = 'Simulation_195';
         
         configDirecName
     end
@@ -23,6 +24,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function testFullSystem(obj)
+            return
             import VANTAGE.PostProcessing.Validate
             switch obj.testType
                 case 'Modular'
@@ -43,6 +45,9 @@ classdef Test_Fusion < matlab.unittest.TestCase
                 case 'Simulation_195'
                     obj.configDirecName = obj.configDirecNameSim195;
                     testType = 'Simulation/_195';
+                case 'Simulation_250'
+                    obj.configDirecName = obj.configDirecNameSim250;
+                    testType = 'Simulation/_250';
             end
 
             configfiles = dir(obj.configDirecName);
@@ -58,7 +63,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             manifestFilename = strcat(configfile,'/Manifest.json');
             SensorData = jsondecode(fileread(strcat(configfile,'/Sensors.json')));
             
-            Model = VANTAGE.PostProcessing.Model(manifestFilename,configfile);
+            Model = VANTAGE.PostProcessing.Model(manifestFilename,configfile,true);
             
             fileLims = [1 inf];
             Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
@@ -103,19 +108,23 @@ classdef Test_Fusion < matlab.unittest.TestCase
             elseif strcmpi(obj.testType,'Simulation_030')
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_030/';
                 tmp = split(SensorData.TOFData,'/');
-                testNumber = tmp{4};
+                testNumber = tmp{5};
             elseif strcmpi(obj.testType,'Simulation_085')
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_085/';
                 tmp = split(SensorData.TOFData,'/');
-                testNumber = tmp{4};
+                testNumber = tmp{5};
             elseif strcmpi(obj.testType,'Simulation_140')
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_140/';
                 tmp = split(SensorData.TOFData,'/');
-                testNumber = tmp{4};
+                testNumber = tmp{5};
             elseif strcmpi(obj.testType,'Simulation_195')
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
                 tmp = split(SensorData.TOFData,'/');
-                testNumber = tmp{4};
+                testNumber = tmp{5};
+            elseif strcmpi(obj.testType,'Simulation_250')
+                dataFolder = 'Data/Results/matFiles/Simulation_4_15_250/';
+                tmp = split(SensorData.TOFData,'/');
+                testNumber = tmp{5};
             else
                 error('invalid test type in Deployer.TruthFileName')
             end
@@ -140,12 +149,31 @@ classdef Test_Fusion < matlab.unittest.TestCase
                 case 'Modular'
                     obj.configDirecName = obj.configDirecNameModular;
                     testType = 'ModularTest_4_9';
+                    testDef = 'Modular';
                 case '100m'
                     obj.configDirecName = obj.configDirecName100m;
                     testType = '3_25_100m';
-                case 'Simulation'
-                    obj.configDirecName = obj.configDirecNameSim;
-                    testType = 'Simulation';
+                    testDef = '100m';
+                case 'Simulation_085'
+                    obj.configDirecName = obj.configDirecNameSim085;
+                    testType = 'Simulation/_085';
+                    testDef = 'Sim085';
+                case 'Simulation_030'
+                    obj.configDirecName = obj.configDirecNameSim030;
+                    testType = 'Simulation/_030';
+                    testDef = 'Sim030';
+                case 'Simulation_140'
+                    obj.configDirecName = obj.configDirecNameSim140;
+                    testType = 'Simulation/_140';
+                    testDef = 'Sim140';
+                case 'Simulation_195'
+                    obj.configDirecName = obj.configDirecNameSim195;
+                    testType = 'Simulation/_195';
+                    testDef = 'Sim195';
+                case 'Simulation_250'
+                    obj.configDirecName = obj.configDirecNameSim195;
+                    testType = 'Simulation/_250';
+                    testDef = 'Sim250';
             end
             
             configfiles = dir(obj.configDirecName);
@@ -159,14 +187,32 @@ classdef Test_Fusion < matlab.unittest.TestCase
             manifestFilename = [configfolder '/Manifest.json'];
             SensorData = jsondecode(fileread(strcat(configfolder,'/Sensors.json')));
             
-            Model = VANTAGE.PostProcessing.Model(manifestFilename,configfolder);
+            Model = VANTAGE.PostProcessing.Model(manifestFilename,configfolder,false);
 
             Validator = Validate(configfolder,Model,false);
             
             %Validator.PlotResults(Model,SensorData);
             
-            Validator.ErrorAnalysis(Model,SensorData);
+%             Validator.ErrorAnalysis(Model,SensorData,testDef);
             end
+            %{
+           ______.........--=T=--.........______
+              .             |:|
+         :-. //           /""""""-.
+         ': '-._____..--""(""""""()`---.__
+          /:   _..__   ''  ":""""'[] |""`\\
+          ': :'     `-.     _:._     '"""" :
+           ::          '--=:____:.___....-"
+                             O"       O" 
+            MARSHALL LANDING PAD ALERT
+            
+            
+            MAKE THE CALL TO YOUR FUNCTION HERE AFTER FOLDER DEF
+            %}
+            %Validator.ErrorAnalysis(Model,SensorData,testDef);
+            matFileDirectory = [pwd '/Data/Results/matFiles'];
+            Validator.GenerateOutputFiles(matFileDirectory);
+            Validator.masterPlotter(matFileDirectory);
         end
     end
     

@@ -276,7 +276,7 @@ classdef Validate
             end
             finalIndex = length(Time);
             if strcmpi(TestType,'Simulation')
-                CS1_Z = CubeSats.CubeSatFitted{1}(:,3);
+                CS1_Z = CubeSats{1}(:,3);
                 for i = 1:length(CS1_Z)
                     if CS1_Z(i) >= 100
                         break
@@ -321,8 +321,8 @@ classdef Validate
         %
         % @author Dylan Bossie 
         % @date   14-Apr-2019
-        function [] = ErrorAnalysis(obj,Model,SensorData)
-                if strcmpi(Model.Deployer.testScenario,'Modular')
+        function [] = ErrorAnalysis(obj,Model,SensorData,testDef)
+                if strcmpi(testDef,'Modular')
                     resultsFolder = 'Data/Results/matFiles/ModularTest_4_9/';
                     matResults = [resultsFolder 'data/'];
                     AbsoluteErrorFiles = dir([matResults 'AbsError*']);
@@ -335,7 +335,7 @@ classdef Validate
 
                     interpolationPoints = linspace(0,10,1000);
 
-                elseif strcmpi(Model.Deployer.testScenario,'100m')
+                elseif strcmpi(testDef,'100m')
                     resultsFolder = 'Data/Results/matFiles/100m/';
                     matResults = [resultsFolder 'data/'];
                     AbsoluteErrorFiles = dir([matResults 'AbsError*']);
@@ -347,8 +347,60 @@ classdef Validate
                     TimeFiles = dir([matResults 'CSTime*']);
 
                     interpolationPoints = linspace(0,100,1000);
-                elseif strcmpi(Model.Deployer.testScenario,'Simulation')
+                elseif strcmpi(testDef,'Sim085')
+                    resultsFolder = 'Data/Results/matFiles/Simulation_4_15_085/';
+                    matResults = [resultsFolder 'data/'];
+                    AbsoluteErrorFiles = dir([matResults 'AbsError*']);
+                    CubeSatDataFiles = dir([matResults 'CSData*']);
+                    TruthDataFiles = dir([matResults 'TruthData*']);
+                    XErrorFiles = dir([matResults 'XError*']);
+                    YErrorFiles = dir([matResults 'YError*']);
+                    ZErrorFiles = dir([matResults 'ZError*']);
+                    TimeFiles = dir([matResults 'CSTime*']);
+
+                    interpolationPoints = linspace(0,100,1000);
+                    
+                    elseif strcmpi(testDef,'Sim030')
+                    resultsFolder = 'Data/Results/matFiles/Simulation_4_15_030/';
+                    matResults = [resultsFolder 'data/'];
+                    AbsoluteErrorFiles = dir([matResults 'AbsError*']);
+                    CubeSatDataFiles = dir([matResults 'CSData*']);
+                    TruthDataFiles = dir([matResults 'TruthData*']);
+                    XErrorFiles = dir([matResults 'XError*']);
+                    YErrorFiles = dir([matResults 'YError*']);
+                    ZErrorFiles = dir([matResults 'ZError*']);
+                    TimeFiles = dir([matResults 'CSTime*']);
+
+                    interpolationPoints = linspace(0,100,1000);
+                    
+                    elseif strcmpi(testDef,'Sim140')
+                    resultsFolder = 'Data/Results/matFiles/Simulation_4_15_140/';
+                    matResults = [resultsFolder 'data/'];
+                    AbsoluteErrorFiles = dir([matResults 'AbsError*']);
+                    CubeSatDataFiles = dir([matResults 'CSData*']);
+                    TruthDataFiles = dir([matResults 'TruthData*']);
+                    XErrorFiles = dir([matResults 'XError*']);
+                    YErrorFiles = dir([matResults 'YError*']);
+                    ZErrorFiles = dir([matResults 'ZError*']);
+                    TimeFiles = dir([matResults 'CSTime*']);
+
+                    interpolationPoints = linspace(0,100,1000);
+                    
+                    elseif strcmpi(testDef,'Sim195')
                     resultsFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
+                    matResults = [resultsFolder 'data/'];
+                    AbsoluteErrorFiles = dir([matResults 'AbsError*']);
+                    CubeSatDataFiles = dir([matResults 'CSData*']);
+                    TruthDataFiles = dir([matResults 'TruthData*']);
+                    XErrorFiles = dir([matResults 'XError*']);
+                    YErrorFiles = dir([matResults 'YError*']);
+                    ZErrorFiles = dir([matResults 'ZError*']);
+                    TimeFiles = dir([matResults 'CSTime*']);
+
+                    interpolationPoints = linspace(0,100,1000);
+                    
+                    elseif strcmpi(testDef,'Sim250')
+                    resultsFolder = 'Data/Results/matFiles/Simulation_4_15_250/';
                     matResults = [resultsFolder 'data/'];
                     AbsoluteErrorFiles = dir([matResults 'AbsError*']);
                     CubeSatDataFiles = dir([matResults 'CSData*']);
@@ -402,25 +454,30 @@ classdef Validate
                     % Save fitted results for error analysis later
                     dataFolder = resultsFolder;
                     if strcmpi(Model.Deployer.testScenario,'Modular')
-                        dataFolder = [dataFolder 'Modular/'];
+                        dataStruct.velocity = dataStruct.velocity';
+                        %dataFolder = [dataFolder 'Modular/'];
                         folderString = Model.Deployer.TruthFileName;
                         tmp = split(folderString,'/');
                         testNumber = tmp{3};
                     elseif strcmpi(Model.Deployer.testScenario,'100m')
-                        dataFolder = [dataFolder '100m/'];
+                        %dataFolder = [dataFolder '100m/'];
+                        dataStruct.velocity = dataStruct.velocity';
                         folderString = Model.Deployer.TruthFileName;
                         tmp = split(folderString,'/');
                         testNumber = tmp{3};
                     elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-                        dataFolder = [dataFolder 'Simulation/'];
-                        tmp = split(SensorData.TOFData,'/');
-                        testNumber = tmp{4};
+                        %dataFolder = [dataFolder 'Simulation/'];
+                        name = AbsoluteErrorFiles(i).name;
+                        tmp = split(name,'AbsErrorData');
+                        tmp = tmp{2};
+                        tmp = split(tmp,'.');
+                        testNumber = tmp{1};
                     else
                         error('invalid test type in Deployer.TruthFileName')
                     end
 
                     mkdir(dataFolder)
-                    save([pwd '/' dataFolder testNumber '_' Model.Deployer.testScenario 'dataStruct.mat'],'dataStruct');
+                    save([pwd '/' dataFolder testNumber '_' testDef 'dataStruct.mat'],'dataStruct');
 
     %                 CubeSats = CS.CubeSatFitted;
 
@@ -463,21 +520,8 @@ classdef Validate
 %                 error('invalid test type in Deployer.TruthFileName')
 %             end
             %{
-   ______.........--=T=--.........______
-      .             |:|
- :-. //           /""""""-.
- ': '-._____..--""(""""""()`---.__
-  /:   _..__   ''  ":""""'[] |""`\\
-  ': :'     `-.     _:._     '"""" :
-   ::          '--=:____:.___....-"
-                     O"       O" 
-            MARSHALL LANDING PAD ALERT
-            
-            
-            MAKE THE CALL TO YOUR FUNCTION HERE AFTER FOLDER DEF
-            %}
-            matFileDirectory = [pwd '/Data/Results/matFiles'];
-            %obj.masterPlotter(matFileDirectory);
+
+%}
             
         end
         
@@ -618,61 +662,115 @@ classdef Validate
             title([TestType ' 3D Position - ' TestNum])
         end
         
-        
-    end
-    %% Private methods
-    methods (Access = private)
+        %% Generate output report
         %
-        % Present TOF Errors vs Reqs
+        % Generate output report to transmit back to deployer system
+        % 
+        % @param    matFileDirectory        Directory containing mat files
         %
-        % @param    
+        % @return 
         %
-        % @return   
-        %
-        % @author   Joshua Kirby
-        % @date     19-Mar-2019
-        function TOFpresentErrorsVsReqs(~,Model,SensorData)
-            % TOF Processing
-            fileLims = [1 inf];
-            %%%%%%%%%%%%%%%%%%%%%%%%%
-            Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
-                Model.Deployer,'presentResults',1,'fileLims',fileLims,'showDebugPlots',0);
-            % Get Truth Data
-            Truth = Model.Truth_VCF;
-            %%%%%%%%%%%%%%%%%%%%%%%%%
-            % Loop over cubesats
-            %%% Absolute Error Plots
-            titlefontsize = 20;
-            labelfontsize = 16;
-            figure
-            hold on
-            grid on
-            grid minor
-            xlabel('Range, m','fontsize',labelfontsize)
-            ylabel('Error, cm','fontsize',labelfontsize)
-            title(['TOF Absolute Centroid Error Vs Range'],'fontsize',titlefontsize)
-            linewidth = 2;
-            for i = 1:Truth.numCubeSats
-                % Truth Data interpolation
-                Truth.Cubesat(i).timeInterp = Model.Deployer.CubesatArray(i).time;
-                Truth.Cubesat(i).posInterp  = interp1(Truth.t,...
-                    Truth.Cubesat(i).pos,Truth.Cubesat(i).timeInterp);
-                % Calculate errors
-                Error.Cubesat(i).time = Truth.Cubesat(i).timeInterp;
-                Error.Cubesat(i).err  = vecnorm(Truth.Cubesat(i).posInterp-Model.Deployer.CubesatArray(i).centroids_VCF',2,2);
-                % Plot
-                plot(vecnorm(Truth.Cubesat(i).posInterp,2,2),Error.Cubesat(i).err.*100,'linewidth',linewidth);
-                legendstrings{i} = ['Cubesat ',num2str(i)];
+        % @author Dylan Bossie 
+        % @date   21-Apr-2019
+        function [] = GenerateOutputFiles(obj,matFileDirectory)
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %Modular data output files
+            modularMatFileDirectory = [matFileDirectory '/Modular/'];
+            modularMatFiles = dir([modularMatFileDirectory '*.mat']);
+            
+            %Iterate mat files and produce an output
+            mkdir([modularMatFileDirectory 'jsonOut']);
+            for i = 1:numel(modularMatFiles)
+                matData = load([modularMatFileDirectory modularMatFiles(i).name]);
+                matData = matData.dataStruct;
+                
+                %Detect off-nominal vel
+                velocity = norm(matData.velocity);
+                if velocity > 2.1 || velocity < 0.49
+                    isNominalDeployment = false;
+                else
+                    isNominalDeployment = true;
+                end
+                
+                matData.isNominalDeployment = isNominalDeployment;
+                
+                matjsonData = jsonencode(matData);
+                tmp = split(modularMatFiles(i).name,'dataStruct');
+                filename = [modularMatFileDirectory 'jsonOut/' tmp{1} '.json'];
+                fid = fopen(filename, 'w+');
+                if fid == -1
+                    error('Cannot create JSON file');
+                end
+                
+                fwrite(fid, matjsonData, 'char');
+                fclose(fid);
             end
-            legend(legendstrings,'location','eastoutside')
-            hold off
-            %%% Errors vs requirements plot
-            err = [];
-            for i = 1:Truth.numCubeSats
-                err = [err Error.Cubesat(i).err'];
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %100m data output files
+            matFileDirectory100m = [matFileDirectory '/100m/'];
+            matFiles100m = dir([matFileDirectory100m '*.mat']);
+            
+            %Iterate mat files and produce an output
+            mkdir([matFileDirectory100m 'jsonOut']);
+            for i = 1:numel(matFiles100m)
+                matData = load([matFileDirectory100m matFiles100m(i).name]);
+                matData = matData.dataStruct;
+                
+                %Detect off-nominal vel
+                velocity = norm(matData.velocity);
+                if velocity > 2.1 || velocity < 0.49
+                    isNominalDeployment = false;
+                else
+                    isNominalDeployment = true;
+                end
+                
+                matData.isNominalDeployment = isNominalDeployment;
+                
+                matjsonData = jsonencode(matData);
+                tmp = split(matFiles100m(i).name,'dataStruct');
+                filename = [matFileDirectory100m 'jsonOut/' tmp{1} '.json'];
+                fid = fopen(filename, 'w+');
+                if fid == -1
+                    error('Cannot create JSON file');
+                end
+                
+                fwrite(fid, matjsonData, 'char');
+                fclose(fid);
             end
-            onesigmastd = quantile(err,normcdf(1)-normcdf(-1));
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %Simulation data output files
+            simulationFileDirectory = [matFileDirectory '/Simulation/'];
+            simulationMatFiles = dir([simulationFileDirectory '*.mat']);
+            
+            %Iterate mat files and produce an output
+            mkdir([simulationFileDirectory 'jsonOut']);
+            for i = 1:numel(simulationMatFiles)
+                matData = load([simulationFileDirectory simulationMatFiles(i).name]);
+                matData = matData.dataStruct;
+                
+                %Detect off-nominal vel
+                velocity = norm(matData.velocity);
+                if velocity > 2.1 || velocity < 0.49
+                    isNominalDeployment = false;
+                else
+                    isNominalDeployment = true;
+                end
+                
+                matData.isNominalDeployment = isNominalDeployment;
+                
+                matjsonData = jsonencode(matData);
+                tmp = split(simulationMatFiles(i).name,'dataStruct');
+                filename = [simulationFileDirectory 'jsonOut/' tmp{1} '.json'];
+                fid = fopen(filename, 'w+');
+                if fid == -1
+                    error('Cannot create JSON file');
+                end
+                
+                fwrite(fid, matjsonData, 'char');
+                fclose(fid);
+            end
         end
+        
         
         %% Correlate the truth data of a single, most trusted CubeSat
         %
@@ -1563,38 +1661,40 @@ classdef Validate
             
             % Fitted Curve to be representative of VANTAGE's performance
             % I will have to do this last, if at all
-            fittedPositionDistance = req_distance;
-            fittedPositionMeanError = req_error;
-            fittedPositionSTDError = req_error;
+            fittedPositionDistance = NaN;
+            fittedPositionMeanError = NaN;
+            fittedPositionSTDError = NaN;
             
             plotLabels = { 'Distance [m]', ...
-                'Position Measurement Error [m]' };
-            plotTitle = 'Position Measurement Error Versus Distance';
+                'Error [m]' };
+            plotTitle = 'Position Measurement Error Mean + 1 SD';
             distance_range = [1,100];
             
             [f_Master] = ...
                 obj.errorPlot(req_distance,Simulation.distance_final,...
                 Modular.distance_final,m100.distance_final,...
                 fittedPositionDistance,req_error,...
-                Simulation.mu_pos_err_final,Modular.mu_pos_err_final,...
-                m100.mu_pos_err_final,fittedPositionMeanError,...
-                Simulation.std_pos_err_final,Modular.std_pos_err_final,...
-                m100.std_pos_err_final,fittedPositionSTDError,...
+                Simulation.mu_pos_err_final+Simulation.std_pos_err_final,...
+                Modular.mu_pos_err_final+Modular.std_pos_err_final,...
+                m100.mu_pos_err_final+m100.std_pos_err_final,fittedPositionSTDError,...
+                fittedPositionMeanError,...
+                [],[],...
+                [],...
                 pointsOfInterest,plotLabels,plotTitle,distance_range);
             
             %%% Velocity Error VS Velocity Plot
             req_distance = [ 0.1, 10, 10, 100 ];
-            req_error = [ 0.1, 0.1, 1, 10 ];
+            req_error = [ 0.01, 0.01, 0.01, 0.01 ];
             pointsOfInterest = [];
             
             % Fitted Curve to be representative of VANTAGE's performance
             % I will have to do this last, if at all
             fittedVelocityVelocity = req_distance;
-            fittedVelocityMeanError = req_error;
+            fittedVelocityMeanError = 10 .* req_error;
             
             plotLabels = { 'Average Velocity [m/s]', ...
-                'Average Velocity Measurement Error [m/s]' };
-            plotTitle = 'Average Velocity Measurement Error Versus Average Velocity';
+                'Error [m/s]' };
+            plotTitle = 'Average Velocity Measurement Error';
             velocity_range = [ -Inf, Inf ];
             
             [f_Velocity] = ...
@@ -1608,17 +1708,17 @@ classdef Validate
             
             %%% Launch Time Error VS Velocity Plot
             req_distance = [ 0.1, 10, 10, 100 ];
-            req_error = [ 0.1, 0.1, 1, 10 ];
+            req_error = [ 0.5, 0.5, 0.5, 0.5 ];
             pointsOfInterest = [];
             
             % Fitted Curve to be representative of VANTAGE's performance
             % I will have to do this last, if at all
-            fittedTimeVelocity = req_distance;
-            fittedTimeMeanError = req_error;
+            fittedTimeVelocity = NaN;
+            fittedTimeMeanError = NaN;
             
             plotLabels = { 'Average Velocity [m/s]', ...
-                'Launch Time Measurement Error [m/s]' };
-            plotTitle = 'Launch Time Measurement Error Versus Average Velocity';
+                'Error [s]' };
+            plotTitle = 'Launch Time Measurement Error';
             velocity_range = [ -Inf, Inf ];
             
             [f_Time] = ...
@@ -1632,9 +1732,82 @@ classdef Validate
             
         end
         
+        %% Makes nice plots
+        %
+        % This code makes nice plots
+        %
+        % @param   x   A cell array of x axis plot vectors
+        %
+        % @param   y   A cell array of y axis plot vectors
+        %
+        % @param   linespec   a cell array of string containing plotting
+        %                     specifications
+        %
+        % @param   colors   a cell array of color vectors
+        %
+        % @param   plotLabels   a cell containing {xlabel,ylabel}
+        %
+        % @param   plotTitle   a string containing the plot title
+        %
+        % @param   legend_str   a cell array of strings which shall label
+        %                       each line
+        %
+        % @param   x_range   a 2 length vector containing [xmin,xmax]
+        %
+        % @return   f   The figure handle
+        %
+        % @author Marshall Herr
+        % @date   21-Apr-2019
+        function [] = nicePlot(~,x,y,linespec,colors,plotLabels,plotTitle,legend_str,x_range)
+            
+            % Plotting parameters
+            LINEWIDTH   = 2;
+            FONTSIZE    = 24;
+            MARKERSIZE  = 6;
+            
+            set(0, 'defaulttextInterpreter', 'latex')
+            set(0, 'DefaultAxesLineStyleOrder', 'default')
+            
+            p = gobjects(length(x),1);
+            
+            f = figure();% 'Visible', 'off' );
+            a = axes;
+            
+            for i = 1 : length(x)
+                
+                p(i) = plot( x{i}, y{i}, linespec{i}, 'color', colors{i},...
+                    'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
+                
+            end
+            
+            a.XLim = x_range;
+            a.TickLabelInterpreter = 'latex';
+            a.FontSize = FONTSIZE;
+            a.XLabel.FontSize = FONTSIZE;
+            a.YLabel.FontSize = FONTSIZE;
+            a.XLabel.String = plotLabels{1};
+            a.YLabel.String = plotLabels{2};
+            a.Title.FontSize = FONTSIZE;
+            a.Title.String = plotTitle;
+            
+            legend( legend_str, 'interpreter', 'latex', ...  
+                'location', 'southeast', 'fontsize', FONTSIZE * 0.9)
+            
+            grid on
+            grid minor
+            f.Visible = 'on';
+            
+        end
+        
         %% Convolves stuff
         %
-        % This code shall produce things
+        % This code shall produce error convolution fields
+        %
+        % @param   structure   The data structure from a specific test
+        %
+        % @param   numElements   The number of elements within each field
+        %
+        % @return   structure   The editted structure
         %
         % @author Marshall Herr
         % @date   16-Apr-2019
@@ -1748,18 +1921,18 @@ classdef Validate
                     fileStruct(i).name ];
                 dataStruct = load( fileName );
                 % lol
-                try
                 dataStruct = dataStruct.dataStruct;
+                isColumn = size( dataStruct.velocity );
+                if isColumn(2) ~= 1
+                    error( 'Velocity data is not a column vector. ' )
+                end
                 outputStruct.distance(i) = {dataStruct.distance(:)};
                 outputStruct.velocity(i) = {dataStruct.velocity};
                 outputStruct.mag_velocity(i) = norm(dataStruct.velocity);
                 outputStruct.t_err(i) = dataStruct.t_err;
-                outputStruct.v_err(i) = {dataStruct.v_err};
-                outputStruct.mag_v_err(i) = norm(dataStruct.v_err);
+                % turns out the velocity error is given in cm not m
+                outputStruct.v_err(i) = {dataStruct.v_err .* cm_to_m};
                 outputStruct.pos_err(i) = {dataStruct.pos_err(:)};
-                catch
-                    disp('fuckin hell yea break my shit')
-                end
                 
                 % turns out the position error is given in cm not m
                 for j = 1 : length(outputStruct.pos_err{i})
@@ -1768,6 +1941,8 @@ classdef Validate
                         outputStruct.pos_err{i}{j} .* cm_to_m;
                     
                 end
+                
+                outputStruct.mag_v_err(i) = norm(outputStruct.v_err{i});
                 
             end
             
@@ -1779,6 +1954,8 @@ classdef Validate
             outputStruct.t_err = outputStruct.t_err( sortedIndexes );
             outputStruct.v_err = outputStruct.v_err( sortedIndexes );
             outputStruct.pos_err = outputStruct.pos_err( sortedIndexes );
+            outputStruct.mag_velocity = outputStruct.mag_velocity( sortedIndexes );
+            outputStruct.mag_v_err = outputStruct.mag_v_err( sortedIndexes );
             
         end
         
@@ -1817,6 +1994,8 @@ classdef Validate
         %
         % @param   plotTitle   a string containing the plot title
         %
+        % @param   x_range   a 2 length vector containing [xmin,xmax]
+        %
         % @return   f   plot figure handle
         %
         % @author Marshall Herr
@@ -1845,8 +2024,8 @@ classdef Validate
                        111, 155, 117; ...
                        192, 174, 109; ...
                        091, 097, 103 ] ./ 255;
-            legend_str = { 'Requirements', 'Variance Weighted Error', ...
-                'Simulated Tests', 'Modular Tests', '100m Tests' };
+            legend_str = { 'Requirements', 'Simulated Tests', ...
+                'Modular Tests', '100m Tests' };
             set(0, 'defaulttextInterpreter', 'latex')
             set(0, 'DefaultAxesLineStyleOrder', 'default')
             
@@ -1861,7 +2040,7 @@ classdef Validate
             p(1) = loglog( x_req, req, '--', 'color', colors(1,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
             hold on
-            p(2) = loglog( x_K, mu_err_K, '*-', 'color', colors(2,:), ...
+            p(2) = loglog( x_K, mu_err_K, '--', 'color', colors(1,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
             p(3) = loglog( x_S, mu_err_S, 'o-', 'color', colors(3,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
@@ -1870,11 +2049,6 @@ classdef Validate
             p(5) = loglog( x_100m, mu_err_100m, 'd-', 'color', colors(5,:), ...
                 'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
             index = 5;
-            if ~isempty(sigma_err_K)
-                p(index+1) = loglog( x_K, mu_err_K + sigma_err_K, '*-', 'color', colors(2,:), ...
-                    'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
-                index = index + 1;
-            end
             if ~isempty(sigma_err_S)
                 p(index+1) = loglog( x_S, mu_err_S + sigma_err_S, 'o-', 'color', colors(3,:), ...
                     'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
@@ -1922,13 +2096,68 @@ classdef Validate
             a.Title.FontSize = FONTSIZE;
             a.Title.String = plotTitle;
             
-            legend( p(1:NumPlotsDefault), legend_str, 'interpreter', 'latex', ...  
+            legend( p([1,3:NumPlotsDefault]), legend_str, 'interpreter', 'latex', ...  
                 'location', 'southeast', 'fontsize', FONTSIZE * 0.9)
             
             grid on
             grid minor
             f.Visible = 'on';
             
+        end
+        
+    end
+    %% Private methods
+    methods (Access = private)
+        %
+        % Present TOF Errors vs Reqs
+        %
+        % @param    
+        %
+        % @return   
+        %
+        % @author   Joshua Kirby
+        % @date     19-Mar-2019
+        function TOFpresentErrorsVsReqs(~,Model,SensorData)
+            % TOF Processing
+            fileLims = [1 inf];
+            %%%%%%%%%%%%%%%%%%%%%%%%%
+            Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
+                Model.Deployer,'presentResults',1,'fileLims',fileLims,'showDebugPlots',0);
+            % Get Truth Data
+            Truth = Model.Truth_VCF;
+            %%%%%%%%%%%%%%%%%%%%%%%%%
+            % Loop over cubesats
+            %%% Absolute Error Plots
+            titlefontsize = 20;
+            labelfontsize = 16;
+            figure
+            hold on
+            grid on
+            grid minor
+            xlabel('Range, m','fontsize',labelfontsize)
+            ylabel('Error, cm','fontsize',labelfontsize)
+            title(['TOF Absolute Centroid Error Vs Range'],'fontsize',titlefontsize)
+            linewidth = 2;
+            for i = 1:Truth.numCubeSats
+                % Truth Data interpolation
+                Truth.Cubesat(i).timeInterp = Model.Deployer.CubesatArray(i).time;
+                Truth.Cubesat(i).posInterp  = interp1(Truth.t,...
+                    Truth.Cubesat(i).pos,Truth.Cubesat(i).timeInterp);
+                % Calculate errors
+                Error.Cubesat(i).time = Truth.Cubesat(i).timeInterp;
+                Error.Cubesat(i).err  = vecnorm(Truth.Cubesat(i).posInterp-Model.Deployer.CubesatArray(i).centroids_VCF',2,2);
+                % Plot
+                plot(vecnorm(Truth.Cubesat(i).posInterp,2,2),Error.Cubesat(i).err.*100,'linewidth',linewidth);
+                legendstrings{i} = ['Cubesat ',num2str(i)];
+            end
+            legend(legendstrings,'location','eastoutside')
+            hold off
+            %%% Errors vs requirements plot
+            err = [];
+            for i = 1:Truth.numCubeSats
+                err = [err Error.Cubesat(i).err'];
+            end
+            onesigmastd = quantile(err,normcdf(1)-normcdf(-1));
         end
     end
 end

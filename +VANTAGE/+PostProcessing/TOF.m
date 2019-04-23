@@ -110,7 +110,7 @@ classdef TOF
             CubeSats = Deployer.CubesatArray;
             
             % Obtain filenames from SensorData TOFData dir
-            ls = dir(SensorData.TOFData);
+            ls = dir([SensorData.TOFData '*.pcd']);
             ls = ls([ls.bytes]~=0);
             % Error check data against truth
             if length(obj.ModelRef.Truth_VCF.t) < length(ls)
@@ -170,7 +170,11 @@ classdef TOF
             centroidingDevolved = 0;
             numConsOutliers = zeros(1,length(CubeSats));
             ii = fileLims(1);
+            count = 0;
             while ~stopProcessing
+                count = count+1;
+                if count == 76
+                end
                 % Initialize (disposable) CubeSats_TOF
                 for i = 1:length(CubeSats)
                     CubeSats_TOF(i) = VANTAGE.PostProcessing.CubeSat_TOF(CubeSats(i));
@@ -185,7 +189,7 @@ classdef TOF
                     outOfRange = 1;
                 end
                 % Associate with known cubesats within Deployer
-                [CubeSats,numConsOutliers] = obj.associateCentroids(CubeSats_TOF,CubeSats,numConsOutliers);
+                [CubeSats,numConsOutliers] = obj.associateCentroids(CubeSats_TOF,CubeSats,numConsOutliers,SensorData);
                 % Determine if all of the CubeSats have too many
                 % consecutive outliers
                 if ~any(numConsOutliers < obj.maxConsOutliers)
@@ -285,7 +289,8 @@ classdef TOF
         %
         % @author   Joshua Kirby
         % @date     10-Mar-2019
-        function [CubeSats,numConsOutliers] = associateCentroids(obj,CubeSats_TOF,CubeSats,numConsOutliers)
+        function [CubeSats,numConsOutliers] = associateCentroids(obj,CubeSats_TOF,CubeSats,numConsOutliers,SensorData)
+            try
             % Define persistent variable to save whether the last file
             % contained outliers for each CubeSat
             persistent hadOutlier
@@ -440,6 +445,13 @@ classdef TOF
                             meanResNorm(ii) = mean(vecnorm([extractedPossibleSats(ii,:).resFromPredPt],2,1));
                         end
                         [~,Imin] = min(meanResNorm);
+                        
+                        %%%%%%%%%%%%%%%%%%%%%
+                        %{
+                        if Imin > obj.ModelRef.Deployer.numCubesats
+                            Imin = obj.ModelRef.Deployer.numCubesats;
+                        end
+                        %}
                         % save the minimum mean norm residual
                         for ii = 1:length(extractedCombsSats(Imin,:))
                             CubeSats(extractedCombsSats(Imin,ii)).centroids_VCF = ...
@@ -464,6 +476,7 @@ classdef TOF
                         meanResNorm(ii) = nanmean(resNorm(ii,:));
                     end
                     [~,Imin] = nanmin(meanResNorm);
+                    
                     satsSaved = [];
                     for ii = 1:size(possibleCubesats,2)
                         if ~possibleCubesats(Imin,ii).isOutlier
@@ -482,6 +495,9 @@ classdef TOF
                 % Update the consecutive number of outliers
                 numConsOutliers = hadOutlier.*numConsOutliers + hasOutlier;
                 hadOutlier = hasOutlier;
+            end
+            catch
+                disp('fuuuuck')
             end
         end
         

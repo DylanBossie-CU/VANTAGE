@@ -142,7 +142,11 @@ classdef TimeManager
                         tmp = char(filenames(i));
                         filenum = str2num(tmp(end-8:end-4));
                         tofFps = 10;
+                        try
                         t(i) = filenum/tofFps;
+                        catch
+                            disp('awoeinawoef')
+                        end
                     elseif strcmpi(filetype,'Optical')
                         tmp = char(filenames(i));
                         filenum = str2num(tmp(end-7:end-4));
