@@ -1,95 +1,97 @@
 
-
-
-%% The Signals
-wokeSig='NUC is Woke';
-manifestSig='Manifest is Sent';
-standbySig='NUC is Standby';
-initiateSig='CubeSat is Deploying';
-resultsSig='Results is Done';
-
-
-%% Set up sockets (sig=signals, data=data, PI is server)
-t_sig = tcpip('169.254.146.34', 4013, 'NetworkRole', 'client');
-t_data = tcpip('169.254.146.34', 4014, 'NetworkRole', 'client');
-
-%% Pi is written to 32768 size bytes (32768 was chosen arbitrarily(favorite number), max size unknown)
-%Set Output Buffer Size
-t_sig.OutputBufferSize=32768;
-t_data.OutputBufferSize=32768;
-
-% Open Sockets
-fopen(t_sig);
-fopen(t_data);
-
-%% Tell PI that NUC is awake
-send(t_sig,wokeSig);
-pause(0.2)
-
-%% Wait for PI to send the manifest
-standby(t_sig,manifestSig);
-
-%% Recieve Manifest, write to ManifestID file
-ManifestID=fopen('Manifesto.json','w');
-manifest=receive(t_data);
-fwrite(ManifestID,manifest);
-fclose(ManifestID);
-
-%% Tell PI that NUC is ready to take Data
-send(t_sig,standbySig);
-
-%% Wait for PI to tell NUC to start
-standby(t_sig,initiateSig);
-
-
-%% Start sensor automation
-% File Definitions
-% High-level directory of all TOF information. This should contain the
-% executable data capture script and the desired location to save point
-% cloud outputs.
-tofDirName = '/home/vantage/Documents/githere/VANTAGE/Automation/TOF_Automation/examples/';
-tofDirData = '/home/vantage/Documents/githere/VANTAGE/Data/TOF_Automated/';
-tofFlush = strcat(tofDirData,'pointcloud*');
-tofScript = strcat(tofDirName,'TOF_Data_Capture.py');
-
-opticalDirName = '/home/vantage/Documents/githere/VANTAGE/Automation/OpticalCam_Automation/';
-opticalDirImages = '/home/vantage/Documents/githere/VANTAGE/Data/AutomatedImageCapture/';
-opticalDirData = '/home/vantage/Documents/githere/VANTAGE/Data/Optical_Automated/';
-opticalFlush = strcat(opticalDirData,'VANTAGEOp*');
-opticalScript = strcat(opticalDirName,'Optical_Data_Capture.py');
-
-% Flush all TOF point clouds detected in output directory
-unix(sprintf('rm %s',tofFlush));
-
-% Flush all optical images detected in output directory
-unix(sprintf('rm %s',opticalFlush));
-
-
-% TOF Data Collection
-% This command executes a bash command, which will begin data capture using
-% the TOF sensor, and save point clouds to an output directory.
-unix(sprintf('python %s &',tofScript));
-
-% Optical Camera Data Collection
-% This command executes a bash command, which will begin data capture using
-% the optical camera, and save images to an output directory.
-unix(sprintf('python %s &',opticalScript));
+% 
+% 
+% %% The Signals
+% wokeSig='NUC is Woke';
+% manifestSig='Manifest is Sent';
+% standbySig='NUC is Standby';
+% initiateSig='CubeSat is Deploying';
+% resultsSig='Results is Done';
+% 
+% 
+% %% Set up sockets (sig=signals, data=data, PI is server)
+% t_sig = tcpip('169.254.146.34', 4013, 'NetworkRole', 'client');
+% t_data = tcpip('169.254.146.34', 4014, 'NetworkRole', 'client');
+% 
+% %% Pi is written to 32768 size bytes (32768 was chosen arbitrarily(favorite number), max size unknown)
+% %Set Output Buffer Size
+% t_sig.OutputBufferSize=32768;
+% t_data.OutputBufferSize=32768;
+% 
+% % Open Sockets
+% fopen(t_sig);
+% fopen(t_data);
+% 
+% %% Tell PI that NUC is awake
+% send(t_sig,wokeSig);
+% pause(0.2)
+% 
+% %% Wait for PI to send the manifest
+% standby(t_sig,manifestSig);
+% 
+% %% Recieve Manifest, write to ManifestID file
+% ManifestID=fopen('Manifesto.json','w');
+% manifest=receive(t_data);
+% fwrite(ManifestID,manifest);
+% fclose(ManifestID);
+% 
+% %% Tell PI that NUC is ready to take Data
+% send(t_sig,standbySig);
+% 
+% %% Wait for PI to tell NUC to start
+% standby(t_sig,initiateSig);
+% 
+% 
+% %% Start sensor automation
+% % File Definitions
+% % High-level directory of all TOF information. This should contain the
+% % executable data capture script and the desired location to save point
+% % cloud outputs.
+% tofDirName = '/home/vantage/Documents/githere/VANTAGE/Automation/TOF_Automation/examples/';
+% tofDirData = '/home/vantage/Documents/githere/VANTAGE/Data/TOF_Automated/';
+% tofFlush = strcat(tofDirData,'pointcloud*');
+% tofScript = strcat(tofDirName,'TOF_Data_Capture.py');
+% 
+% opticalDirName = '/home/vantage/Documents/githere/VANTAGE/Automation/OpticalCam_Automation/';
+% opticalDirImages = '/home/vantage/Documents/githere/VANTAGE/Data/AutomatedImageCapture/';
+% opticalDirData = '/home/vantage/Documents/githere/VANTAGE/Data/Optical_Automated/';
+% opticalFlush = strcat(opticalDirData,'VANTAGEOp*');
+% opticalScript = strcat(opticalDirName,'Optical_Data_Capture.py');
+% 
+% % Flush all TOF point clouds detected in output directory
+% unix(sprintf('rm %s',tofFlush));
+% 
+% % Flush all optical images detected in output directory
+% unix(sprintf('rm %s',opticalFlush));
+% 
+% 
+% % TOF Data Collection
+% % This command executes a bash command, which will begin data capture using
+% % the TOF sensor, and save point clouds to an output directory.
+% unix(sprintf('python %s &',tofScript));
+% 
+% % Optical Camera Data Collection
+% % This command executes a bash command, which will begin data capture using
+% % the optical camera, and save images to an output directory.
+% unix(sprintf('python %s &',opticalScript));
 
 %% Start le epic post-processing PogChamp
 import VANTAGE.PostProcessing.*
+import VANTAGE.PostProcessing.Validate
 
 %%%%%% Modular config direcs
-configDirecNameModular = 'Config/Final_Tests/ModularTest_4_9/Test*';
+configDirecNameModular = 'config/Final_Tests/ModularTest_4_9/Test*';
 %%%%%% 100m config direcs
-configDirecName100m = 'Config/Final_Tests/3_25_100m/Test*';
+configDirecName100m = 'config/Final_Tests/3_25_100m/Test*';
 %%%%%% Simulation config direcs
-configDirecNameSim085 = 'Config/Final_Tests/Simulation/_085/Sample*';
-configDirecNameSim030 = 'Config/Final_Tests/Simulation/_030/Sample*';
-configDirecNameSim140 = 'Config/Final_Tests/Simulation/_140/Sample*';
-configDirecNameSim195 = 'Config/Final_Tests/Simulation/_195/Sample*';
-configDirecNameSim250 = 'Config/Final_Tests/Simulation/_250/Sample*';
+configDirecNameSim085 = 'config/Final_Tests/Simulation/_085/Sample*';
+configDirecNameSim030 = 'config/Final_Tests/Simulation/_030/Sample*';
+configDirecNameSim140 = 'config/Final_Tests/Simulation/_140/Sample*';
+configDirecNameSim195 = 'config/Final_Tests/Simulation/_195/Sample*';
+configDirecNameSim250 = 'config/Final_Tests/Simulation/_250/Sample*';
 
-testType = 'Simulation_195';
+%%%%%% Define desired test type here
+testType = 'Modular';
 
 switch testType
     case 'Modular'
@@ -124,7 +126,7 @@ for iter = 1:numel(configfiles)
 
     configfile = [pwd '/config/Final_Tests/' testType '/' configfiles(iter).name];
 
-    %%% Filenames and Configurables
+    %%% Filenames and configurables
     manifestFilename = strcat(configfile,'/Manifest.json');
     SensorData = jsondecode(fileread(strcat(configfile,'/Sensors.json')));
 
@@ -160,7 +162,7 @@ for iter = 1:numel(configfiles)
     end
 
     % Save fitted results for error analysis later
-    if strcmpi(testType,'Modular')
+    if strcmpi(testType,'ModularTest_4_9')
         dataFolder = 'Data/Results/matFiles/ModularTest_4_9/';
         folderString = Model.Deployer.TruthFileName;
         tmp = split(folderString,'/');
@@ -205,63 +207,58 @@ for iter = 1:numel(configfiles)
     save([pwd '/' dataFolder 'data/CSTime' testNumber '.mat'],'t_fit');
 end
 %%%% Results processing
-switch obj.testType
-    case 'Modular'
-        obj.configDirecName = obj.configDirecNameModular;
+switch testType
+    case 'ModularTest_4_9'
+        configDirecName = configDirecNameModular;
         testType = 'ModularTest_4_9';
         testDef = 'Modular';
     case '100m'
-        obj.configDirecName = obj.configDirecName100m;
+        configDirecName = configDirecName100m;
         testType = '3_25_100m';
         testDef = '100m';
     case 'Simulation_085'
-        obj.configDirecName = obj.configDirecNameSim085;
+        configDirecName = configDirecNameSim085;
         testType = 'Simulation/_085';
         testDef = 'Sim085';
     case 'Simulation_030'
-        obj.configDirecName = obj.configDirecNameSim030;
+        configDirecName = configDirecNameSim030;
         testType = 'Simulation/_030';
         testDef = 'Sim030';
     case 'Simulation_140'
-        obj.configDirecName = obj.configDirecNameSim140;
+        configDirecName = configDirecNameSim140;
         testType = 'Simulation/_140';
         testDef = 'Sim140';
     case 'Simulation_195'
-        obj.configDirecName = obj.configDirecNameSim195;
+        configDirecName = configDirecNameSim195;
         testType = 'Simulation/_195';
         testDef = 'Sim195';
     case 'Simulation_250'
-        obj.configDirecName = obj.configDirecNameSim195;
+        configDirecName = configDirecNameSim195;
         testType = 'Simulation/_250';
         testDef = 'Sim250';
 end
             
-configfiles = dir(obj.configDirecName);
+configfiles = dir(configDirecName);
 
-for iter = 1:numel(configfiles)
-    %%% Housekeeping and Allocation
-    rng(99);
+% for iter = 1:numel(configfiles)
+%     %%% Housekeeping and Allocation
+%     rng(99);
+% 
+%     %%% Filenames and configurables
+%     configfolder = [configfiles(iter).folder '/' configfiles(iter).name];
+%     manifestFilename = [configfolder '/Manifest.json'];
+%     SensorData = jsondecode(fileread(strcat(configfolder,'/Sensors.json')));
+% 
+%     Model = VANTAGE.PostProcessing.Model(manifestFilename,configfolder,false);
+% 
+%     Validator = Validate(configfolder,Model,false);
+% end
 
-    %%% Filenames and Configurables
-    configfolder = [configfiles(iter).folder '/' configfiles(iter).name];
-    manifestFilename = [configfolder '/Manifest.json'];
-    SensorData = jsondecode(fileread(strcat(configfolder,'/Sensors.json')));
+Validator.ErrorAnalysis(Model,SensorData,testDef);
 
-    Model = VANTAGE.PostProcessing.Model(manifestFilename,configfolder,false);
-
-    Validator = Validate(configfolder,Model,false);
-
-    %Validator.PlotResults(Model,SensorData);
-
-    %             Validator.ErrorAnalysis(Model,SensorData,testDef);
-end
-
-%Validator.ErrorAnalysis(Model,SensorData,testDef);
 matFileDirectory = [pwd '/Data/Results/matFiles'];
 Validator.GenerateOutputFiles(matFileDirectory);
-Validator.masterPlotter(matFileDirectory);
-
-
+%Validator.masterPlotter(matFileDirectory);
 
 
 %% write results and input results filename and format in this code 

@@ -940,7 +940,7 @@ classdef Optical
     %
     function obj = PixelToUnitVec(obj,isSystemCentroid)
         %Read optical camera parameters
-        CameraParameters = jsondecode(fileread('./Config/Sensors.json'));
+        CameraParameters = jsondecode(fileread('./config/Sensors.json'));
         focalLength = CameraParameters.OpticalFocalLength;
         pixelSize = CameraParameters.OpticalPixelSize;
         gridSize = CameraParameters.OpticalResolution;
