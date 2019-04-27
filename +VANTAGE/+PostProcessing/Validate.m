@@ -1727,9 +1727,82 @@ classdef Validate
             
         end
         
+        %% Makes nice plots
+        %
+        % This code makes nice plots
+        %
+        % @param   x   A cell array of x axis plot vectors
+        %
+        % @param   y   A cell array of y axis plot vectors
+        %
+        % @param   linespec   a cell array of string containing plotting
+        %                     specifications
+        %
+        % @param   colors   a cell array of color vectors
+        %
+        % @param   plotLabels   a cell containing {xlabel,ylabel}
+        %
+        % @param   plotTitle   a string containing the plot title
+        %
+        % @param   legend_str   a cell array of strings which shall label
+        %                       each line
+        %
+        % @param   x_range   a 2 length vector containing [xmin,xmax]
+        %
+        % @return   f   The figure handle
+        %
+        % @author Marshall Herr
+        % @date   21-Apr-2019
+        function [] = nicePlot(~,x,y,linespec,colors,plotLabels,plotTitle,legend_str,x_range)
+            
+            % Plotting parameters
+            LINEWIDTH   = 2;
+            FONTSIZE    = 24;
+            MARKERSIZE  = 6;
+            
+            set(0, 'defaulttextInterpreter', 'latex')
+            set(0, 'DefaultAxesLineStyleOrder', 'default')
+            
+            p = gobjects(length(x),1);
+            
+            f = figure();% 'Visible', 'off' );
+            a = axes;
+            
+            for i = 1 : length(x)
+                
+                p(i) = plot( x{i}, y{i}, linespec{i}, 'color', colors{i},...
+                    'LineWidth', LINEWIDTH, 'MarkerSize', MARKERSIZE );
+                
+            end
+            
+            a.XLim = x_range;
+            a.TickLabelInterpreter = 'latex';
+            a.FontSize = FONTSIZE;
+            a.XLabel.FontSize = FONTSIZE;
+            a.YLabel.FontSize = FONTSIZE;
+            a.XLabel.String = plotLabels{1};
+            a.YLabel.String = plotLabels{2};
+            a.Title.FontSize = FONTSIZE;
+            a.Title.String = plotTitle;
+            
+            legend( legend_str, 'interpreter', 'latex', ...  
+                'location', 'southeast', 'fontsize', FONTSIZE * 0.9)
+            
+            grid on
+            grid minor
+            f.Visible = 'on';
+            
+        end
+        
         %% Convolves stuff
         %
-        % This code shall produce things
+        % This code shall produce error convolution fields
+        %
+        % @param   structure   The data structure from a specific test
+        %
+        % @param   numElements   The number of elements within each field
+        %
+        % @return   structure   The editted structure
         %
         % @author Marshall Herr
         % @date   16-Apr-2019
@@ -1915,6 +1988,8 @@ classdef Validate
         % @param   plotLabels   a cell containing {xlabel,ylabel}
         %
         % @param   plotTitle   a string containing the plot title
+        %
+        % @param   x_range   a 2 length vector containing [xmin,xmax]
         %
         % @return   f   plot figure handle
         %
