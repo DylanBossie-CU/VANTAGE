@@ -11,7 +11,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
         configDirecNameSim195 = 'Config/Final_Tests/Simulation/_195/Sample*';
         configDirecNameSim250 = 'Config/Final_Tests/Simulation/_250/Sample*';
          
-        testType = 'Simulation_195';
+        testType = '100m';
         
         configDirecName
     end
@@ -208,7 +208,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             
             MAKE THE CALL TO YOUR FUNCTION HERE AFTER FOLDER DEF
             %}
-            %Validator.ErrorAnalysis(Model,SensorData,testDef);
+            Validator.ErrorAnalysis(Model,SensorData,testDef);
             matFileDirectory = [pwd '/Data/Results/matFiles'];
             Validator.GenerateOutputFiles(matFileDirectory);
             Validator.masterPlotter(matFileDirectory);

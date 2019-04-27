@@ -230,7 +230,7 @@ classdef Validate
         
         % @author Dylan Bossie 
         % @date   11-Apr-2019
-        function [pos_err] = InterpolateDistance(~, CSArray,timefitted,time,distance)
+        function [pos_err,time_interp] = InterpolateDistance(~, CSArray,timefitted,time,distance)
             CubeSats = CSArray.CubeSatFitted;
             CubeSatTime = timefitted.t_fit;
             pos_err = cell(numel(CubeSats),1);
@@ -249,6 +249,7 @@ classdef Validate
                 pos_err{i} = abs(absdistance-distancecs');
                 pos_err{i} = pos_err{i}';
             end
+            time_interp = interp1(Z',CubeSatTime,distancecs);
         end
         
         %% Compute mean velocity
@@ -434,11 +435,11 @@ classdef Validate
 
                     % Interpolate cubesats to the truth distances for
                     % pos_err
-                    pos_err = obj.InterpolateDistance(CS,Time,Model.Truth_VCF.t,distance);
+                    [pos_err,time] = obj.InterpolateDistance(CS,Time,Model.Truth_VCF.t,distance);
 
                     t_err = obj.ComputeLaunchTime(CS,Time,Model.Truth_VCF);
 
-                    if t_err > 5
+                    if t_err > 10
                         error('Time manager generated incorrect time offset');
                     end
                     
@@ -450,34 +451,28 @@ classdef Validate
                     dataStruct.t_err = t_err;
                     dataStruct.v_err = v_err;
                     dataStruct.pos_err = pos_err;
+                    dataStruct.time = time;
 
                     % Save fitted results for error analysis later
-                    dataFolder = resultsFolder;
                     if strcmpi(Model.Deployer.testScenario,'Modular')
-                        dataStruct.velocity = dataStruct.velocity';
-                        %dataFolder = [dataFolder 'Modular/'];
-                        folderString = Model.Deployer.TruthFileName;
-                        tmp = split(folderString,'/');
-                        testNumber = tmp{3};
+                        dataFolder = [pwd '/Data/Results/matFiles/Modular/'];
                     elseif strcmpi(Model.Deployer.testScenario,'100m')
-                        %dataFolder = [dataFolder '100m/'];
-                        dataStruct.velocity = dataStruct.velocity';
-                        folderString = Model.Deployer.TruthFileName;
-                        tmp = split(folderString,'/');
-                        testNumber = tmp{3};
+                        dataFolder = [pwd '/Data/Results/matFiles/100m/'];
                     elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-                        %dataFolder = [dataFolder 'Simulation/'];
-                        name = AbsoluteErrorFiles(i).name;
-                        tmp = split(name,'AbsErrorData');
-                        tmp = tmp{2};
-                        tmp = split(tmp,'.');
-                        testNumber = tmp{1};
+                        dataFolder = [pwd '/Data/Results/matFiles/Simulation/'];
                     else
                         error('invalid test type in Deployer.TruthFileName')
                     end
-
+                    dataStruct.velocity = dataStruct.velocity';
+                    name = AbsoluteErrorFiles(i).name;
+                    tmp = split(name,'AbsErrorData');
+                    tmp = tmp{2};
+                    tmp = split(tmp,'.');
+                    testNumber = tmp{1};
+                    
+                    
                     mkdir(dataFolder)
-                    save([pwd '/' dataFolder testNumber '_' testDef 'dataStruct.mat'],'dataStruct');
+                    save([dataFolder testNumber '_' testDef 'dataStruct.mat'],'dataStruct');
 
     %                 CubeSats = CS.CubeSatFitted;
 
@@ -672,7 +667,7 @@ classdef Validate
         %
         % @author Dylan Bossie 
         % @date   21-Apr-2019
-        function [] = GenerateOutputFiles(obj,matFileDirectory)
+        function [] = GenerateOutputFiles(~,matFileDirectory)
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %Modular data output files
             modularMatFileDirectory = [matFileDirectory '/Modular/'];

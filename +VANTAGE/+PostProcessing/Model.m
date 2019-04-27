@@ -61,6 +61,8 @@ classdef Model < handle
                 end
             else
                 obj.Deployer = Deployer(manifestFilename, strcat(configDirecName,'/Deployer.json'),obj);
+                SensorData = jsondecode(fileread(strcat(configDirecName,'/Sensors.json')));
+                obj.TimeMan = TimeManager(SensorData,obj.Deployer.testScenario,obj);
                 obj.Truth_VCF = obj.processTruthData(obj.Deployer.TruthFileName);
             end
         end
