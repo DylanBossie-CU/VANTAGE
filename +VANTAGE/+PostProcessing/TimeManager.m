@@ -22,6 +22,8 @@ classdef TimeManager
         % Datevec corresponding to t=0s
         DatevecZero
         
+        % Reference to the Model Class
+        % @type Model
         ModelRef
     end
     

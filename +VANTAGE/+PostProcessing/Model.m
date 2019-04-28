@@ -4,6 +4,7 @@ classdef Model < handle
 
     properties (SetAccess = public)
         % Deployer class
+        % @type Deployer
         Deployer
         
         % Truth data
@@ -12,17 +13,21 @@ classdef Model < handle
     
     properties (SetAccess = protected)
         % Transform class
+        % @type Transform
         Transform
         
         % Time Manager Class
+        % @type TimeMan
         TimeMan
     end
     
     properties (SetAccess = private)
         % Optical camera class
+        % @type Optical
         Optical
 
         % TOF camera class
+        % @type TOF
         TOF
     end
 

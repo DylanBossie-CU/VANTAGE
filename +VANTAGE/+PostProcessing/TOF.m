@@ -4,7 +4,7 @@ classdef TOF
     %
     %% Properties       
     properties (Access = public)
-        %
+
         % Maximum range within which TOF data is considered valid, m
         maxAllowableRange
         
@@ -15,6 +15,7 @@ classdef TOF
         faceLenMatchTol = 0.02; % m
 
         % Reference to Model class
+        % @type Model
         ModelRef
         
         % fps
