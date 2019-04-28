@@ -5,6 +5,7 @@ classdef Deployer
     properties (SetAccess = public)
         
         % Array of cubesat objects
+        % @type CubeSat
         CubesatArray = VANTAGE.PostProcessing.CubeSat.empty
 
     end

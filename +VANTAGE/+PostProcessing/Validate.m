@@ -7,6 +7,7 @@ classdef Validate
         ComputingResults
         
         % Model handle class
+        % @type Model
         ModelRef
     end
     

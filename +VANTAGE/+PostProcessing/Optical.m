@@ -48,6 +48,7 @@ classdef Optical
     PlotIBoundaries
 
     % Model handle class
+    % @type Model
     ModelRef
 
     % Data filenames
