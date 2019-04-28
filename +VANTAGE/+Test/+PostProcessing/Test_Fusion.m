@@ -24,7 +24,6 @@ classdef Test_Fusion < matlab.unittest.TestCase
     
     methods (Test)
         function testFullSystem(this)
-            return
             import VANTAGE.PostProcessing.Validate
             switch this.testType
                 case 'Modular'
