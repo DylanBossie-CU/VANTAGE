@@ -48,7 +48,7 @@ classdef Deployer
         %
         % @return     A reference to an initialized Deployer object
         %
-        function obj = Deployer(manifestFilename, configFilename, Model)
+        function this = Deployer(manifestFilename, configFilename, Model)
             % This constructor will need to read the deployment manifest file
             % and initialize an instance of the Deployer class. This constructor
             % should also create instances of the CubeSat class for every
@@ -58,15 +58,15 @@ classdef Deployer
             manifestData = jsondecode(fileread(manifestFilename));
 
             % Define test type
-            obj.testScenario = manifestData.testScenario;
+            this.testScenario = manifestData.testScenario;
             % Extract truth file name
-            obj.TruthFileName = manifestData.TruthDataFile;
+            this.TruthFileName = manifestData.TruthDataFile;
             % Read deployer dimensions from config file
 
             % Initialize Deployer instance with tube positions and expected release time
-            obj.DeploymentTube = manifestData.DeploymentTube;
-            obj.VantageTube = manifestData.VantageTube;
-            obj.ExpectedRelease = datetime(...
+            this.DeploymentTube = manifestData.DeploymentTube;
+            this.VantageTube = manifestData.VantageTube;
+            this.ExpectedRelease = datetime(...
                 manifestData.expectedRelease(1),...
                 manifestData.expectedRelease(2),...
                 manifestData.expectedRelease(3),...
@@ -78,7 +78,7 @@ classdef Deployer
             I = [manifestData.CubesatArray.rangeOrder];
             % Initialize cubesat array
             for i = I
-                obj.CubesatArray(1,i) = VANTAGE.PostProcessing.CubeSat(...
+                this.CubesatArray(1,i) = VANTAGE.PostProcessing.CubeSat(...
                     manifestData.CubesatArray(i).name,...
                     manifestData.CubesatArray(i).rangeOrder,...
                     manifestData.CubesatArray(i).expectedU,...
@@ -86,22 +86,22 @@ classdef Deployer
             end
 
             % Read data from deployer configuration file
-            obj.DeployerGeometry = jsondecode(fileread(configFilename));
+            this.DeployerGeometry = jsondecode(fileread(configFilename));
             
             % Assign CubeSat number
-            obj.numCubesats = length(obj.CubesatArray);
+            this.numCubesats = length(this.CubesatArray);
             
-            obj.ExpectedVelocity = manifestData.expectedVelocity;
+            this.ExpectedVelocity = manifestData.expectedVelocity;
         end
 
         % A method for getting the initial states of all cubesats.
         %
-        % @param      obj   The object
+        % @param      this   The object
         %
         % @return     pos_init an Nx3 matrix of cubesat positions in VCF
         % @return     V_init an Nx3 matrix of cubesat velocities in VCF
         %
-        function [pos_init, V_init] = GetInitalStates(obj)
+        function [pos_init, V_init] = GetInitalStates(this)
             
 
 
@@ -109,39 +109,39 @@ classdef Deployer
 
         % A method for getting the expected number of cubesats
         % 
-        % @param      obj   The object
+        % @param      this   The object
         %
         % @return     The expected number of cubesats
         %
-        function [numCubesats] = GetNumCubesats(obj)
-            numCubesats = obj.numCubesats;
+        function [numCubesats] = GetNumCubesats(this)
+            numCubesats = this.numCubesats;
         end
 
         % A method for getting the camera origin
-        % @param      obj   The object
+        % @param      this   The object
         %
         % @return     the camera origin
         %
-        function [camOrigin] = GetCamOriginVCF(obj)
-            camOrigin = obj.DeployerGeometry.CAMERA_LOC;
+        function [camOrigin] = GetCamOriginVCF(this)
+            camOrigin = this.DeployerGeometry.CAMERA_LOC;
         end
 
         % A method for getting the VANTAGE tube number
-        % @param      obj   The object
+        % @param      this   The object
         %
         % @return     the VANTAGE tube number
         %
-        function [VantageTube] = GetVantageTube(obj)
-            VantageTube = obj.VantageTube;
+        function [VantageTube] = GetVantageTube(this)
+            VantageTube = this.VantageTube;
         end
 
         % A method for getting the expected deployment tube
-        % @param      obj   The object
+        % @param      this   The object
         %
         % @return     the expected deployment tube
         %
-        function [DeploymentTube] = GetDeploymentTube(obj)
-            DeploymentTube = obj.DeploymentTube;
+        function [DeploymentTube] = GetDeploymentTube(this)
+            DeploymentTube = this.DeploymentTube;
         end
     end
 end

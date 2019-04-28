@@ -82,7 +82,7 @@ classdef CubeSat_TOF
         %
         % @return     A reference to an initialized Cubesat_TOF object
         %
-        function obj = CubeSat_TOF(CubeSat)
+        function this = CubeSat_TOF(CubeSat)
             % Error checking
             if ~isa(CubeSat,'VANTAGE.PostProcessing.CubeSat')
                 error('Input to CubeSat_TOF constructor must be a VANTAGE.PostProcessing.CubeSat')
@@ -90,10 +90,10 @@ classdef CubeSat_TOF
             % The following properties are used prospectively and not taken
             % as true since CubeSat_TOF will not necessarily contain the
             % same point cloud as the CubeSat with which it is initialized
-            obj.name = CubeSat.name;
-            obj.expectedU = CubeSat.expectedU;
-            obj.actualDims = CubeSat.actualDims;
-            obj.rangeOrder = CubeSat.rangeOrder;
+            this.name = CubeSat.name;
+            this.expectedU = CubeSat.expectedU;
+            this.actualDims = CubeSat.actualDims;
+            this.rangeOrder = CubeSat.rangeOrder;
         end
     end
     
