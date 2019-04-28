@@ -24,12 +24,12 @@ classdef Validate
         % 
         % @author   Dylan Bossie
         % @date     14-Apr-2019
-        function obj = Validate(configFilename,ModelRef,CorrelateTruthData)
+        function this = Validate(configFilename,ModelRef,CorrelateTruthData)
             configFilename = [configFilename '/Validate.json'];
             parameters = jsondecode(fileread(configFilename));
-            %obj.CorrelateTruthData = parameters.CorrelateTruthData;
-            obj.ComputingResults = parameters.ComputingResults;
-            obj.ModelRef = ModelRef;
+            %this.CorrelateTruthData = parameters.CorrelateTruthData;
+            this.ComputingResults = parameters.ComputingResults;
+            this.ModelRef = ModelRef;
             
             % If user chooses to update truth data with corrections
             if CorrelateTruthData
@@ -38,16 +38,16 @@ classdef Validate
                 % in general!
                 mostTrustedCubesat = 1;
                 % Extracting measured data
-                MeasuredDataArray = obj.ModelRef.Deployer.CubesatArray;
+                MeasuredDataArray = this.ModelRef.Deployer.CubesatArray;
                 % Extracting truth data
-                TruthData = obj.ModelRef.Truth_VCF;
+                TruthData = this.ModelRef.Truth_VCF;
                 % Updating truth data
-%                 [updatedTruth,dt,n_vec,theta,offset_vec] = obj.PerformTruthDataCorrelation(MeasuredDataArray,TruthData,mostTrustedCubesat);
-                [updatedTruth,dt,n_vec,theta,offset_vec] = obj.PerformTruthDataCorrelationMultiple(MeasuredDataArray,TruthData);
+%                 [updatedTruth,dt,n_vec,theta,offset_vec] = this.PerformTruthDataCorrelation(MeasuredDataArray,TruthData,mostTrustedCubesat);
+                [updatedTruth,dt,n_vec,theta,offset_vec] = this.PerformTruthDataCorrelationMultiple(MeasuredDataArray,TruthData);
                 % Replacing old truth data with new truth data
-                obj.ModelRef.Truth_VCF = updatedTruth;
+                this.ModelRef.Truth_VCF = updatedTruth;
                 % Writting new truth data to json file
-                obj.WriteUpdatedTruthData(updatedTruth,ModelRef.Deployer.TruthFileName,dt,n_vec,theta,offset_vec);
+                this.WriteUpdatedTruthData(updatedTruth,ModelRef.Deployer.TruthFileName,dt,n_vec,theta,offset_vec);
             end
         end
         
@@ -61,7 +61,7 @@ classdef Validate
         %
         % @author   Joshua Kirby
         % @date     19-Mar-2019
-        function validateTOF(obj)
+        function validateTOF(this)
             %%% Housekeeping and Allocation
             close all;
             rng(99);
@@ -100,7 +100,7 @@ classdef Validate
             Model = VANTAGE.PostProcessing.Model(manifestFilename,configDirecName);
 
             %%% Present Errors
-            obj.TOFpresentErrorsVsReqs(Model,SensorData);
+            this.TOFpresentErrorsVsReqs(Model,SensorData);
         end
         
         %% Fit polynomial to CubeSat data
@@ -263,8 +263,8 @@ classdef Validate
         %
         % @author Dylan Bossie 
         % @date   11-Apr-2019
-        function [meanvelocity] = ComputeMeanVelocity(obj,CubeSats,time,type)
-            TestType = obj.ModelRef.Deployer.testScenario;
+        function [meanvelocity] = ComputeMeanVelocity(this,CubeSats,time,type)
+            TestType = this.ModelRef.Deployer.testScenario;
             if strcmpi(type,'cs')
                 Time = time.t_fit;
                 CubeSats = CubeSats.CubeSatFitted;
@@ -323,7 +323,7 @@ classdef Validate
         %
         % @author Dylan Bossie 
         % @date   14-Apr-2019
-        function [] = ErrorAnalysis(obj,Model,SensorData,testDef)
+        function [] = ErrorAnalysis(this,Model,SensorData,testDef)
                 if strcmpi(testDef,'Modular')
                     resultsFolder = 'Data/Results/matFiles/ModularTest_4_9/';
                     matResults = [resultsFolder 'data/'];
@@ -427,18 +427,18 @@ classdef Validate
                     Time = load([TimeFiles(i).folder '/' TimeFiles(i).name]);
 
                     % Defining properties to provide for output
-                    meanvelocity = obj.ComputeMeanVelocity(CS,Time,'cs');
-                    velocity = obj.ComputeMeanVelocity(Model.Truth_VCF.Cubesat,Model.Truth_VCF.t,'truth');
+                    meanvelocity = this.ComputeMeanVelocity(CS,Time,'cs');
+                    velocity = this.ComputeMeanVelocity(Model.Truth_VCF.Cubesat,Model.Truth_VCF.t,'truth');
 
                     v_err = abs(meanvelocity-velocity');
 
-                    distance = obj.ComputeTruthDistance(Model);
+                    distance = this.ComputeTruthDistance(Model);
 
                     % Interpolate cubesats to the truth distances for
                     % pos_err
-                    [pos_err,time] = obj.InterpolateDistance(CS,Time,Model.Truth_VCF.t,distance);
+                    [pos_err,time] = this.InterpolateDistance(CS,Time,Model.Truth_VCF.t,distance);
 
-                    t_err = obj.ComputeLaunchTime(CS,Time,Model.Truth_VCF);
+                    t_err = this.ComputeLaunchTime(CS,Time,Model.Truth_VCF);
 
                     if t_err > 10
                         error('Time manager generated incorrect time offset');
@@ -798,7 +798,7 @@ classdef Validate
         %
         % @author Marshall Herr
         % @date   14-Apr-2019
-        function [updatedTruth,dt,n_vec,theta,offset_vec] = PerformTruthDataCorrelation(obj,MeasuredDataArray,TruthData,mostTrustedCubesat,should_debug)
+        function [updatedTruth,dt,n_vec,theta,offset_vec] = PerformTruthDataCorrelation(this,MeasuredDataArray,TruthData,mostTrustedCubesat,should_debug)
             %{
             First thing is first, I am going to unpackage TruthData into
             the variables I used when I originally wrote this code. They
@@ -847,7 +847,7 @@ classdef Validate
             %{
             Now that that's done, we can blindly paste my algorith below!
             %}
-            [dt,n_vec,theta,offset_vec] = obj.CorrelationMachine(VANTAGE_Data,Truth_Data);
+            [dt,n_vec,theta,offset_vec] = this.CorrelationMachine(VANTAGE_Data,Truth_Data);
             
             %{
             Alright! Algorithm over, time to repackage TruthData and return
@@ -1410,7 +1410,7 @@ classdef Validate
         %
         % @author Marshall Herr
         % @date   15-Apr-2019
-        function [updatedTruth,dt,n_vec,theta,offset_vec] = PerformTruthDataCorrelationMultiple(obj,MeasuredDataArray,TruthData)
+        function [updatedTruth,dt,n_vec,theta,offset_vec] = PerformTruthDataCorrelationMultiple(this,MeasuredDataArray,TruthData)
             %{
             This time we don't have a single most trusted cubesat and must
             average across however many there are
@@ -1474,7 +1474,7 @@ classdef Validate
                 %{
                 Now that that's done, we can blindly paste my algorith below!
                 %}
-                [dt(k),n_vec(k,:),theta(k),offset_vec(k,:)] = obj.CorrelationMachine(VANTAGE_Data,Truth_Data);
+                [dt(k),n_vec(k,:),theta(k),offset_vec(k,:)] = this.CorrelationMachine(VANTAGE_Data,Truth_Data);
                 
             end
             
@@ -1599,7 +1599,7 @@ classdef Validate
         %
         % @author Marshall Herr
         % @date   16-Apr-2019
-        function [] = masterPlotter(obj,dataDirectory)
+        function [] = masterPlotter(this,dataDirectory)
             %{
             dataDirectory:
                 -> Modular
@@ -1628,24 +1628,24 @@ classdef Validate
             fileSearch = [ dataDirectory, '/Simulation/', fileType ];
             fileStruct = dir(fileSearch);
             numFilesS = length(fileStruct);
-            [Simulation] = obj.extractMatFileData(fileStruct);
+            [Simulation] = this.extractMatFileData(fileStruct);
             
             % Modular Data Extraction
             fileSearch = [ dataDirectory, '/Modular/', fileType ];
             fileStruct = dir(fileSearch);
             numFilesM = length(fileStruct);
-            [Modular] = obj.extractMatFileData(fileStruct);
+            [Modular] = this.extractMatFileData(fileStruct);
             
             % 100m Data Extraction
             fileSearch = [ dataDirectory, '/100m/', fileType ];
             fileStruct = dir(fileSearch);
             numFiles100m = length(fileStruct);
-            [m100] = obj.extractMatFileData(fileStruct);
+            [m100] = this.extractMatFileData(fileStruct);
             
             % convolve measurements
-            [Simulation] = obj.convolveMeasurements(Simulation,numFilesS);
-            [Modular] = obj.convolveMeasurements(Modular,numFilesM);
-            [m100] = obj.convolveMeasurements(m100,numFiles100m);
+            [Simulation] = this.convolveMeasurements(Simulation,numFilesS);
+            [Modular] = this.convolveMeasurements(Modular,numFilesM);
+            [m100] = this.convolveMeasurements(m100,numFiles100m);
             
             %%% Contour Plot of Error VS Distance & Velocity
             
@@ -1667,7 +1667,7 @@ classdef Validate
             distance_range = [1,100];
             
             [f_Master] = ...
-                obj.errorPlot(req_distance,Simulation.distance_final,...
+                this.errorPlot(req_distance,Simulation.distance_final,...
                 Modular.distance_final,m100.distance_final,...
                 fittedPositionDistance,req_error,...
                 Simulation.mu_pos_err_final+Simulation.std_pos_err_final,...
@@ -1694,7 +1694,7 @@ classdef Validate
             velocity_range = [ -Inf, Inf ];
             
             [f_Velocity] = ...
-                obj.errorPlot(req_distance,Simulation.mag_velocity,...
+                this.errorPlot(req_distance,Simulation.mag_velocity,...
                 Modular.mag_velocity,m100.mag_velocity,...
                 fittedVelocityVelocity,req_error,...
                 Simulation.mag_v_err,Modular.mag_v_err,...
@@ -1718,7 +1718,7 @@ classdef Validate
             velocity_range = [ -Inf, Inf ];
             
             [f_Time] = ...
-                obj.errorPlot(req_distance,Simulation.mag_velocity,...
+                this.errorPlot(req_distance,Simulation.mag_velocity,...
                 Modular.mag_velocity,m100.mag_velocity,...
                 fittedTimeVelocity,req_error,...
                 Simulation.t_err,Modular.t_err,...

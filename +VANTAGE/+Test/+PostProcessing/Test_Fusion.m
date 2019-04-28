@@ -23,34 +23,34 @@ classdef Test_Fusion < matlab.unittest.TestCase
     end
     
     methods (Test)
-        function testFullSystem(obj)
+        function testFullSystem(this)
             return
             import VANTAGE.PostProcessing.Validate
-            switch obj.testType
+            switch this.testType
                 case 'Modular'
-                    obj.configDirecName = obj.configDirecNameModular;
+                    this.configDirecName = this.configDirecNameModular;
                     testType = 'ModularTest_4_9';
                 case '100m'
-                    obj.configDirecName = obj.configDirecName100m;
+                    this.configDirecName = this.configDirecName100m;
                     testType = '3_25_100m';
                 case 'Simulation_085'
-                    obj.configDirecName = obj.configDirecNameSim085;
+                    this.configDirecName = this.configDirecNameSim085;
                     testType = 'Simulation/_085';
                 case 'Simulation_030'
-                    obj.configDirecName = obj.configDirecNameSim030;
+                    this.configDirecName = this.configDirecNameSim030;
                     testType = 'Simulation/_030';
                 case 'Simulation_140'
-                    obj.configDirecName = obj.configDirecNameSim140;
+                    this.configDirecName = this.configDirecNameSim140;
                     testType = 'Simulation/_140';
                 case 'Simulation_195'
-                    obj.configDirecName = obj.configDirecNameSim195;
+                    this.configDirecName = this.configDirecNameSim195;
                     testType = 'Simulation/_195';
                 case 'Simulation_250'
-                    obj.configDirecName = obj.configDirecNameSim250;
+                    this.configDirecName = this.configDirecNameSim250;
                     testType = 'Simulation/_250';
             end
 
-            configfiles = dir(obj.configDirecName);
+            configfiles = dir(this.configDirecName);
             
             for iter = 1:numel(configfiles)
             %%% Housekeeping and Allocation
@@ -95,33 +95,33 @@ classdef Test_Fusion < matlab.unittest.TestCase
             end
             
             % Save fitted results for error analysis later
-            if strcmpi(obj.testType,'Modular')
+            if strcmpi(this.testType,'Modular')
                 dataFolder = 'Data/Results/matFiles/ModularTest_4_9/';
                 folderString = Model.Deployer.TruthFileName;
                 tmp = split(folderString,'/');
                 testNumber = tmp{3};
-            elseif strcmpi(obj.testType,'100m')
+            elseif strcmpi(this.testType,'100m')
                 dataFolder = 'Data/Results/matFiles/100m/';
                 folderString = Model.Deployer.TruthFileName;
                 tmp = split(folderString,'/');
                 testNumber = tmp{3};
-            elseif strcmpi(obj.testType,'Simulation_030')
+            elseif strcmpi(this.testType,'Simulation_030')
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_030/';
                 tmp = split(SensorData.TOFData,'/');
                 testNumber = tmp{5};
-            elseif strcmpi(obj.testType,'Simulation_085')
+            elseif strcmpi(this.testType,'Simulation_085')
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_085/';
                 tmp = split(SensorData.TOFData,'/');
                 testNumber = tmp{5};
-            elseif strcmpi(obj.testType,'Simulation_140')
+            elseif strcmpi(this.testType,'Simulation_140')
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_140/';
                 tmp = split(SensorData.TOFData,'/');
                 testNumber = tmp{5};
-            elseif strcmpi(obj.testType,'Simulation_195')
+            elseif strcmpi(this.testType,'Simulation_195')
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
                 tmp = split(SensorData.TOFData,'/');
                 testNumber = tmp{5};
-            elseif strcmpi(obj.testType,'Simulation_250')
+            elseif strcmpi(this.testType,'Simulation_250')
                 dataFolder = 'Data/Results/matFiles/Simulation_4_15_250/';
                 tmp = split(SensorData.TOFData,'/');
                 testNumber = tmp{5};
@@ -141,42 +141,42 @@ classdef Test_Fusion < matlab.unittest.TestCase
             end
         end
         
-        function testError(obj)
+        function testError(this)
             return
             import VANTAGE.PostProcessing.Validate
             
-            switch obj.testType
+            switch this.testType
                 case 'Modular'
-                    obj.configDirecName = obj.configDirecNameModular;
+                    this.configDirecName = this.configDirecNameModular;
                     testType = 'ModularTest_4_9';
                     testDef = 'Modular';
                 case '100m'
-                    obj.configDirecName = obj.configDirecName100m;
+                    this.configDirecName = this.configDirecName100m;
                     testType = '3_25_100m';
                     testDef = '100m';
                 case 'Simulation_085'
-                    obj.configDirecName = obj.configDirecNameSim085;
+                    this.configDirecName = this.configDirecNameSim085;
                     testType = 'Simulation/_085';
                     testDef = 'Sim085';
                 case 'Simulation_030'
-                    obj.configDirecName = obj.configDirecNameSim030;
+                    this.configDirecName = this.configDirecNameSim030;
                     testType = 'Simulation/_030';
                     testDef = 'Sim030';
                 case 'Simulation_140'
-                    obj.configDirecName = obj.configDirecNameSim140;
+                    this.configDirecName = this.configDirecNameSim140;
                     testType = 'Simulation/_140';
                     testDef = 'Sim140';
                 case 'Simulation_195'
-                    obj.configDirecName = obj.configDirecNameSim195;
+                    this.configDirecName = this.configDirecNameSim195;
                     testType = 'Simulation/_195';
                     testDef = 'Sim195';
                 case 'Simulation_250'
-                    obj.configDirecName = obj.configDirecNameSim195;
+                    this.configDirecName = this.configDirecNameSim195;
                     testType = 'Simulation/_250';
                     testDef = 'Sim250';
             end
             
-            configfiles = dir(obj.configDirecName);
+            configfiles = dir(this.configDirecName);
             
             for iter = 1:numel(configfiles)
             %%% Housekeeping and Allocation
