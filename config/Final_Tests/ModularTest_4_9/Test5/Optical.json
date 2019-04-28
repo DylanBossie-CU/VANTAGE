@@ -5,7 +5,7 @@
 	"PlotBinarizedImages": true,
 	"PlotCentroids": true,
 	"PlotHist": false,
-	"PlotAny": false,
+	"PlotAny": true,
 	"PlotCubeSats": false,
 	"PlotIBoundaries": false,
 	"RunOcclusion": false,

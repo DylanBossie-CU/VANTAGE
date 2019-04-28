@@ -260,7 +260,7 @@ classdef Optical
             case '100m'
                 binarizedFrame = imbinarize(frame,0.01);
             case 'modular'
-                binarizedFrame = imbinarize(frame,1.0);
+                binarizedFrame = imbinarize(frame,0.01);
             case 'simulation'
                 binarizedFrame = imbinarize(frame,0.01);
         end
