@@ -1,6 +1,6 @@
 # binaries
 
-these binaries has been compiled for and tested on RHEL 6.9. They should work for most LINUX distros, but this is untested.
+these binaries have been compiled for and tested on RHEL 6.9 and Ubuntu 16.04.6 LTS. They should work for most LINUX distros, but this is untested.
 
 If you need the required binaries for another system, start at http://www.ians.uni-stuttgart.de/MoRePaS/software/mtocpp/docs/download.html and follow the steps provided there.
 
