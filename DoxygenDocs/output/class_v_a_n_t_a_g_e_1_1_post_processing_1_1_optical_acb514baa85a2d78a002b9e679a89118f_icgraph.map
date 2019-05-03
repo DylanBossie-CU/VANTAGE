@@ -1,0 +1,7 @@
+<map id="findCentroids" name="findCentroids">
+<area shape="rect" id="node2" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_optical.html#a3d872e247862b92bb53f3c071d601026" title="% Perform image processing Execute frame processing based on provided automated naming convention ..." alt="" coords="160,31,291,57"/>
+<area shape="rect" id="node3" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_optical.html#af3ed3985b135b814836c82ce586026c7" title="% Perform optical processing Process optical frames to find the estimated cubesat positions ..." alt="" coords="342,5,477,32"/>
+<area shape="rect" id="node6" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_optical.html#af0c23bab0dd1ebdfb4c648db2493b39b" title="% Detect 100m Pixel Location Object association requires knowledge of the final pixel location of the..." alt="" coords="339,56,480,83"/>
+<area shape="rect" id="node4" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_model.html#abb78a75f2251b1d21f1feec5ed5fee40" title="A method for looping through optical data and performing sensor fusion to return a final state output..." alt="" coords="528,23,743,65"/>
+<area shape="rect" id="node5" href="$class_v_a_n_t_a_g_e_1_1_test_1_1_post_processing_1_1_test___optical.html#a0a29459f87cba1861c06b65c0884007e" title="VANTAGE::Test::PostProcessing\l::Test_Optical::test100mData" alt="" coords="791,23,1011,65"/>
+</map>

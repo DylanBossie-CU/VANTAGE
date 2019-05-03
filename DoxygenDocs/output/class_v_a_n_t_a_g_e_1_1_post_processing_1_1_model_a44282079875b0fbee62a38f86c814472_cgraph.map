@@ -1,0 +1,6 @@
+<map id="RunSensorFusion" name="RunSensorFusion">
+<area shape="rect" id="node2" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_deployer.html#a1d70fd7999c43930eae044ae8e7c6218" title="A method for getting the expected number of cubesats. " alt="" coords="184,5,393,47"/>
+<area shape="rect" id="node3" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_model.html#a580337303c19fe308e05c59f70562702" title="A method for approximating a cubesat centroid using a weighted centroiding method. " alt="" coords="235,71,342,98"/>
+<area shape="rect" id="node4" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a39c9f1d3ab7e5e874f6d1886cdca4f11" title="Returns the TOF weight given a predicted mean range of cubesats. " alt="" coords="441,31,628,72"/>
+<area shape="rect" id="node5" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_optical.html#aaa935b7017e71146d3b264c260189e83" title="Get desired weight for optical camera measurements based on current range. " alt="" coords="441,96,628,137"/>
+</map>

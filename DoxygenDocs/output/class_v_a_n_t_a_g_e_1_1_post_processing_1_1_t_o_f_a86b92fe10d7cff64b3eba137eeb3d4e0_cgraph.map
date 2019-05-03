@@ -1,0 +1,12 @@
+<map id="findCentroidFromFaces" name="findCentroidFromFaces">
+<area shape="rect" id="node2" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a772690d6d441927dbb75203f26894649" title="%% Find plane boundary points and centroid " alt="" coords="220,31,303,57"/>
+<area shape="rect" id="node10" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a08377919068d43ba3c2c832d38063d4b" title="%% Check that planes intersect as expected " alt="" coords="220,132,303,159"/>
+<area shape="rect" id="node11" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a9ea2e988b143de92fd005723e93cdcfa" title="%% Find faces&#39; centroids and corners %% and determine if each face qualifies as a fullFace ..." alt="" coords="220,81,303,108"/>
+<area shape="rect" id="node3" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a8c37f19000ad432f7abbb99719a522cc" title="%% for all faces " alt="" coords="397,31,506,57"/>
+<area shape="rect" id="node4" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a1e3c3ea97b56cc39d4f9c3886f45f373" title="unitvec" alt="" coords="641,5,709,32"/>
+<area shape="rect" id="node5" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a9095c3e319a806f1271204678885f34b" title="Dimensions to choose from, corresponding to indices of CubeSat.actualDims. " alt="" coords="393,81,510,108"/>
+<area shape="rect" id="node6" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#aaca61ed8938454ebe5eac7053b6e3f0b" title="% Subroutines " alt="" coords="351,132,552,159"/>
+<area shape="rect" id="node7" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#aab46b3b9c9267da8d76c050449ea9a85" title="roundToNearestOdd" alt="" coords="600,107,749,133"/>
+<area shape="rect" id="node9" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a680f1b6bd0941ab960fe9bdf76a61524" title="minBoundingBox" alt="" coords="609,157,740,184"/>
+<area shape="rect" id="node8" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#ae2e76a9a874d5a1db0c616b8aeb9cff4" title="binarySign" alt="" coords="797,107,887,133"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="docGenDriver" name="docGenDriver">
+<area shape="rect" id="node2" href="$class_matlab_doc_maker.html#a4ea0d0f724d201bba3448cc579624e35" title="Runs the setup script for MatlabDocMaker and collects all necessary paths in order for the documentat..." alt="" coords="163,72,336,99"/>
+<area shape="rect" id="node3" href="$class_matlab_doc_maker.html#a2adbec43ff3458cb781610f91fe9b8fc" title="Returns the project name. " alt="" coords="1417,25,1659,52"/>
+<area shape="rect" id="node4" href="$class_matlab_doc_maker.html#a979a5ae4d0f991df505b8ae9e6fb4486" title="MatlabDocMaker::getPref" alt="" coords="911,59,1093,85"/>
+<area shape="rect" id="node6" href="$class_matlab_doc_maker.html#ae48d4af7d9bbd19578dad38ea4a32cda" title="MatlabDocMaker::setPref" alt="" coords="672,160,855,187"/>
+<area shape="rect" id="node7" href="$class_matlab_doc_maker.html#a01cb613496ec3db0c68249d8af346ac4" title="Sets the project logo. Set to &#39; to unset. " alt="" coords="384,101,616,128"/>
+<area shape="rect" id="node5" href="$class_matlab_doc_maker.html#a39bd4f486e4b0357e56cd38c050c6afa" title="Gets the tag for the MatLab preferences struct. " alt="" coords="1141,59,1369,85"/>
+<area shape="rect" id="node8" href="$class_matlab_doc_maker.html#a38f7b77a4fda9f45af92f62b448f52a4" title="Returns the directory where the applications documentation configuration files reside. " alt="" coords="664,94,863,135"/>
+</map>

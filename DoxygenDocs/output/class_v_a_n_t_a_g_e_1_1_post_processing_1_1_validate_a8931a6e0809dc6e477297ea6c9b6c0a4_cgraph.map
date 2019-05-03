@@ -1,0 +1,5 @@
+<map id="masterPlotter" name="masterPlotter">
+<area shape="rect" id="node2" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#a08c5a723f333855911f2446161248aee" title="% Convolves stuff " alt="" coords="164,5,339,32"/>
+<area shape="rect" id="node3" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#abdc1bf8936ede340ea679e68ba7cb6c1" title="% Generates all of the plots Plotting parameters " alt="" coords="213,56,290,83"/>
+<area shape="rect" id="node4" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#a5e1dfacee0e3abb4bfb85034b6f59b72" title="% Extracts all of the data from a folder of mat files " alt="" coords="180,107,323,133"/>
+</map>

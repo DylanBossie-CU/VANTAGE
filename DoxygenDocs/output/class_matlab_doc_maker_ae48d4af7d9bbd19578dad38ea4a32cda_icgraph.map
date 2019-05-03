@@ -1,0 +1,7 @@
+<map id="setPref" name="setPref">
+<area shape="rect" id="node2" href="$class_matlab_doc_maker.html#aa36d079ff377b0de42dd58c0154abc0d" title="Sets the project description. " alt="" coords="120,5,279,32"/>
+<area shape="rect" id="node3" href="$class_matlab_doc_maker.html#a01cb613496ec3db0c68249d8af346ac4" title="Sets the project logo. Set to &#39; to unset. " alt="" coords="141,56,258,83"/>
+<area shape="rect" id="node4" href="$class_matlab_doc_maker.html#a4ea0d0f724d201bba3448cc579624e35" title="Runs the setup script for MatlabDocMaker and collects all necessary paths in order for the documentat..." alt="" coords="327,81,385,108"/>
+<area shape="rect" id="node6" href="$class_matlab_doc_maker.html#a5cf2636bc8dac454f314847775fc9da7" title="Sets the project version. " alt="" coords="133,157,266,184"/>
+<area shape="rect" id="node5" href="$doc_gen_driver_8m.html#ad0aa1270d72ad9362725fd4a2878ac54" title="Builds MATLAB documentation based on a command&#45;line driven input scheme. " alt="" coords="433,81,543,108"/>
+</map>

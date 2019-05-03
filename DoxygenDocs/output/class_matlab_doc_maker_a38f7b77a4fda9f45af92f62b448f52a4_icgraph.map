@@ -1,0 +1,7 @@
+<map id="getConfigDirectory" name="getConfigDirectory">
+<area shape="rect" id="node2" href="$class_matlab_doc_maker.html#ad140908baecf279ebe64dc7c17f32b51" title="Creates the Doxygen documentation. " alt="" coords="361,5,424,32"/>
+<area shape="rect" id="node3" href="$class_matlab_doc_maker.html#a064d4238c88ffd6990c6d61798196b2d" title="Returns the logo image file for the project. Either an absolute path or a plain filename. For the latter case the image file is assumed to reside inside the directory returned by MatlabDocMaker.getConfigDirectory. " alt="" coords="195,31,313,57"/>
+<area shape="rect" id="node4" href="$class_matlab_doc_maker.html#a01cb613496ec3db0c68249d8af346ac4" title="Sets the project logo. Set to &#39; to unset. " alt="" coords="195,81,313,108"/>
+<area shape="rect" id="node5" href="$class_matlab_doc_maker.html#a4ea0d0f724d201bba3448cc579624e35" title="Runs the setup script for MatlabDocMaker and collects all necessary paths in order for the documentat..." alt="" coords="363,81,422,108"/>
+<area shape="rect" id="node6" href="$doc_gen_driver_8m.html#ad0aa1270d72ad9362725fd4a2878ac54" title="Builds MATLAB documentation based on a command&#45;line driven input scheme. " alt="" coords="472,81,581,108"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="setProjectLogo" name="setProjectLogo">
+<area shape="rect" id="node2" href="$class_matlab_doc_maker.html#a4ea0d0f724d201bba3448cc579624e35" title="Runs the setup script for MatlabDocMaker and collects all necessary paths in order for the documentat..." alt="" coords="171,5,229,32"/>
+<area shape="rect" id="node3" href="$doc_gen_driver_8m.html#ad0aa1270d72ad9362725fd4a2878ac54" title="Builds MATLAB documentation based on a command&#45;line driven input scheme. " alt="" coords="277,5,387,32"/>
+</map>

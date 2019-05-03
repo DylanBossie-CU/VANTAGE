@@ -1,0 +1,13 @@
+<map id="getPref" name="getPref">
+<area shape="rect" id="node2" href="$class_matlab_doc_maker.html#a38f7b77a4fda9f45af92f62b448f52a4" title="Returns the directory where the applications documentation configuration files reside. " alt="" coords="124,139,265,166"/>
+<area shape="rect" id="node4" href="$class_matlab_doc_maker.html#a064d4238c88ffd6990c6d61798196b2d" title="Returns the logo image file for the project. Either an absolute path or a plain filename. For the latter case the image file is assumed to reside inside the directory returned by MatlabDocMaker.getConfigDirectory. " alt="" coords="336,190,455,216"/>
+<area shape="rect" id="node6" href="$class_matlab_doc_maker.html#a4ea0d0f724d201bba3448cc579624e35" title="Runs the setup script for MatlabDocMaker and collects all necessary paths in order for the documentat..." alt="" coords="525,38,583,64"/>
+<area shape="rect" id="node8" href="$class_matlab_doc_maker.html#a19a9b6f47a1f5d5a885b7b6a9d292de5" title="Returns the directory where the applications source files reside. " alt="" coords="122,291,267,318"/>
+<area shape="rect" id="node10" href="$class_matlab_doc_maker.html#aa89963080acfafc85a47816868aca48c" title="Returns the short project description. " alt="" coords="316,392,475,419"/>
+<area shape="rect" id="node11" href="$class_matlab_doc_maker.html#a4acc06137969a77dfa03bcf2c77b73b5" title="Returns the current version of the project. " alt="" coords="127,63,262,90"/>
+<area shape="rect" id="node12" href="$class_matlab_doc_maker.html#a791f7443b6f8e289c9e37d9ed5db46cc" title="Returns the directory where the applications source files reside. " alt="" coords="121,240,268,267"/>
+<area shape="rect" id="node3" href="$class_matlab_doc_maker.html#ad140908baecf279ebe64dc7c17f32b51" title="Creates the Doxygen documentation. " alt="" coords="523,240,585,267"/>
+<area shape="rect" id="node5" href="$class_matlab_doc_maker.html#a01cb613496ec3db0c68249d8af346ac4" title="Sets the project logo. Set to &#39; to unset. " alt="" coords="337,88,454,115"/>
+<area shape="rect" id="node7" href="$doc_gen_driver_8m.html#ad0aa1270d72ad9362725fd4a2878ac54" title="Builds MATLAB documentation based on a command&#45;line driven input scheme. " alt="" coords="633,38,743,64"/>
+<area shape="rect" id="node9" href="$class_matlab_doc_maker.html#ac477800dc8332769ae7a542a49aa6d0c" title="Opens the generated documentation. " alt="" coords="368,342,423,368"/>
+</map>
