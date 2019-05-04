@@ -25,6 +25,13 @@ These should contain the following:
 #### Simulation/
 The simulation folder will have subfolders describing the type, date, and speed of the test. An example of this is: *Simulation_4_15_030*, which represents a test taken on April 15, at 0.30m/s. Within each of these subdirectories should be two folders, *Optical/* and *TOF/*. It will also have a *truth.json* file, and a *truth_corrected.json*, which is the truth file VANTAGE will process. In the case of the simulation, optical data should have naming conventions of a prefix *VTube*, and a timestamp suffix. If using the VANTAGE simulation software suite, this convention will automaticall be generated in the output. The TOF data should have multiple samples (taken with randomized noise), so it will have subdirectories of convention *Sample*. These files will then be prefixed with *Sample*, and suffixed with a timestamp and frame stamp.
 
+#### ModularTest_4_9/ & 3_25_100m/
+This folder should have subfolders corresponding to a test number taken on that day (e.g. *Test5/*). This will then follow the general structure of a folder *Optical/*, *TOF/*, *truth.json*, and *truth_corrected.json*.
+
+Optical images within the *Optical/* folder should be defined by the format *VANTAGEOPYYYYM_DD_HH_MM_SS_mmm.png*
+TOF pointclouds within the *TOF/* folder should be defined by the format *pointcloud_YYYY_MM_DD_HH_MM_SS.mmmmmm.pcd*
+
+
 ## Configs
 There are folders corresponding to each of the three tests used by VANTAGE, configured as *3_25_100m*, *ModularTest_4_9*, and *Simulation*. Within each of these folders will be subdirectories corresponding to individual tests run on those dates.
 1. Modular
