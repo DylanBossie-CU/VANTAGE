@@ -25,6 +25,13 @@ These should contain the following:
 #### Simulation/
 The simulation folder will have subfolders describing the type, date, and speed of the test. An example of this is: *Simulation_4_15_030*, which represents a test taken on April 15, at 0.30m/s. Within each of these subdirectories should be two folders, *Optical/* and *TOF/*. It will also have a *truth.json* file, and a *truth_corrected.json*, which is the truth file VANTAGE will process. In the case of the simulation, optical data should have naming conventions of a prefix *VTube*, and a timestamp suffix. If using the VANTAGE simulation software suite, this convention will automaticall be generated in the output. The TOF data should have multiple samples (taken with randomized noise), so it will have subdirectories of convention *Sample*. These files will then be prefixed with *Sample*, and suffixed with a timestamp and frame stamp.
 
+#### ModularTest_4_9/ & 3_25_100m/
+This folder should have subfolders corresponding to a test number taken on that day (e.g. *Test5/*). This will then follow the general structure of a folder *Optical/*, *TOF/*, *truth.json*, and *truth_corrected.json*.
+
+Optical images within the *Optical/* folder should be defined by the format *VANTAGEOPYYYYM_DD_HH_MM_SS_mmm.png*
+TOF pointclouds within the *TOF/* folder should be defined by the format *pointcloud_YYYY_MM_DD_HH_MM_SS.mmmmmm.pcd*
+
+
 ## Configs
 There are folders corresponding to each of the three tests used by VANTAGE, configured as *3_25_100m*, *ModularTest_4_9*, and *Simulation*. Within each of these folders will be subdirectories corresponding to individual tests run on those dates.
 1. Modular
@@ -37,7 +44,6 @@ Each of these folders will then contain configuration files, as described below:
 ### Deployer.json
 
 ### Manifest.json
-This is a sample of the file that would be delivered to the VANTAGE system by an operator of the NanoRacks deployer. It contains descriptions of the cubesats to be deployed as well as deployment geometry. It also contains the expected release time of the cubesats. Additionally, it should contain a filepath to the truth data json and the test scenario.
 
 ### Optical.json
 OpticalData: Directory pointing to optical images for current test
@@ -76,7 +82,6 @@ CleanModular: Pixel regions for manual data processing (Modular test)
 ## Tools
 Miscellaneous tools can be found in the [MiscTools](https://github.com/DylanBossie-CU/VANTAGE/tree/master/MiscTools) directory.
 ### tofCropping
-This directory contains the GUI used for cropping TOF point clouds. An example of the directory structure required is included. The GUI specifically looks for this directory to be called "Data". Run croppingGUI.m to crop point clouds.
 
 ### PlotCubeSats
 This tool is used to generate 3D scatter plots of the first CubeSat launched for a given test type. Output figures will then be saved to *FigureOut/*.
@@ -97,3 +102,38 @@ To utilize this script, define a directory which contains point clouds, and defi
 
 ### RewriteDataStructVelocity
 This script reads dataStruct output files, and transposes the velocity vector as needed to be processed in *masterPlotter()*.
+
+
+## Automation
+Contains tools for getting data from sensors and communicating with Raspberry Pi for remote boot.
+### OpticalCam_Automation
+Contains three tools for the optical camera. Important settings to mess with here: exposure time(associated with the ueye.is_Exposure command) and the sensor gain (for brighter images with more noise, is_SetHardwareGain command)
+#### Optical_Data_Capture.py
+This file is used for data collection during testing. Set up to take many images at a specified interval.
+
+#### Optical_Single_Frame.py
+This file is used for capturing single frames, primarily for use in performing sensor calibrations when data needs to be taken on command. This script is called from the calibration Matlab script.
+
+#### SimpleLive_Pyueye_OpenCV.py
+Used to see a live view of the optical camera output. Useful for performing alignments, can also be useful for camera calibrations and for showing off at Symposium/Expo
+
+
+
+### TOF_Automation
+This directory contains all of the drivers and stuff for ToF. All of the scripts you need to run are in the \examples subdirectory
+Listed below are the important ones.
+
+#### TOF_Data_Capture.py
+Main testing script, takes a certain number of frames.
+
+#### image_viewer_orig.py
+Live views of the ToF camera.
+
+#### TOF_Single_Frame_Capture.py
+Captures Single frame of the ToF camera's "intensity" image. This is like a normal optical image that can be used for calibration.
+
+#### create_application.py
+The ToF camera runs on an application where certain parameters are set. See the ToF manual to understand what all the parameters mean.
+
+
+### PiComms
