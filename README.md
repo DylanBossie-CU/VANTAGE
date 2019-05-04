@@ -42,12 +42,16 @@ This is a sample of the file that would be delivered to the VANTAGE system by an
 ### Optical.json
 
 ### Sensors.json
+TOFData: Directory pointing to the TOF data for the current test to be run.
+OpticalFocalLength: Focal length of optical camera (m).
 
 ### TOF.json
 
 ### Transform.json
 
 ### Validate.json
+CorrelateTruthData: Boolean for whether to perform timestamp alignment. This should always remain on, unless you really don't want to generate a new file.
+ComputingResults: Originally used for turning off result processing, but is now always on (except in the VANTAGE_main, where the process is automated and plotting is not desired).
 
 ## Tools
 Miscellaneous tools can be found in the [MiscTools](https://github.com/DylanBossie-CU/VANTAGE/tree/master/MiscTools) directory.
