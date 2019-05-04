@@ -37,6 +37,7 @@ Each of these folders will then contain configuration files, as described below:
 ### Deployer.json
 
 ### Manifest.json
+This is a sample of the file that would be delivered to the VANTAGE system by an operator of the NanoRacks deployer. It contains descriptions of the cubesats to be deployed as well as deployment geometry. It also contains the expected release time of the cubesats. Additionally, it should contain a filepath to the truth data json and the test scenario.
 
 ### Optical.json
 
@@ -51,6 +52,7 @@ Each of these folders will then contain configuration files, as described below:
 ## Tools
 Miscellaneous tools can be found in the [MiscTools](https://github.com/DylanBossie-CU/VANTAGE/tree/master/MiscTools) directory.
 ### tofCropping
+This directory contains the GUI used for cropping TOF point clouds. An example of the directory structure required is included. The GUI specifically looks for this directory to be called "Data". Run croppingGUI.m to crop point clouds.
 
 ### PlotCubeSats
 This tool is used to generate 3D scatter plots of the first CubeSat launched for a given test type. Output figures will then be saved to *FigureOut/*.
