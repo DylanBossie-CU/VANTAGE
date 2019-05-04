@@ -18,7 +18,10 @@ classdef Validate
         %
         % Constructs validate class 
         %
-        % @param    
+        % @param    configFileName          Validate class config
+        % @param    ModelRef                Reference to Model class
+        % @param    CorrelateTruthData      Boolean to perform truth data
+        %                                   analysis
         %
         % @return   Class instance
         % 
@@ -151,9 +154,13 @@ classdef Validate
         %
         % Compute error between CubeSat and truth, plot results
         % 
-        % @param    
+        % @param    CubeSat             Centroid array for a CubeSat
+        % @param    Truth               Truth centroid array for a CubeSat
         %
-        % @return 
+        % @return   Error               Absolute Error
+        % @return   XError              Error in horizontal
+        % @return   YError              Error in vertical
+        % @return   ZError              Error in downrange
         %
         % @author Dylan Bossie 
         % @date   11-Apr-2019
@@ -174,9 +181,9 @@ classdef Validate
         %% Compute truth distance vector
         %
         % 
-        % @param    
+        % @param    Model           Model class reference
         %
-        % @return 
+        % @return   distance        Absolute distance from VCF origin
         %
         % @author Dylan Bossie 
         % @date   11-Apr-2019
@@ -196,9 +203,11 @@ classdef Validate
         %% Compute time of cs launch
         %
         % 
-        % @param    
+        % @param    CubeSat         CubeSat centroid array
+        % @param    Time            CubeSat time array
+        % @param    Truth           Truth data cell array
         %
-        % @return 
+        % @return   launch_time_diff    Error in launch time calculation
         %
         % @author Dylan Bossie 
         % @date   11-Apr-2019
@@ -225,7 +234,10 @@ classdef Validate
         %% Interpolate cubesats to truth dat apositions
         %
         % 
-        % @param    
+        % @param    CSArray             Array of measured CubeSat data
+        % @param    timefitted          Fitted time array to CubeSat data
+        % @param    time                Actual time data
+        % @param    distance            Actual absolute distance vector
         %
         % @return 
         
@@ -257,9 +269,11 @@ classdef Validate
         %
         % Compute mean velocity of all cubesats in current file
         % 
-        % @param    
+        % @param    CubeSats            CubeSat data cell array
+        % @param    time                Time data array
+        % @param    type                Test type
         %
-        % @return 
+        % @return   meanvelocity        Mean velocity
         %
         % @author Dylan Bossie 
         % @date   11-Apr-2019
@@ -318,6 +332,8 @@ classdef Validate
         % Compute mean error for all tests and assimilate cubesat results
         % 
         % @param        Model       Model class containing initial data
+        % @param        SensorData  Sensor parameters
+        % @param        testDef     Test type
         %
         % @return
         %
@@ -526,12 +542,8 @@ classdef Validate
         %
         % Plot final fitted results
         % 
-        % @param        CubeSatFitted       Cell array of CubeSats with
-        %                               corresponding fitted measurements
-        % @param        TruthFitted         Cell array of truth data for
-        %                               corrresponding CubeSats
-        % @param        AbsoluteError       Distances between meas. and
-        %                                   truth values
+        % @param        ModelRef        Reference to model class
+        % @param        SensorData      Information on sensors
         %
         % @return 
         %
