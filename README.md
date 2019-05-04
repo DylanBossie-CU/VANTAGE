@@ -40,7 +40,31 @@ Each of these folders will then contain configuration files, as described below:
 This is a sample of the file that would be delivered to the VANTAGE system by an operator of the NanoRacks deployer. It contains descriptions of the cubesats to be deployed as well as deployment geometry. It also contains the expected release time of the cubesats. Additionally, it should contain a filepath to the truth data json and the test scenario.
 
 ### Optical.json
+OpticalData: Directory pointing to optical images for current test
 
+OpticalFileExtension: Prefix for optical image files
+
+DesiredFPS: Deprecated variable for processing at a specific FPS other than sensor parameter
+
+PlotBinarizedImages: Boolean for plotting images after adaptive binarization
+
+PlotCentroids: Boolean for plotting centroids of objects on binarized images
+
+PlotHist: Boolean for plotting visual magnitude histogram of current image
+
+PlotAny: Boolean for setting on/off for plotting anything in optical processing
+
+PlotCubeSats: Boolean for plotting grayscale image
+
+PlotIBoundaries: Boolean for plotting boundaries on grayscale image
+
+RunOcclusion: Boolean for attempting optical occlusion processing
+
+PerformDataCleaning: Boolean for setting data to 0 manually as defined in 'Clean100m' and 'CleanModular'
+
+Clean100m: Pixel regions for manual data processing (100m test)
+
+CleanModular: Pixel regions for manual data processing (Modular test)
 ### Sensors.json
 
 ### TOF.json
