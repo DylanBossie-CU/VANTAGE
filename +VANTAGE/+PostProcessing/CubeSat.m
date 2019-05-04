@@ -48,15 +48,15 @@ classdef CubeSat
         %
         % @return     A reference to an initialized CubeSat object
         %
-        function obj = CubeSat(name, rangeOrder, expectedU, actualDims)
+        function this = CubeSat(name, rangeOrder, expectedU, actualDims)
             
             TOFfit_VCF{1,3} = cfit;
             
             if nargin == 4
-                obj.name = name;
-                obj.rangeOrder = rangeOrder;
-                obj.expectedU = expectedU;
-                obj.actualDims = actualDims;
+                this.name = name;
+                this.rangeOrder = rangeOrder;
+                this.expectedU = expectedU;
+                this.actualDims = actualDims;
             end
         end
         
@@ -69,8 +69,8 @@ classdef CubeSat
         %
         % @author   Joshua Kirby
         % @date     06-Apr-2019
-        function centroid_TofPredicted_VCF = evalTofFit(obj,t)
-            centroid_TofPredicted_VCF = cellfun(@(x) feval(x,t),obj.TOFfit_VCF)';
+        function centroid_TofPredicted_VCF = evalTofFit(this,t)
+            centroid_TofPredicted_VCF = cellfun(@(x) feval(x,t),this.TOFfit_VCF)';
         end
     end
     

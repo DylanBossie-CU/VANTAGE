@@ -33,16 +33,16 @@ classdef Transform
         % 
         % @author   Joshua Kirby
         % @date     17-Feb-2019
-        function obj = Transform(configFilename)
+        function this = Transform(configFilename)
             if nargin == 1
                 % Obtain data from json file
                 config = jsondecode(fileread(configFilename));
 
                 % Set transforms between TCF and VCF
-                obj = obj.setTdata('VCF',config.VT_DCM,config.V_TCF2VCF,'TCF');
+                this = this.setTdata('VCF',config.VT_DCM,config.V_TCF2VCF,'TCF');
 
                 % Set transforms between CCF and VCF
-                obj = obj.setTdata('VCF',config.VC_DCM,config.V_CCF2VCF,'CCF');
+                this = this.setTdata('VCF',config.VC_DCM,config.V_CCF2VCF,'CCF');
             else
                 error('Incorrect number of input arguments for initialization of Transform Class instance')
             end
@@ -61,7 +61,7 @@ classdef Transform
         %
         % @author 	Joshua Kirby
         % @date 	24-Jan-2019
-        function [output] = tf(obj,targFrame,data,srcFrame)
+        function [output] = tf(this,targFrame,data,srcFrame)
             % Error catching
             if ~ischar(srcFrame)
                 error('srcFrame must be a single element string')
@@ -88,20 +88,20 @@ classdef Transform
             end
             
             % Perform transformation and translation
-            % Identify src-to-targ indices in TDATA struct using obj.nomen
-            src  = findNomen(obj,srcFrame);
-            targ = findNomen(obj,targFrame);
+            % Identify src-to-targ indices in TDATA struct using this.nomen
+            src  = findNomen(this,srcFrame);
+            targ = findNomen(this,targFrame);
             
             % Check that this particular src-to-targ is populated
             if ~src || ~targ
                 error(['The requested transformation does not have a '...
                     'transform matrix or translation vector set'])
-            elseif isempty(obj.TDATA(src,targ).C) || isempty(obj.TDATA(src,targ).V)
+            elseif isempty(this.TDATA(src,targ).C) || isempty(this.TDATA(src,targ).V)
                 error('The requested transformation frames exist separately but their relation is not populated explicitly')
             end
             
             % Produced transformed/translated output data
-            output = obj.TDATA(src,targ).C*(data-obj.TDATA(src,targ).V);
+            output = this.TDATA(src,targ).C*(data-this.TDATA(src,targ).V);
         end
         
     end
@@ -124,10 +124,10 @@ classdef Transform
         %
         % @author	Joshua Kirby
         % @date  	24-Jan-2019
-        function obj = setTdata(obj,targFrame,C,V,srcFrame)
+        function this = setTdata(this,targFrame,C,V,srcFrame)
             % Error catching
-            if size(obj.nomen,1) == obj.maxNomen
-                error('''obj.nomen'' already has the maximum number of entries as specified by maxNomen.')
+            if size(this.nomen,1) == this.maxNomen
+                error('''this.nomen'' already has the maximum number of entries as specified by maxNomen.')
             end
             
             if size(C,1)~=3 || size(C,2)~=3
@@ -165,38 +165,38 @@ classdef Transform
                 return
             end
             
-            % Make new entry for srcFrame if not already in obj.nomen
-            if ~findNomen(obj,srcFrame)
-                obj.nomen{size(obj.nomen,1)+1,1} = srcFrame;
+            % Make new entry for srcFrame if not already in this.nomen
+            if ~findNomen(this,srcFrame)
+                this.nomen{size(this.nomen,1)+1,1} = srcFrame;
             end
             
-            % Make new entry for targFrame if not already in obj.nomen
-            if ~findNomen(obj,targFrame)
-                obj.nomen{size(obj.nomen,1)+1,1} = targFrame;
+            % Make new entry for targFrame if not already in this.nomen
+            if ~findNomen(this,targFrame)
+                this.nomen{size(this.nomen,1)+1,1} = targFrame;
             end
             
             % Set/overwrite transform matrix and translation vector (src-to-targ)
-            obj.TDATA(findNomen(obj,srcFrame),findNomen(obj,targFrame)).C = C;
-            obj.TDATA(findNomen(obj,srcFrame),findNomen(obj,targFrame)).V = V;
+            this.TDATA(findNomen(this,srcFrame),findNomen(this,targFrame)).C = C;
+            this.TDATA(findNomen(this,srcFrame),findNomen(this,targFrame)).V = V;
             
             % Set/overwrite transform matrix and translation vector (targ-to-src)
-            obj.TDATA(findNomen(obj,targFrame),findNomen(obj,srcFrame)).C = C';
-            obj.TDATA(findNomen(obj,targFrame),findNomen(obj,srcFrame)).V = C*(-V);
+            this.TDATA(findNomen(this,targFrame),findNomen(this,srcFrame)).C = C';
+            this.TDATA(findNomen(this,targFrame),findNomen(this,srcFrame)).V = C*(-V);
         end
         %% Index into nomen
         %
-        % Return row number of string location in obj.nomen
+        % Return row number of string location in this.nomen
         %
-        % @param	str     string to be found in obj.nomen
+        % @param	str     string to be found in this.nomen
         %
-        % @return           index of string in obj.nomen, set to 0 if string not
+        % @return           index of string in this.nomen, set to 0 if string not
         %                   found
         %
         % @author   Joshua Kirby
         % @date 	24-Jan-2019
-        function [row] = findNomen(obj,str)
+        function [row] = findNomen(this,str)
             
-            [row,~] = ind2sub(size(obj.nomen),find(strcmp(str,obj.nomen)));
+            [row,~] = ind2sub(size(this.nomen),find(strcmp(str,this.nomen)));
             
             if isempty(row)
                 row = 0;

@@ -204,7 +204,7 @@ while(nRet == ueye.IS_SUCCESS):
     cv2.imshow("SimpleLive_Python_uEye_OpenCV", frame2)
 
     # Press q if you want to end the loop
-    if cv2.waitKey(1) & 0xFF == ord('r'):
+    if cv2.waitKey(1):
     	nRet = ueye.is_FreezeVideo(hCam, ueye.IS_WAIT)
     	nRet1= ueye.is_GetImageInfo(hCam,MemID, Iinfo, ueye.sizeof(Iinfo) )
     	print(Iinfo.TimestampSystem.wSecond.value)

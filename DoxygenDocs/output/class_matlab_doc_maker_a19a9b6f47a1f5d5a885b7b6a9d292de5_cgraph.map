@@ -1,0 +1,5 @@
+<map id="getOutputDirectory" name="getOutputDirectory">
+<area shape="rect" id="node2" href="$class_matlab_doc_maker.html#a979a5ae4d0f991df505b8ae9e6fb4486" title="getPref" alt="" coords="199,5,267,32"/>
+<area shape="rect" id="node3" href="$class_matlab_doc_maker.html#a39bd4f486e4b0357e56cd38c050c6afa" title="Gets the tag for the MatLab preferences struct. " alt="" coords="315,5,428,32"/>
+<area shape="rect" id="node4" href="$class_matlab_doc_maker.html#a2adbec43ff3458cb781610f91fe9b8fc" title="Returns the project name. " alt="" coords="476,5,603,32"/>
+</map>

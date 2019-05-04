@@ -1,0 +1,17 @@
+<map id="naiveFindCentroids" name="naiveFindCentroids">
+<area shape="rect" id="node2" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#ac31c50d961216a61116089224a0c723b" title="% Identifying cubesats within point clouds Pull out z values " alt="" coords="199,56,360,83"/>
+<area shape="rect" id="node3" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a86b92fe10d7cff64b3eba137eeb3d4e0" title="% Calculating centroids from identified planes for a cubesat Find centroid based on number of identif..." alt="" coords="196,107,363,133"/>
+<area shape="rect" id="node14" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#afc8e1f5b21d3201c7c41d4aaa30c18f5" title="% Identifying visible planes for a cubesat %% Allocation Initial value for minimum number of points c..." alt="" coords="208,157,351,184"/>
+<area shape="rect" id="node16" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a17d171d967a29d4f103d802e5cee06d9" title="% Loading point clouds from files " alt="" coords="237,208,321,235"/>
+<area shape="rect" id="node4" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a772690d6d441927dbb75203f26894649" title="%% Find plane boundary points and centroid " alt="" coords="411,31,493,57"/>
+<area shape="rect" id="node12" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a08377919068d43ba3c2c832d38063d4b" title="%% Check that planes intersect as expected " alt="" coords="411,132,493,159"/>
+<area shape="rect" id="node13" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a9ea2e988b143de92fd005723e93cdcfa" title="%% Find faces&#39; centroids and corners %% and determine if each face qualifies as a fullFace ..." alt="" coords="411,81,493,108"/>
+<area shape="rect" id="node5" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a8c37f19000ad432f7abbb99719a522cc" title="%% for all faces " alt="" coords="587,31,697,57"/>
+<area shape="rect" id="node6" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a1e3c3ea97b56cc39d4f9c3886f45f373" title="unitvec" alt="" coords="831,5,899,32"/>
+<area shape="rect" id="node7" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a9095c3e319a806f1271204678885f34b" title="Dimensions to choose from, corresponding to indices of CubeSat.actualDims. " alt="" coords="583,81,701,108"/>
+<area shape="rect" id="node8" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#aaca61ed8938454ebe5eac7053b6e3f0b" title="% Subroutines " alt="" coords="541,132,743,159"/>
+<area shape="rect" id="node9" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a680f1b6bd0941ab960fe9bdf76a61524" title="minBoundingBox" alt="" coords="800,157,931,184"/>
+<area shape="rect" id="node10" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#aab46b3b9c9267da8d76c050449ea9a85" title="roundToNearestOdd" alt="" coords="791,107,940,133"/>
+<area shape="rect" id="node11" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#ae2e76a9a874d5a1db0c616b8aeb9cff4" title="binarySign" alt="" coords="988,107,1077,133"/>
+<area shape="rect" id="node15" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#ac5e8892f0c5e1b35d46d320653c703b8" title="the mean of the samples belongs to the plane " alt="" coords="414,183,490,209"/>
+</map>

@@ -43,20 +43,225 @@ standby(t_sig,initiateSig);
 
 
 %% Start sensor automation
-% Automation Code here:   %
+% File Definitions
+% High-level directory of all TOF information. This should contain the
+% executable data capture script and the desired location to save point
+% cloud outputs.
+tofDirName = '/home/vantage/Documents/githere/VANTAGE/Automation/TOF_Automation/examples/';
+tofDirData = '/home/vantage/Documents/githere/VANTAGE/Data/TOF_Automated/';
+tofFlush = strcat(tofDirData,'pointcloud*');
+tofScript = strcat(tofDirName,'TOF_Data_Capture.py');
+
+opticalDirName = '/home/vantage/Documents/githere/VANTAGE/Automation/OpticalCam_Automation/';
+opticalDirImages = '/home/vantage/Documents/githere/VANTAGE/Data/AutomatedImageCapture/';
+opticalDirData = '/home/vantage/Documents/githere/VANTAGE/Data/Optical_Automated/';
+opticalFlush = strcat(opticalDirData,'VANTAGEOp*');
+opticalScript = strcat(opticalDirName,'Optical_Data_Capture.py');
+
+% Flush all TOF point clouds detected in output directory
+unix(sprintf('rm %s',tofFlush));
+
+% Flush all optical images detected in output directory
+unix(sprintf('rm %s',opticalFlush));
 
 
+% TOF Data Collection
+% This command executes a bash command, which will begin data capture using
+% the TOF sensor, and save point clouds to an output directory.
+unix(sprintf('python %s &',tofScript));
 
-%                         %
-%% Crop out data so we can simulate realistic data (no cars near ISS)
+% Optical Camera Data Collection
+% This command executes a bash command, which will begin data capture using
+% the optical camera, and save images to an output directory.
+unix(sprintf('python %s &',opticalScript));
+
+%% Start le epic post-processing PogChamp
+import VANTAGE.PostProcessing.*
+
+%%%%%% Modular config direcs
+configDirecNameModular = 'Config/Final_Tests/ModularTest_4_9/Test*';
+%%%%%% 100m config direcs
+configDirecName100m = 'Config/Final_Tests/3_25_100m/Test*';
+%%%%%% Simulation config direcs
+configDirecNameSim085 = 'Config/Final_Tests/Simulation/_085/Sample*';
+configDirecNameSim030 = 'Config/Final_Tests/Simulation/_030/Sample*';
+configDirecNameSim140 = 'Config/Final_Tests/Simulation/_140/Sample*';
+configDirecNameSim195 = 'Config/Final_Tests/Simulation/_195/Sample*';
+configDirecNameSim250 = 'Config/Final_Tests/Simulation/_250/Sample*';
+
+testType = 'Simulation_195';
+
+switch testType
+    case 'Modular'
+        configDirecName = configDirecNameModular;
+        testType = 'ModularTest_4_9';
+    case '100m'
+        configDirecName = configDirecName100m;
+        testType = '3_25_100m';
+    case 'Simulation_085'
+        configDirecName = configDirecNameSim085;
+        testType = 'Simulation/_085';
+    case 'Simulation_030'
+        configDirecName = configDirecNameSim030;
+        testType = 'Simulation/_030';
+    case 'Simulation_140'
+        configDirecName = configDirecNameSim140;
+        testType = 'Simulation/_140';
+    case 'Simulation_195'
+        configDirecName = configDirecNameSim195;
+        testType = 'Simulation/_195';
+    case 'Simulation_250'
+        configDirecName = configDirecNameSim250;
+        testType = 'Simulation/_250';
+end
+
+configfiles = dir(configDirecName);
+
+for iter = 1:numel(configfiles)
+    %%% Housekeeping and Allocation
+    close all;
+    rng(99);
+
+    configfile = [pwd '/config/Final_Tests/' testType '/' configfiles(iter).name];
+
+    %%% Filenames and Configurables
+    manifestFilename = strcat(configfile,'/Manifest.json');
+    SensorData = jsondecode(fileread(strcat(configfile,'/Sensors.json')));
+
+    Model = VANTAGE.PostProcessing.Model(manifestFilename,configfile,true);
+
+    fileLims = [1 inf];
+    Model.Deployer = Model.TOF.TOFProcessing(SensorData,...
+        Model.Deployer,'presentResults',0,'fileLims',fileLims,'showDebugPlots',0);
+
+    % Process truth data
+    Truth = Model.Truth_VCF;
+
+    % Compute results
+    Model.ComputeStateOutput();
+
+    Validator = Validate(configfile,Model,true);
+
+    CubeSatFitted = cell(Model.Deployer.numCubesats,1);
+    TruthFitted = cell(Model.Deployer.numCubesats,1);
+    AbsoluteError = cell(Model.Deployer.numCubesats,1);
+    XError = cell(Model.Deployer.numCubesats,1);
+    YError = cell(Model.Deployer.numCubesats,1);
+    ZError = cell(Model.Deployer.numCubesats,1);
+
+    data_t = Model.Deployer.CubesatArray(1).time(end);
+    t_fit = linspace(0,data_t);
+    for i=1:Model.Deployer.numCubesats
+       CubeSat = Model.Deployer.CubesatArray(i);
+       CubeSatFitted{i} = Validator.fitCubeSatTraj(CubeSat.centroids_VCF,CubeSat.time,'CS',t_fit,Model);
+       TruthFitted{i} = interp1(Model.Truth_VCF.t,Model.Truth_VCF.Cubesat(i).pos,t_fit,'linear');
+       [AbsoluteError{i},XError{i},YError{i},ZError{i}] = ...
+           Validator.ProcessError(CubeSatFitted{i},TruthFitted{i});
+    end
+
+    % Save fitted results for error analysis later
+    if strcmpi(testType,'Modular')
+        dataFolder = 'Data/Results/matFiles/ModularTest_4_9/';
+        folderString = Model.Deployer.TruthFileName;
+        tmp = split(folderString,'/');
+        testNumber = tmp{3};
+    elseif strcmpi(testType,'100m')
+        dataFolder = 'Data/Results/matFiles/100m/';
+        folderString = Model.Deployer.TruthFileName;
+        tmp = split(folderString,'/');
+        testNumber = tmp{3};
+    elseif strcmpi(testType,'Simulation_030')
+        dataFolder = 'Data/Results/matFiles/Simulation_4_15_030/';
+        tmp = split(SensorData.TOFData,'/');
+        testNumber = tmp{5};
+    elseif strcmpi(testType,'Simulation_085')
+        dataFolder = 'Data/Results/matFiles/Simulation_4_15_085/';
+        tmp = split(SensorData.TOFData,'/');
+        testNumber = tmp{5};
+    elseif strcmpi(testType,'Simulation_140')
+        dataFolder = 'Data/Results/matFiles/Simulation_4_15_140/';
+        tmp = split(SensorData.TOFData,'/');
+        testNumber = tmp{5};
+    elseif strcmpi(testType,'Simulation_195')
+        dataFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
+        tmp = split(SensorData.TOFData,'/');
+        testNumber = tmp{5};
+    elseif strcmpi(testType,'Simulation_250')
+        dataFolder = 'Data/Results/matFiles/Simulation_4_15_250/';
+        tmp = split(SensorData.TOFData,'/');
+        testNumber = tmp{5};
+    else
+        error('invalid test type in Deployer.TruthFileName')
+    end
+
+    mkdir(dataFolder)
+    mkdir([dataFolder 'data/']);
+    save([pwd '/' dataFolder 'data/CSData' testNumber '.mat'],'CubeSatFitted');
+    save([pwd '/' dataFolder 'data/TruthData' testNumber '.mat'],'TruthFitted');
+    save([pwd '/' dataFolder 'data/AbsErrorData' testNumber '.mat'],'AbsoluteError');
+    save([pwd '/' dataFolder 'data/XErrorData' testNumber '.mat'],'XError');
+    save([pwd '/' dataFolder 'data/YErrorData' testNumber '.mat'],'YError');
+    save([pwd '/' dataFolder 'data/ZErrorData' testNumber '.mat'],'ZError');
+    save([pwd '/' dataFolder 'data/CSTime' testNumber '.mat'],'t_fit');
+end
+%%%% Results processing
+switch obj.testType
+    case 'Modular'
+        obj.configDirecName = obj.configDirecNameModular;
+        testType = 'ModularTest_4_9';
+        testDef = 'Modular';
+    case '100m'
+        obj.configDirecName = obj.configDirecName100m;
+        testType = '3_25_100m';
+        testDef = '100m';
+    case 'Simulation_085'
+        obj.configDirecName = obj.configDirecNameSim085;
+        testType = 'Simulation/_085';
+        testDef = 'Sim085';
+    case 'Simulation_030'
+        obj.configDirecName = obj.configDirecNameSim030;
+        testType = 'Simulation/_030';
+        testDef = 'Sim030';
+    case 'Simulation_140'
+        obj.configDirecName = obj.configDirecNameSim140;
+        testType = 'Simulation/_140';
+        testDef = 'Sim140';
+    case 'Simulation_195'
+        obj.configDirecName = obj.configDirecNameSim195;
+        testType = 'Simulation/_195';
+        testDef = 'Sim195';
+    case 'Simulation_250'
+        obj.configDirecName = obj.configDirecNameSim195;
+        testType = 'Simulation/_250';
+        testDef = 'Sim250';
+end
+            
+configfiles = dir(obj.configDirecName);
+
+for iter = 1:numel(configfiles)
+    %%% Housekeeping and Allocation
+    rng(99);
+
+    %%% Filenames and Configurables
+    configfolder = [configfiles(iter).folder '/' configfiles(iter).name];
+    manifestFilename = [configfolder '/Manifest.json'];
+    SensorData = jsondecode(fileread(strcat(configfolder,'/Sensors.json')));
+
+    Model = VANTAGE.PostProcessing.Model(manifestFilename,configfolder,false);
+
+    Validator = Validate(configfolder,Model,false);
+
+    %Validator.PlotResults(Model,SensorData);
+
+    %             Validator.ErrorAnalysis(Model,SensorData,testDef);
+end
+
+%Validator.ErrorAnalysis(Model,SensorData,testDef);
+matFileDirectory = [pwd '/Data/Results/matFiles'];
+Validator.GenerateOutputFiles(matFileDirectory);
+Validator.masterPlotter(matFileDirectory);
 
 
-%% Start postprocess shit
-% Post Process Code here: % 
-
-
-
-%                         %
 
 
 %% write results and input results filename and format in this code 
