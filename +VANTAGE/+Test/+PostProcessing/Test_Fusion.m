@@ -11,7 +11,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
         configDirecNameSim195 = 'Config/Final_Tests/Simulation/_195/Sample*';
         configDirecNameSim250 = 'Config/Final_Tests/Simulation/_250/Sample*';
          
-        testType = 'Modular';
+        testType = 'Simulation_085';
         
         configDirecName
     end
@@ -127,9 +127,11 @@ classdef Test_Fusion < matlab.unittest.TestCase
             else
                 error('invalid test type in Deployer.TruthFileName')
             end
+            CubeSats = Model.Deployer.CubesatArray;
             
             mkdir(dataFolder)
             mkdir([dataFolder 'data/']);
+            save([pwd '/' dataFolder 'data/CubeSatArray' testNumber '.mat'],'CubeSats');
             save([pwd '/' dataFolder 'data/CSData' testNumber '.mat'],'CubeSatFitted');
             save([pwd '/' dataFolder 'data/TruthData' testNumber '.mat'],'TruthFitted');
             save([pwd '/' dataFolder 'data/AbsErrorData' testNumber '.mat'],'AbsoluteError');

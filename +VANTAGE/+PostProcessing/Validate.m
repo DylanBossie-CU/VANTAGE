@@ -348,7 +348,7 @@ classdef Validate
                     ZErrorFiles = dir([matResults 'ZError*']);
                     TimeFiles = dir([matResults 'CSTime*']);
 
-                    interpolationPoints = linspace(0,100,1000);
+                    
                 elseif strcmpi(testDef,'Sim085')
                     resultsFolder = 'Data/Results/matFiles/Simulation_4_15_085/';
                     matResults = [resultsFolder 'data/'];
@@ -360,7 +360,6 @@ classdef Validate
                     ZErrorFiles = dir([matResults 'ZError*']);
                     TimeFiles = dir([matResults 'CSTime*']);
 
-                    interpolationPoints = linspace(0,100,1000);
                     
                     elseif strcmpi(testDef,'Sim030')
                     resultsFolder = 'Data/Results/matFiles/Simulation_4_15_030/';
@@ -372,8 +371,6 @@ classdef Validate
                     YErrorFiles = dir([matResults 'YError*']);
                     ZErrorFiles = dir([matResults 'ZError*']);
                     TimeFiles = dir([matResults 'CSTime*']);
-
-                    interpolationPoints = linspace(0,100,1000);
                     
                     elseif strcmpi(testDef,'Sim140')
                     resultsFolder = 'Data/Results/matFiles/Simulation_4_15_140/';
@@ -385,8 +382,6 @@ classdef Validate
                     YErrorFiles = dir([matResults 'YError*']);
                     ZErrorFiles = dir([matResults 'ZError*']);
                     TimeFiles = dir([matResults 'CSTime*']);
-
-                    interpolationPoints = linspace(0,100,1000);
                     
                     elseif strcmpi(testDef,'Sim195')
                     resultsFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
@@ -398,8 +393,6 @@ classdef Validate
                     YErrorFiles = dir([matResults 'YError*']);
                     ZErrorFiles = dir([matResults 'ZError*']);
                     TimeFiles = dir([matResults 'CSTime*']);
-
-                    interpolationPoints = linspace(0,100,1000);
                     
                     elseif strcmpi(testDef,'Sim250')
                     resultsFolder = 'Data/Results/matFiles/Simulation_4_15_250/';
@@ -411,8 +404,6 @@ classdef Validate
                     YErrorFiles = dir([matResults 'YError*']);
                     ZErrorFiles = dir([matResults 'ZError*']);
                     TimeFiles = dir([matResults 'CSTime*']);
-
-                    interpolationPoints = linspace(0,100,1000);
                 else
                     error('not a valid test case')
                 end
@@ -474,50 +465,7 @@ classdef Validate
                     
                     mkdir(dataFolder)
                     save([dataFolder testNumber '_' testDef 'dataStruct.mat'],'dataStruct');
-
-    %                 CubeSats = CS.CubeSatFitted;
-
-                    % Interpolate error for each CubeSat across the desired
-                    % range for the given test
-    %                 interpError = zeros(numel(CubeSats),length(interpolationPoints));
-    %                 for j = 1:numel(CubeSats)
-    %                     CubeSat = CubeSats{j};
-    %                     CSAbsError = pos_err{j};
-    %                     Z_points = CubeSat(:,3);
-    %                     interpError(j,:) = interp1(Z_points,CSAbsError,interpolationPoints);
-    %                 end
-    %                 
-    %                 % Compute the mean error
-    %                 MeanError = zeros(length(interpolationPoints),1);
-    %                 for j = 1:length(interpolationPoints)
-    %                     MeanError(j) = mean(interpError(:,j));
-    %                 end
-    %                 MeanErrorAllFiles(i,:) = MeanError;
                 end
-            
-%             % Process mean error across all test cases
-%             TotalMeanError = zeros(numel(interpolationPoints),1);
-%             for i = 1:length(interpolationPoints)
-%                 TotalMeanError(i) = mean(MeanErrorAllFiles(:,i));
-%             end
-% 
-%             % Output final .mat file
-%             if strcmpi(Model.Deployer.testScenario,'Modular')
-%                 dataFolder = 'Data/ModularTest_4_9/Results';
-%                 folderString = Model.Deployer.TruthFileName;
-%                 save([pwd '/' dataFolder '/FINALERROR_Modular.mat'],'TotalMeanError');
-%             elseif strcmpi(Model.Deployer.testScenario,'100m')
-%                 dataFolder = 'Data/3_25_100m/Results';
-%                 folderString = Model.Deployer.TruthFileName;
-%                 save([pwd '/' dataFolder '/FINALERROR_100m.mat'],'TotalMeanError');
-%             elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-%                 testNumber = 'notimplemented';
-%             else
-%                 error('invalid test type in Deployer.TruthFileName')
-%             end
-            %{
-
-%}
             
         end
         
