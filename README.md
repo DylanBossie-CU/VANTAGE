@@ -72,12 +72,21 @@ Clean100m: Pixel regions for manual data processing (100m test)
 
 CleanModular: Pixel regions for manual data processing (Modular test)
 ### Sensors.json
+TOFData: Directory pointing to pointclouds for current test
+
+OpticalFocalLength: Focal length of optical camera (m)
+
+OpticalPixelSize: Pixel width of optical camera (m)
+
+OpticalResolution: (width,height) (pixels)
 
 ### TOF.json
 
 ### Transform.json
 
 ### Validate.json
+CorrelateTruthData: Whether to perform truth data corrections/timestamp alignment
+ComputingResults: Deprecated - whether to perform results processing
 
 ## Tools
 Miscellaneous tools can be found in the [MiscTools](https://github.com/DylanBossie-CU/VANTAGE/tree/master/MiscTools) directory.
