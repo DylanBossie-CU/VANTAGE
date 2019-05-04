@@ -147,7 +147,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
                     testType = 'Simulation';
             end
             
-            configfiles = dir(obj.configDirecName);
+            configfiles = dir(obj.configDirecNameSim085);
             
             for iter = 1:numel(configfiles)
             %%% Housekeeping and Allocation
