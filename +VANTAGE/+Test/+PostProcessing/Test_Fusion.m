@@ -1,15 +1,15 @@
 classdef Test_Fusion < matlab.unittest.TestCase
     properties
         %%%%%% Modular config direcs
-        configDirecNameModular = 'Config/Final_Tests/ModularTest_4_9/Test*'
+        configDirecNameModular = 'Config/ModularTest_4_9/Test*'
         %%%%%% 100m config direcs
-        configDirecName100m = 'Config/Final_Tests/3_25_100m/Test*';
+        configDirecName100m = 'Config/3_25_100m/Test*';
         %%%%%% Simulation config direcs
-        configDirecNameSim085 = 'Config/Final_Tests/Simulation/_085/Sample*';
-        configDirecNameSim030 = 'Config/Final_Tests/Simulation/_030/Sample*';
-        configDirecNameSim140 = 'Config/Final_Tests/Simulation/_140/Sample*';
-        configDirecNameSim195 = 'Config/Final_Tests/Simulation/_195/Sample*';
-        configDirecNameSim250 = 'Config/Final_Tests/Simulation/_250/Sample*';
+        configDirecNameSim085 = 'Config/Simulation/_085/Sample*';
+        configDirecNameSim030 = 'Config/Simulation/_030/Sample*';
+        configDirecNameSim140 = 'Config/Simulation/_140/Sample*';
+        configDirecNameSim195 = 'Config/Simulation/_195/Sample*';
+        configDirecNameSim250 = 'Config/Simulation/_250/Sample*';
          
         testType = 'Simulation_085';
         
@@ -56,7 +56,7 @@ classdef Test_Fusion < matlab.unittest.TestCase
             close all;
             rng(99);
 
-            configfile = [pwd '/config/Final_Tests/' testType '/' configfiles(iter).name];
+            configfile = [pwd '/config/' testType '/' configfiles(iter).name];
             
             %%% Filenames and Configurables
             manifestFilename = strcat(configfile,'/Manifest.json');

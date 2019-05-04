@@ -1,4 +1,0 @@
-Data/*
-Figures/*
-March*18*100m*Data/*
-desktop.ini
