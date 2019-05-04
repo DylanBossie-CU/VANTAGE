@@ -37,36 +37,20 @@ Each of these folders will then contain configuration files, as described below:
 ### Deployer.json
 
 ### Manifest.json
-This is a sample of the file that would be delivered to the VANTAGE system by an operator of the NanoRacks deployer. It contains descriptions of the cubesats to be deployed as well as deployment geometry. It also contains the expected release time of the cubesats. Additionally, it should contain a filepath to the truth data json and the test scenario.
-DeploymentTube: tube number from which cubesats are expected to deploy.
-VantageTube: tube that is occupied by VANTAGE system.
-expectedRelease: datetime array containing expected release time.
-CubesatArray: array containing data for each cubesat to be deployed.
-  name: cubesat name.
-  rangeOrder: order in which this cubesat will exit the tube.
-  expectedU: expected cubesat size in U.
-  actualDims: the actual dimensions of the cubesat in meters.
-TruthDataFile: filepath to truth data file (.json).
-testScenario: test scenario being run ('modular', '100m', or 'simulation')
 
 ### Optical.json
 
 ### Sensors.json
-TOFData: Directory pointing to the TOF data for the current test to be run.
-OpticalFocalLength: Focal length of optical camera (m).
 
 ### TOF.json
 
 ### Transform.json
 
 ### Validate.json
-CorrelateTruthData: Boolean for whether to perform timestamp alignment. This should always remain on, unless you really don't want to generate a new file.
-ComputingResults: Originally used for turning off result processing, but is now always on (except in the VANTAGE_main, where the process is automated and plotting is not desired).
 
 ## Tools
 Miscellaneous tools can be found in the [MiscTools](https://github.com/DylanBossie-CU/VANTAGE/tree/master/MiscTools) directory.
 ### tofCropping
-This directory contains the GUI used for cropping TOF point clouds. An example of the directory structure required is included. The GUI specifically looks for this directory to be called "Data". Run croppingGUI.m to crop point clouds.
 
 ### PlotCubeSats
 This tool is used to generate 3D scatter plots of the first CubeSat launched for a given test type. Output figures will then be saved to *FigureOut/*.
@@ -87,3 +71,38 @@ To utilize this script, define a directory which contains point clouds, and defi
 
 ### RewriteDataStructVelocity
 This script reads dataStruct output files, and transposes the velocity vector as needed to be processed in *masterPlotter()*.
+
+
+## Automation
+Contains tools for getting data from sensors and communicating with Raspberry Pi for remote boot.
+### OpticalCam_Automation
+Contains three tools for the optical camera. Important settings to mess with here: exposure time(associated with the ueye.is_Exposure command) and the sensor gain (for brighter images with more noise, is_SetHardwareGain command)
+#### Optical_Data_Capture.py
+This file is used for data collection during testing. Set up to take many images at a specified interval.
+
+#### Optical_Single_Frame.py
+This file is used for capturing single frames, primarily for use in performing sensor calibrations when data needs to be taken on command. This script is called from the calibration Matlab script.
+
+#### SimpleLive_Pyueye_OpenCV.py
+Used to see a live view of the optical camera output. Useful for performing alignments, can also be useful for camera calibrations and for showing off at Symposium/Expo
+
+
+
+### TOF_Automation
+This directory contains all of the drivers and stuff for ToF. All of the scripts you need to run are in the \examples subdirectory
+Listed below are the important ones.
+
+#### TOF_Data_Capture.py
+Main testing script, takes a certain number of frames.
+
+#### image_viewer_orig.py
+Live views of the ToF camera.
+
+#### TOF_Single_Frame_Capture.py
+Captures Single frame of the ToF camera's "intensity" image. This is like a normal optical image that can be used for calibration.
+
+#### create_application.py
+The ToF camera runs on an application where certain parameters are set. See the ToF manual to understand what all the parameters mean.
+
+
+### PiComms
