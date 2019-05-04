@@ -38,26 +38,23 @@ Each of these folders will then contain configuration files, as described below:
 
 ### Manifest.json
 This is a sample of the file that would be delivered to the VANTAGE system by an operator of the NanoRacks deployer. It contains descriptions of the cubesats to be deployed as well as deployment geometry. It also contains the expected release time of the cubesats. Additionally, it should contain a filepath to the truth data json and the test scenario.
+DeploymentTube: tube number from which cubesats are expected to deploy.
+VantageTube: tube that is occupied by VANTAGE system.
+expectedRelease: datetime array containing expected release time.
+CubesatArray: array containing data for each cubesat to be deployed.
+  name: cubesat name.
+  rangeOrder: order in which this cubesat will exit the tube.
+  expectedU: expected cubesat size in U.
+  actualDims: the actual dimensions of the cubesat in meters.
+TruthDataFile: filepath to truth data file (.json).
+testScenario: test scenario being run ('modular', '100m', or 'simulation')
 
 ### Optical.json
-OpticalData: Data directory pointing to Optical data for the current test
-OpticalFileExtension: Prefix to be used when searching for files
-DesiredFPS: Previously used to define to skip files in order to process at a specific FPS - deprecated
-PlotBinarizedImages: Define if optical image processing should output plots post-binarization
-PlotCentroids: Define if PlotBinarizedImages should also plot detected centroids on figure
-PlotHist: Define if adaptive binarization thresholding should plot visual magnitude histogram
-PlotAny: Turn on/off ability to plot anything in optical processing
-PlotCubeSats: Define if grayscale images should be plotted
-PlotIBoundaries: Define if grayscale images should have object boundaries plotted on figure
-RunOcclusion: Should optical processing attempt to perform occlusion check
-PerformDataCleaning: Utilize parameters defined in Optical.json to manually set pixel regions to boolean false
-Clean100m: Activated by PerformDataCleaning to set defined region to 0
-CleanModular: Activated by PerformDataCleaning to set defined region to 0
+
 ### Sensors.json
 TOFData: Directory pointing to the TOF data for the current test to be run.
 OpticalFocalLength: Focal length of optical camera (m).
-OpticalPixelSize: Size of pixel (m).
-OpticalResolution: [width,height] (pixels).
+
 ### TOF.json
 
 ### Transform.json
