@@ -143,7 +143,6 @@ classdef Test_Fusion < matlab.unittest.TestCase
         end
         
         function testError(this)
-            return
             import VANTAGE.PostProcessing.Validate
             
             switch this.testType

@@ -10,6 +10,16 @@ The modular test was developed for the purpose of testing the VANTAGE system fro
 3. 100m Testing
 The 100m test was developed for the purpose of testing the system across the full 0-100m required range. This test was performed at the Boulder airport, using a test rig based on attaching CubeSats to a car, and acquiring truth data by affixing a GPS Trimble system to the car.
 
+### Running the Software Suite
+VANTAGE has a main script for running the entire software suite, as well as test cases for utilizing only the post-processing portion of the code.
+#### VANTAGE_main.m
+Running VANTAGE_main executes everything involved in the full system, from transmitting a Manifest.json file to VANTAGE, executing data capture, and performing post-processing. See below for a description of the avionics, communications, and how to configure the first portion of the code for a different avionics setup.
+
+#### Post-processing
+To perform only post-processing on an existing data set, utilize +VANTAGE/+Test/+PostProcessing/Test_Fusion.m . This file utilizes a testing framework to attempt post-processing on a given data set. To configure this test case, modify the configDirecNames in the test case constructor to point to the config directories of the corresponding test types. Additionally modify *testType* to define the type of the three tests that you wish to process. This can be set to any of the cases in the switch statement below.
+
+When run, the program will detect the relevant files based on the configuration file, and sequentially process the TOF data, then the optical data. See the UML diagrams in the VANTAGE PFR data package for specifics on the workings of the software algorithms.
+
 ### Data Directory
 The organization of the data directory (*VANTAGE/Data/*) is crucial for the successful operation of the VANTAGE software suite. The majority of errors that will be encountered when running the suite will be due to incorrectly configured data folders. The data directory is currently configured to handle the three types of tests used in the 2018-2019 development cycle. To ensure the correct configuration of the data:
 

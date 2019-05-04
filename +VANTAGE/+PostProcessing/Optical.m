@@ -931,11 +931,9 @@ classdef Optical
     % Convert pixel location to VCF unit vector
     %
     %
-    % @param      CubeSats     List of CubeSat classes containing centroid
-    %                          locations
-    % @return     CubeSatUnitVectors    List of unit vectors in VCF for
-    %                                   each centroid input
-    %
+    % @param      isSystemCentroid      Boolean for if converting a system
+    %                                   centroid or a series of centroids
+    % @return     this                  Updated object
     % @author     Dylan Bossie
     % @date       4-Mar-2019
     %
