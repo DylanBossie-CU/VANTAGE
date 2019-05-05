@@ -197,6 +197,8 @@ To utilize this script, define a directory which contains point clouds, and defi
 ### RewriteDataStructVelocity
 This script reads dataStruct output files, and transposes the velocity vector as needed to be processed in *masterPlotter()*.
 
+### TimeManager
+This uses date vectors and date strings to extract the time from a given TOF or Optical image filename and convert it to a global internal VANTAGE Time (number of seconds past first TOF file time), using the method *VantageTime*.  The method *VantageTime2DateStr* can be used to convert VANTAGE Times to consistent human-readable date strings.
 
 ## Automation
 Contains tools for getting data from sensors and communicating with Raspberry Pi for remote boot.
