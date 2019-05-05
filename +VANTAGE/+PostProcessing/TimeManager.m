@@ -22,6 +22,8 @@ classdef TimeManager
         % Datevec corresponding to t=0s
         DatevecZero
         
+        % Reference to the Model Class
+        % @type Model
         ModelRef
     end
     
@@ -35,16 +37,16 @@ classdef TimeManager
         % 
         % @author   Joshua Kirby
         % @date     06-Apr-2019
-        function obj = TimeManager(SensorData,testType,ModelRef)
+        function this = TimeManager(SensorData,testType,ModelRef)
             % Get DateVecZero
             ls = dir(SensorData.TOFData);
             ls = ls([ls.bytes]~=0);
             try
-            obj.DatevecZero = obj.datevecFromTofFilename(ls(1).name,testType);
+            this.DatevecZero = this.datevecFromTofFilename(ls(1).name,testType);
             catch
                 disp('go fuck urself')
             end
-            obj.ModelRef = ModelRef;
+            this.ModelRef = ModelRef;
         end
         
         %
@@ -56,9 +58,9 @@ classdef TimeManager
         %
         % @author   Joshua Kirby
         % @date     06-Apr-2019
-        function syncTruthData(obj,ModelRef)
+        function syncTruthData(this,ModelRef)
             dv0_truth = ModelRef.Truth_VCF.t0_datevec;
-            offset_sec = etime(obj.DatevecZero,dv0_truth);
+            offset_sec = etime(this.DatevecZero,dv0_truth);
             if offset_sec < 0
                 warning('Truth data starts after TOF data')
             end
@@ -69,8 +71,8 @@ classdef TimeManager
             ModelRef.Truth_VCF.t = ModelRef.Truth_VCF.t - offset_sec;
             dv0_updated = dv0_truth;
             dv0_updated(6) = dv0_truth(6) + offset_sec;
-            dv0_str = datestr(dv0_updated,obj.VantageDateFormat);
-            ModelRef.Truth_VCF.t0_datevec = datevec(dv0_str,obj.VantageDateFormat);
+            dv0_str = datestr(dv0_updated,this.VantageDateFormat);
+            ModelRef.Truth_VCF.t0_datevec = datevec(dv0_str,this.VantageDateFormat);
         end
         %
         % Extract datevec from TOF point cloud filename
@@ -81,14 +83,14 @@ classdef TimeManager
         %
         % @author   Joshua Kirby
         % @date     06-Apr-2019
-        function [dv] = datevecFromTofFilename(obj,TOF_filename,testType)
+        function [dv] = datevecFromTofFilename(this,TOF_filename,testType)
             TOF_filename = char(TOF_filename);
             if strcmpi(testType,'Simulation')
                 ds = '0000_00_00_00_00_00.000';
             else
                 ds = TOF_filename(12:end-4);
             end
-            dv = datevec(ds,obj.TofDateFormat);
+            dv = datevec(ds,this.TofDateFormat);
         end
         
         %
@@ -100,14 +102,14 @@ classdef TimeManager
         %
         % @author   Joshua Kirby
         % @date     06-Apr-2019
-        function [dv] = datevecFromOpticalFilename(obj,Opt_filename,TestType)
+        function [dv] = datevecFromOpticalFilename(this,Opt_filename,TestType)
             Opt_filename = char(Opt_filename);
             if strcmpi(TestType,'Simulation')
                 ds = '0000_0_00_00_00_0_000';
             else
                 ds = [Opt_filename(10:13),'_',Opt_filename(14:end-4)];
             end
-            dv = datevec(ds,obj.OpticalDateFormat);
+            dv = datevec(ds,this.OpticalDateFormat);
         end
         
         %
@@ -122,32 +124,45 @@ classdef TimeManager
         %
         % @author   Joshua Kirby
         % @date     06-Apr-2019
-        function [t] = VantageTime(obj,filenames,filetype,TestType)
+        function [t] = VantageTime(this,filenames,filetype,TestType)
             filenames = string(filenames);
             t = zeros(length(filenames),1);
+            % if files are not simulation files
             if ~strcmpi(TestType,'simulation')
                 for i = 1:length(filenames)
+                    % if file is TOF
                     if strcmpi(filetype,'TOF')
-                        dv = obj.datevecFromTofFilename(filenames(i),TestType);
+                        % get datevector from filename
+                        dv = this.datevecFromTofFilename(filenames(i),TestType);
+                    % if file is Optical
                     elseif strcmpi(filetype,'Optical')
-                        dv = obj.datevecFromOpticalFilename(filenames(i),TestType);
+                        % get datevector from filename
+                        dv = this.datevecFromOpticalFilename(filenames(i),TestType);
                     else
                         error('filetype must be ''TOF'' or ''Optical''')
                     end
-                    t(i) = etime(dv,obj.DatevecZero);
+                    % elapsed time from t0 datevector to current datevector
+                    % is VANTAGE time
+                    t(i) = etime(dv,this.DatevecZero);
                 end
-            else
+            else % if files are simulation files
                 for i = 1:length(filenames)
+                    % if file is TOF
                     if strcmpi(filetype,'TOF')
+                        % use hardcoded simulation TOF fps to determine
+                        % vantage time
                         tmp = char(filenames(i));
                         filenum = str2num(tmp(end-8:end-4));
                         tofFps = 10;
-                        try
+                        try 
                         t(i) = filenum/tofFps;
                         catch
                             disp('awoeinawoef')
                         end
+                    % if file is Optical
                     elseif strcmpi(filetype,'Optical')
+                        % use hardcoded simulation Optical fps to determine
+                        % Vantage time
                         tmp = char(filenames(i));
                         filenum = str2num(tmp(end-7:end-4));
                         opticalFps = 2;
@@ -169,12 +184,12 @@ classdef TimeManager
         %
         % @author   Joshua Kirby
         % @date     07-Apr-2019
-        function [ds] = VantageTime2DateStr(obj,t)
+        function [ds] = VantageTime2DateStr(this,t)
             ds = strings(size(t));
             for i = 1:length(t)
-                dv    = obj.DatevecZero;
+                dv    = this.DatevecZero;
                 dv(6) = dv(6) + t(i);
-                ds(i) = string(datestr(dv,obj.VantageDateFormat));
+                ds(i) = string(datestr(dv,this.VantageDateFormat));
             end
         end
     end

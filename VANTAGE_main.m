@@ -1,6 +1,3 @@
-
-
-
 %% The Signals
 wokeSig='NUC is Woke';
 manifestSig='Manifest is Sent';
@@ -77,19 +74,21 @@ unix(sprintf('python %s &',opticalScript));
 
 %% Start le epic post-processing PogChamp
 import VANTAGE.PostProcessing.*
+import VANTAGE.PostProcessing.Validate
 
 %%%%%% Modular config direcs
-configDirecNameModular = 'Config/Final_Tests/ModularTest_4_9/Test*';
+configDirecNameModular = 'config/Final_Tests/ModularTest_4_9/Test*';
 %%%%%% 100m config direcs
-configDirecName100m = 'Config/Final_Tests/3_25_100m/Test*';
+configDirecName100m = 'config/Final_Tests/3_25_100m/Test*';
 %%%%%% Simulation config direcs
-configDirecNameSim085 = 'Config/Final_Tests/Simulation/_085/Sample*';
-configDirecNameSim030 = 'Config/Final_Tests/Simulation/_030/Sample*';
-configDirecNameSim140 = 'Config/Final_Tests/Simulation/_140/Sample*';
-configDirecNameSim195 = 'Config/Final_Tests/Simulation/_195/Sample*';
-configDirecNameSim250 = 'Config/Final_Tests/Simulation/_250/Sample*';
+configDirecNameSim085 = 'config/Final_Tests/Simulation/_085/Sample*';
+configDirecNameSim030 = 'config/Final_Tests/Simulation/_030/Sample*';
+configDirecNameSim140 = 'config/Final_Tests/Simulation/_140/Sample*';
+configDirecNameSim195 = 'config/Final_Tests/Simulation/_195/Sample*';
+configDirecNameSim250 = 'config/Final_Tests/Simulation/_250/Sample*';
 
-testType = 'Simulation_195';
+%%%%%% Define desired test type here
+testType = 'Modular';
 
 switch testType
     case 'Modular'
@@ -124,7 +123,7 @@ for iter = 1:numel(configfiles)
 
     configfile = [pwd '/config/Final_Tests/' testType '/' configfiles(iter).name];
 
-    %%% Filenames and Configurables
+    %%% Filenames and configurables
     manifestFilename = strcat(configfile,'/Manifest.json');
     SensorData = jsondecode(fileread(strcat(configfile,'/Sensors.json')));
 
@@ -160,7 +159,7 @@ for iter = 1:numel(configfiles)
     end
 
     % Save fitted results for error analysis later
-    if strcmpi(testType,'Modular')
+    if strcmpi(testType,'ModularTest_4_9')
         dataFolder = 'Data/Results/matFiles/ModularTest_4_9/';
         folderString = Model.Deployer.TruthFileName;
         tmp = split(folderString,'/');
@@ -205,63 +204,57 @@ for iter = 1:numel(configfiles)
     save([pwd '/' dataFolder 'data/CSTime' testNumber '.mat'],'t_fit');
 end
 %%%% Results processing
-switch obj.testType
-    case 'Modular'
-        obj.configDirecName = obj.configDirecNameModular;
+switch testType
+    case 'ModularTest_4_9'
+        configDirecName = configDirecNameModular;
         testType = 'ModularTest_4_9';
         testDef = 'Modular';
     case '100m'
-        obj.configDirecName = obj.configDirecName100m;
+        configDirecName = configDirecName100m;
         testType = '3_25_100m';
         testDef = '100m';
     case 'Simulation_085'
-        obj.configDirecName = obj.configDirecNameSim085;
+        configDirecName = configDirecNameSim085;
         testType = 'Simulation/_085';
         testDef = 'Sim085';
     case 'Simulation_030'
-        obj.configDirecName = obj.configDirecNameSim030;
+        configDirecName = configDirecNameSim030;
         testType = 'Simulation/_030';
         testDef = 'Sim030';
     case 'Simulation_140'
-        obj.configDirecName = obj.configDirecNameSim140;
+        configDirecName = configDirecNameSim140;
         testType = 'Simulation/_140';
         testDef = 'Sim140';
     case 'Simulation_195'
-        obj.configDirecName = obj.configDirecNameSim195;
+        configDirecName = configDirecNameSim195;
         testType = 'Simulation/_195';
         testDef = 'Sim195';
     case 'Simulation_250'
-        obj.configDirecName = obj.configDirecNameSim195;
+        configDirecName = configDirecNameSim195;
         testType = 'Simulation/_250';
         testDef = 'Sim250';
 end
             
-configfiles = dir(obj.configDirecName);
+configfiles = dir(configDirecName);
 
-for iter = 1:numel(configfiles)
-    %%% Housekeeping and Allocation
-    rng(99);
+Validator.ErrorAnalysis(Model,SensorData,testDef);
 
-    %%% Filenames and Configurables
-    configfolder = [configfiles(iter).folder '/' configfiles(iter).name];
-    manifestFilename = [configfolder '/Manifest.json'];
-    SensorData = jsondecode(fileread(strcat(configfolder,'/Sensors.json')));
-
-    Model = VANTAGE.PostProcessing.Model(manifestFilename,configfolder,false);
-
-    Validator = Validate(configfolder,Model,false);
-
-    %Validator.PlotResults(Model,SensorData);
-
-    %             Validator.ErrorAnalysis(Model,SensorData,testDef);
-end
-
-%Validator.ErrorAnalysis(Model,SensorData,testDef);
 matFileDirectory = [pwd '/Data/Results/matFiles'];
 Validator.GenerateOutputFiles(matFileDirectory);
-Validator.masterPlotter(matFileDirectory);
+%Validator.masterPlotter(matFileDirectory);
 
+%{ 
+Directories for Richard
+MANIFEST LOCATION:
+/home/vantage/Documents/githere/VANTAGE/config/Final_Tests/ModularTest_4_9/Test5/Manifest.json
 
+OUTPUT FILE LOCATION:
+/home/vantage/Documents/githere/VANTAGE/Data/Results/matFiles/Modular/jsonOut/Test5_Modular.json
+
+IMAGE DIRECTORY LOCATION:
+/home/vantage/Documents/githere/VANTAGE/Data/ModularTest_4_9/Test5/Optical/VANTAGEOp20194_8_23_52_48_933.png
+/home/vantage/Documents/githere/VANTAGE/Data/ModularTest_4_9/Test5/Optical/VANTAGEOp20194_8_23_52_49_293.png
+%}
 
 
 %% write results and input results filename and format in this code 

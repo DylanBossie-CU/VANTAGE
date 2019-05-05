@@ -1,11 +1,11 @@
 {
 	"OpticalData": "Data/ModularTest_4_9/Test5/Optical/",
-	"OpticalFileExtension": "VantageOp*",
+	"OpticalFileExtension": "VANTAGEOp*",
 	"DesiredFPS": 1,
 	"PlotBinarizedImages": true,
 	"PlotCentroids": true,
 	"PlotHist": false,
-	"PlotAny": false,
+	"PlotAny": true,
 	"PlotCubeSats": false,
 	"PlotIBoundaries": false,
 	"RunOcclusion": false,
