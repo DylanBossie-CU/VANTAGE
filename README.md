@@ -152,8 +152,22 @@ OpticalPixelSize: Pixel width of optical camera (m)
 OpticalResolution: (width,height) (pixels)
 
 ### TOF.json
+maxAllowableRange: Range at which to stop using data from the TOF camera (m)
+
+ptMaxDistanceFromPlane: Maximum distance of any given point from a plane to be considered part of the plane (m)
+
+fps: Nominal fps of the TOF camera
+
+HVfov_deg: [horizontal-TOF-field-of-view vertical-TOF-field-of-view] (deg)
 
 ### Transform.json
+V_TCF2VCF: 3D vector from origin of TOF Cartesian Frame (TCF) to VANTAGE Cartesian Frame (VCF)
+
+VT_DCM: 3x3 orthonormal transform matrix from TCF to VCF such that v_VCF = VT_DCM * v_TCF
+
+V_CCF2VCF: 3D vector from origin of Camera Cartesian Frame (CCF) to VANTAGE Cartesian Frame (VCF)
+
+VC_DCM: 3x3 orthonormal transform matrix from CCF to VCF such that v_VCF = VC_DCM * v_CCF
 
 ### Validate.json
 CorrelateTruthData: Whether to perform truth data corrections/timestamp alignment
