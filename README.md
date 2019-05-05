@@ -198,7 +198,10 @@ To utilize this script, define a directory which contains point clouds, and defi
 This script reads dataStruct output files, and transposes the velocity vector as needed to be processed in *masterPlotter()*.
 
 ### TimeManager
-This uses date vectors and date strings to extract the time from a given TOF or Optical image filename and convert it to a global internal VANTAGE Time (number of seconds past first TOF file time), using the method *VantageTime*.  The method *VantageTime2DateStr* can be used to convert VANTAGE Times to consistent human-readable date strings.
+This uses date vectors and date strings to extract the time from a given TOF or Optical image filename and convert it to a global internal VANTAGE Time (number of seconds past first TOF file time), using the method *VantageTime()*.  The method *VantageTime2DateStr()* can be used to convert VANTAGE Times to consistent human-readable date strings.
+
+### TOFProcessing
+The TOF class's method, *TOFProcessing()* is a one-stop-shop for running the entire TOF suite.  In its default configuration it receives *SensorData* which contains information about where TOF point cloud files are housed as well as a *Deployer* instance.  It will proceed to identify CubeSats and their centroids in each point cloud, associate the centroids from frame to frame, and finally save all centroids to their respective *CubeSat*s.  It also produces *TOFfit_VCF*, which is used by the *CubeSat* method *evalTofFit()* to evaluate the TOF's prediction of a *CubeSat*'s position at a given time.
 
 ## Automation
 Contains tools for getting data from sensors and communicating with Raspberry Pi for remote boot.
