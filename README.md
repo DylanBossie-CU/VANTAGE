@@ -54,6 +54,17 @@ Each of these folders will then contain configuration files, as described below:
 ### Deployer.json
 
 ### Manifest.json
+This is a sample of the file that would be delivered to the VANTAGE system by an operator of the NanoRacks deployer. It contains descriptions of the cubesats to be deployed as well as deployment geometry. It also contains the expected release time of the cubesats. Additionally, it should contain a filepath to the truth data json and the test scenario.
+DeploymentTube: tube number from which cubesats are expected to deploy.
+VantageTube: tube that is occupied by VANTAGE system.
+expectedRelease: datetime array containing expected release time.
+CubesatArray: array containing data for each cubesat to be deployed.
+  name: cubesat name.
+  rangeOrder: order in which this cubesat will exit the tube.
+  expectedU: expected cubesat size in U.
+  actualDims: the actual dimensions of the cubesat in meters.
+TruthDataFile: filepath to truth data file (.json).
+testScenario: test scenario being run ('modular', '100m', or 'simulation')
 
 ### Optical.json
 OpticalData: Directory pointing to optical images for current test
