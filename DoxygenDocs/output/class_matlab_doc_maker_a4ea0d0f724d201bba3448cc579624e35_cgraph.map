@@ -1,0 +1,8 @@
+<map id="setup" name="setup">
+<area shape="rect" id="node2" href="$class_matlab_doc_maker.html#a979a5ae4d0f991df505b8ae9e6fb4486" title="getPref" alt="" coords="467,93,535,120"/>
+<area shape="rect" id="node4" href="$class_matlab_doc_maker.html#a2adbec43ff3458cb781610f91fe9b8fc" title="Returns the project name. " alt="" coords="744,17,871,44"/>
+<area shape="rect" id="node5" href="$class_matlab_doc_maker.html#ae48d4af7d9bbd19578dad38ea4a32cda" title="setPref" alt="" coords="315,43,381,69"/>
+<area shape="rect" id="node6" href="$class_matlab_doc_maker.html#a01cb613496ec3db0c68249d8af346ac4" title="Sets the project logo. Set to &#39; to unset. " alt="" coords="112,93,229,120"/>
+<area shape="rect" id="node3" href="$class_matlab_doc_maker.html#a39bd4f486e4b0357e56cd38c050c6afa" title="Gets the tag for the MatLab preferences struct. " alt="" coords="583,43,696,69"/>
+<area shape="rect" id="node7" href="$class_matlab_doc_maker.html#a38f7b77a4fda9f45af92f62b448f52a4" title="Returns the directory where the applications documentation configuration files reside. " alt="" coords="277,93,419,120"/>
+</map>

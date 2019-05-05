@@ -18,7 +18,10 @@ classdef Validate
         %
         % Constructs validate class 
         %
-        % @param    
+        % @param    configFileName          Validate class config
+        % @param    ModelRef                Reference to Model class
+        % @param    CorrelateTruthData      Boolean to perform truth data
+        %                                   analysis
         %
         % @return   Class instance
         % 
@@ -144,9 +147,13 @@ classdef Validate
         %
         % Compute error between CubeSat and truth, plot results
         % 
-        % @param    
+        % @param    CubeSat             Centroid array for a CubeSat
+        % @param    Truth               Truth centroid array for a CubeSat
         %
-        % @return 
+        % @return   Error               Absolute Error
+        % @return   XError              Error in horizontal
+        % @return   YError              Error in vertical
+        % @return   ZError              Error in downrange
         %
         % @author Dylan Bossie 
         % @date   11-Apr-2019
@@ -167,9 +174,9 @@ classdef Validate
         %% Compute truth distance vector
         %
         % 
-        % @param    
+        % @param    Model           Model class reference
         %
-        % @return 
+        % @return   distance        Absolute distance from VCF origin
         %
         % @author Dylan Bossie 
         % @date   11-Apr-2019
@@ -189,9 +196,11 @@ classdef Validate
         %% Compute time of cs launch
         %
         % 
-        % @param    
+        % @param    CubeSat         CubeSat centroid array
+        % @param    Time            CubeSat time array
+        % @param    Truth           Truth data cell array
         %
-        % @return 
+        % @return   launch_time_diff    Error in launch time calculation
         %
         % @author Dylan Bossie 
         % @date   11-Apr-2019
@@ -218,7 +227,10 @@ classdef Validate
         %% Interpolate cubesats to truth dat apositions
         %
         % 
-        % @param    
+        % @param    CSArray             Array of measured CubeSat data
+        % @param    timefitted          Fitted time array to CubeSat data
+        % @param    time                Actual time data
+        % @param    distance            Actual absolute distance vector
         %
         % @return 
         
@@ -250,9 +262,11 @@ classdef Validate
         %
         % Compute mean velocity of all cubesats in current file
         % 
-        % @param    
+        % @param    CubeSats            CubeSat data cell array
+        % @param    time                Time data array
+        % @param    type                Test type
         %
-        % @return 
+        % @return   meanvelocity        Mean velocity
         %
         % @author Dylan Bossie 
         % @date   11-Apr-2019
@@ -311,6 +325,8 @@ classdef Validate
         % Compute mean error for all tests and assimilate cubesat results
         % 
         % @param        Model       Model class containing initial data
+        % @param        SensorData  Sensor parameters
+        % @param        testDef     Test type
         %
         % @return
         %
@@ -341,7 +357,7 @@ classdef Validate
                     ZErrorFiles = dir([matResults 'ZError*']);
                     TimeFiles = dir([matResults 'CSTime*']);
 
-                    interpolationPoints = linspace(0,100,1000);
+                    
                 elseif strcmpi(testDef,'Sim085')
                     resultsFolder = 'Data/Results/matFiles/Simulation_4_15_085/';
                     matResults = [resultsFolder 'data/'];
@@ -353,7 +369,6 @@ classdef Validate
                     ZErrorFiles = dir([matResults 'ZError*']);
                     TimeFiles = dir([matResults 'CSTime*']);
 
-                    interpolationPoints = linspace(0,100,1000);
                     
                     elseif strcmpi(testDef,'Sim030')
                     resultsFolder = 'Data/Results/matFiles/Simulation_4_15_030/';
@@ -365,8 +380,6 @@ classdef Validate
                     YErrorFiles = dir([matResults 'YError*']);
                     ZErrorFiles = dir([matResults 'ZError*']);
                     TimeFiles = dir([matResults 'CSTime*']);
-
-                    interpolationPoints = linspace(0,100,1000);
                     
                     elseif strcmpi(testDef,'Sim140')
                     resultsFolder = 'Data/Results/matFiles/Simulation_4_15_140/';
@@ -378,8 +391,6 @@ classdef Validate
                     YErrorFiles = dir([matResults 'YError*']);
                     ZErrorFiles = dir([matResults 'ZError*']);
                     TimeFiles = dir([matResults 'CSTime*']);
-
-                    interpolationPoints = linspace(0,100,1000);
                     
                     elseif strcmpi(testDef,'Sim195')
                     resultsFolder = 'Data/Results/matFiles/Simulation_4_15_195/';
@@ -391,8 +402,6 @@ classdef Validate
                     YErrorFiles = dir([matResults 'YError*']);
                     ZErrorFiles = dir([matResults 'ZError*']);
                     TimeFiles = dir([matResults 'CSTime*']);
-
-                    interpolationPoints = linspace(0,100,1000);
                     
                     elseif strcmpi(testDef,'Sim250')
                     resultsFolder = 'Data/Results/matFiles/Simulation_4_15_250/';
@@ -404,8 +413,6 @@ classdef Validate
                     YErrorFiles = dir([matResults 'YError*']);
                     ZErrorFiles = dir([matResults 'ZError*']);
                     TimeFiles = dir([matResults 'CSTime*']);
-
-                    interpolationPoints = linspace(0,100,1000);
                 else
                     error('not a valid test case')
                 end
@@ -467,50 +474,7 @@ classdef Validate
                     
                     mkdir(dataFolder)
                     save([dataFolder testNumber '_' testDef 'dataStruct.mat'],'dataStruct');
-
-    %                 CubeSats = CS.CubeSatFitted;
-
-                    % Interpolate error for each CubeSat across the desired
-                    % range for the given test
-    %                 interpError = zeros(numel(CubeSats),length(interpolationPoints));
-    %                 for j = 1:numel(CubeSats)
-    %                     CubeSat = CubeSats{j};
-    %                     CSAbsError = pos_err{j};
-    %                     Z_points = CubeSat(:,3);
-    %                     interpError(j,:) = interp1(Z_points,CSAbsError,interpolationPoints);
-    %                 end
-    %                 
-    %                 % Compute the mean error
-    %                 MeanError = zeros(length(interpolationPoints),1);
-    %                 for j = 1:length(interpolationPoints)
-    %                     MeanError(j) = mean(interpError(:,j));
-    %                 end
-    %                 MeanErrorAllFiles(i,:) = MeanError;
                 end
-            
-%             % Process mean error across all test cases
-%             TotalMeanError = zeros(numel(interpolationPoints),1);
-%             for i = 1:length(interpolationPoints)
-%                 TotalMeanError(i) = mean(MeanErrorAllFiles(:,i));
-%             end
-% 
-%             % Output final .mat file
-%             if strcmpi(Model.Deployer.testScenario,'Modular')
-%                 dataFolder = 'Data/ModularTest_4_9/Results';
-%                 folderString = Model.Deployer.TruthFileName;
-%                 save([pwd '/' dataFolder '/FINALERROR_Modular.mat'],'TotalMeanError');
-%             elseif strcmpi(Model.Deployer.testScenario,'100m')
-%                 dataFolder = 'Data/3_25_100m/Results';
-%                 folderString = Model.Deployer.TruthFileName;
-%                 save([pwd '/' dataFolder '/FINALERROR_100m.mat'],'TotalMeanError');
-%             elseif strcmpi(Model.Deployer.testScenario,'Simulation')
-%                 testNumber = 'notimplemented';
-%             else
-%                 error('invalid test type in Deployer.TruthFileName')
-%             end
-            %{
-
-%}
             
         end
         
@@ -571,12 +535,8 @@ classdef Validate
         %
         % Plot final fitted results
         % 
-        % @param        CubeSatFitted       Cell array of CubeSats with
-        %                               corresponding fitted measurements
-        % @param        TruthFitted         Cell array of truth data for
-        %                               corrresponding CubeSats
-        % @param        AbsoluteError       Distances between meas. and
-        %                                   truth values
+        % @param        ModelRef        Reference to model class
+        % @param        SensorData      Information on sensors
         %
         % @return 
         %

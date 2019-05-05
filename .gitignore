@@ -15,4 +15,8 @@ fun*
 
 Cal*
 
+*.m~
+
 TruthDataProcessing/Figures
+
+FigureOut/

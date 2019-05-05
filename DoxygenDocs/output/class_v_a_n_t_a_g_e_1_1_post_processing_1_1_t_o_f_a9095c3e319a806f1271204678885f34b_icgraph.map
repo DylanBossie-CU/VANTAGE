@@ -1,0 +1,8 @@
+<map id="distInFromFace" name="distInFromFace">
+<area shape="rect" id="node2" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a772690d6d441927dbb75203f26894649" title="%% Find plane boundary points and centroid " alt="" coords="171,5,253,32"/>
+<area shape="rect" id="node6" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a08377919068d43ba3c2c832d38063d4b" title="%% Check that planes intersect as expected " alt="" coords="171,56,253,83"/>
+<area shape="rect" id="node7" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a9ea2e988b143de92fd005723e93cdcfa" title="%% Find faces&#39; centroids and corners %% and determine if each face qualifies as a fullFace ..." alt="" coords="171,107,253,133"/>
+<area shape="rect" id="node3" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#a86b92fe10d7cff64b3eba137eeb3d4e0" title="% Calculating centroids from identified planes for a cubesat Find centroid based on number of identif..." alt="" coords="301,56,468,83"/>
+<area shape="rect" id="node4" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#afae9d930cc729fa357bc0dfe49d9a364" title="% Calculate centroids from file Extract point cloud locations " alt="" coords="516,56,659,83"/>
+<area shape="rect" id="node5" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#acafbe76b90aaada38867aa07e2da5ec6" title="% TOF Processing Extract relevant data from inputs " alt="" coords="707,56,821,83"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="affine_fit" name="affine_fit">
+<area shape="rect" id="node2" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#afc8e1f5b21d3201c7c41d4aaa30c18f5" title="% Identifying visible planes for a cubesat %% Allocation Initial value for minimum number of points c..." alt="" coords="129,5,272,32"/>
+<area shape="rect" id="node3" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#afae9d930cc729fa357bc0dfe49d9a364" title="% Calculate centroids from file Extract point cloud locations " alt="" coords="320,5,463,32"/>
+<area shape="rect" id="node4" href="$class_v_a_n_t_a_g_e_1_1_post_processing_1_1_t_o_f.html#acafbe76b90aaada38867aa07e2da5ec6" title="% TOF Processing Extract relevant data from inputs " alt="" coords="511,5,625,32"/>
+</map>

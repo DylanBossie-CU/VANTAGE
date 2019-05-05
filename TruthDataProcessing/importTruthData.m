@@ -1,4 +1,26 @@
-function [ t, x, y, z ] = importTruthData( filename, should_edit )
+function [ t, x, y, z, date_str ] = importTruthData( filename, should_edit )
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Author: Marshall Herr
+%%%
+%%% Purpose: Wrapper for importing truth data
+%%%
+%%% Inputs:
+%%%     - filename: The filename to load or a path to a folder containing
+%%%         the files of interest
+%%%     - should_edit: Should the data be edit-able?
+%%%
+%%% Outputs:
+%%%     - t: MST time vector w/ header:
+%%%         [ datenum, time past date vector (seconds) ]
+%%%     - x: X direction vector
+%%%     - y: Y direction vector
+%%%     - z: Z direction vector
+%%%
+%%% Date Created: I forgot to put it down
+%%% Last Editted: 31 March 2019
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+[ t, x, y, z, date_str ] = deal( [] );
 
 if nargin < 2
     
@@ -6,7 +28,31 @@ if nargin < 2
     
 end
 
-if ~nargin
+path = '';
+
+% this catches when a path is place of a filename
+edgeCase = 0;
+
+if nargin > 0
+    
+    if contains( filename, '.csv' )
+        
+        type = 'Modular';
+        
+    elseif contains( filename, '.txt' )
+        
+        type = '100m';
+        
+    else
+        
+        edgeCase = 1;
+        path = filename;
+        
+    end
+    
+end
+
+if ~nargin || edgeCase
     
     done = 0;
     
@@ -14,15 +60,18 @@ if ~nargin
     
         type = questdlg( 'What type of test?', '', 'Modular', '100m', ...
             'Modular' );
+        
+        m = msgbox( 'Select the truth data file.' );
+        waitfor(m)
 
         switch type
             case 'Modular'
 
-                [ filename, path ] = uigetfile( '*.csv' );
+                [ filename, path ] = uigetfile( [ path, '/*.csv' ] );
 
             case '100m'
 
-                [ filename, path ] = uigetfile( '*.txt' );
+                [ filename, path ] = uigetfile( [ path, '/*.txt' ] );
 
             otherwise
 
@@ -37,7 +86,7 @@ if ~nargin
         end
 
         answer = questdlg( [ 'Is ''', filename, ''' correct?' ], ...
-            'GPS CHECK', 'Yes', 'No', 'Cancel', 'Yes' );
+            'FILE CHECK', 'Yes', 'No', 'Cancel', 'Yes' );
 
         switch answer
             case 'Yes'
@@ -52,20 +101,6 @@ if ~nargin
 
     end
     
-else
-    
-    path = '';
-    
-    if contains( filename, '.csv' )
-        
-        type = 'Modular';
-        
-    elseif contains( filename, '.txt' )
-        
-        type = '100m';
-        
-    end
-    
 end
 
 switch type
@@ -76,6 +111,31 @@ switch type
     case '100m'
         
         [ t, x, y, z, u, v, w ] = importTrimbleData( [ path, filename ] );
+        
+        % Rotation onto principal, horizontal, vertical axes
+        % Principal axis is the one which minimizes mean(H) and mean(Z),
+        % I.E. it is the axis that points along the average position
+        % Horizontal is the axis perpendicular to Principal with no z
+        % component
+        % Vertical is the remaining axis perpendiculat to both Principal
+        % and Horizontal
+        p = [x-x(1),y-y(1),0.*z];
+        p = mean(p);
+        p = p / norm(p);
+        h = cross( [0,0,1], p );
+        k = cross( p, h );
+        
+        u = dot( [u,v,w], p.*ones( size( [u,v,w] ) ), 2 );
+        v = dot( [u,v,w], h.*ones( size( [u,v,w] ) ), 2 );
+        w = dot( [u,v,w], k.*ones( size( [u,v,w] ) ), 2 );
+        
+        p = dot( [x,y,z], p.*ones( size( [x,y,z] ) ), 2 );
+        h = dot( [x,y,z], h.*ones( size( [x,y,z] ) ), 2 );
+        k = dot( [x,y,z], k.*ones( size( [x,y,z] ) ), 2 );
+        
+        x = p;
+        y = h;
+        z = k;
         
 end
 
@@ -234,6 +294,36 @@ while ~done
                     
             end
             
+            % Rotation onto principal, horizontal, vertical axes
+            % Principal axis is the one which minimizes mean(H) and
+            % mean(Z), I.E. it is the axis that points along the average
+            % position
+            % Horizontal is the axis perpendicular to Principal with no z
+            % component
+            % Vertical is the remaining axis perpendiculat to both
+            % Principal and Horizontal
+            p = [x-x(1),y-y(1),0.*z];
+            p = mean(p);
+            p = p / norm(p);
+            h = cross( [0,0,1], p );
+            k = cross( p, h );
+            
+            if strcmpi(type,'100m')
+                u = dot( [u,v,w], p.*ones( size( [u,v,w] ) ), 2 );
+                v = dot( [u,v,w], h.*ones( size( [u,v,w] ) ), 2 );
+                w = dot( [u,v,w], k.*ones( size( [u,v,w] ) ), 2 );
+            end
+            
+            p = dot( [x,y,z], p.*ones( size( [x,y,z] ) ), 2 );
+            h = dot( [x,y,z], h.*ones( size( [x,y,z] ) ), 2 );
+            k = dot( [x,y,z], k.*ones( size( [x,y,z] ) ), 2 );
+            
+            if strcmpi( type, '100m' )
+                x = p;
+                y = h;
+                z = k;
+            end
+            
             clf
             
             [ a1, ax, ay, az ] = plotPHK( t, x, y, z );
@@ -248,6 +338,23 @@ end
 
 f.CloseRequestFcn = 'closereq';
 close(f)
+
+% Import the datestring
+if strcmpi( type, '100m' )
+    data = importdata( [ path, filename ] );
+    data = data{2}(1:24);
+    if length( num2str( mod( str2double( data(13:14) ) - 6, 24 ) ) ) < 2
+        data(13:14) = [ '0', ...
+            num2str( mod( str2double( data(13:14) ) - 6, 24 ) ) ];
+    else
+        data(13:14) = num2str( mod( str2double( data(13:14) ) - 6, 24 ) );
+    end
+    
+    data = [ data(10:11), '-', data(6:8), '-', data(1:4), data(12:end) ];
+    
+    date_str = datenum( data );
+    
+end
 
 end
 

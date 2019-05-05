@@ -1,0 +1,6 @@
+<map id="getProjectLogo" name="getProjectLogo">
+<area shape="rect" id="node2" href="$class_matlab_doc_maker.html#a38f7b77a4fda9f45af92f62b448f52a4" title="Returns the directory where the applications documentation configuration files reside. " alt="" coords="172,5,313,32"/>
+<area shape="rect" id="node3" href="$class_matlab_doc_maker.html#a979a5ae4d0f991df505b8ae9e6fb4486" title="getPref" alt="" coords="361,31,429,57"/>
+<area shape="rect" id="node4" href="$class_matlab_doc_maker.html#a39bd4f486e4b0357e56cd38c050c6afa" title="Gets the tag for the MatLab preferences struct. " alt="" coords="477,31,591,57"/>
+<area shape="rect" id="node5" href="$class_matlab_doc_maker.html#a2adbec43ff3458cb781610f91fe9b8fc" title="Returns the project name. " alt="" coords="639,31,765,57"/>
+</map>
