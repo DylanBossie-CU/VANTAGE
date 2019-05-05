@@ -156,3 +156,9 @@ The ToF camera runs on an application where certain parameters are set. See the 
 
 
 ### PiComms
+
+### main.m
+Main wrapper without the automation or post processing code. The MAC Address that the sockets are opened in is the address of the external computer that VANTAGE is connected to, or the Raspberry Pi if the Raspberry Pi is still desired.
+
+### socket_vantage.py
+The code running on the Raspberry Pi. If the code is ran on the external computer that simulates NanoRacks, the Pi can be bypassed completely. Synchronizes with the main script, sends a manifest and receives the results from Vantage. MAC address the sockets are bound to is the address of the Ethernet port of the external computer.
