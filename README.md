@@ -53,6 +53,46 @@ Sample folder: *_030/Sample1* (for 0.30m/s)
 Each of these folders will then contain configuration files, as described below:
 ### Deployer.json
 
+VANTAGE_ROT: [Yaw, Pitch, Roll] euler angles of the deployer from its initial configuration
+[rad]
+
+PHI, XI, NABLA, RHO, P_OPTICAL, D_TOF: Sensor location parameterization variables. After moving the deployer origin to the correct position in the global coordinate frame, then move the deployer origin from the centerline to the VCF origin according to these parameters
+defined in 13-5
+[cm]
+
+MU, BETA, SIGMA, PSI, GAMMA, L: Deployer parameterization variables
+defined in 13-5
+[cm]
+
+
+TUBE_ORIGIN_COEFFS: Deployer tube origins are relative to deployer origin. Each tube contains the coefficients of the deployer parameterization variables needed to locate the tube origin. The order of the variables in each coefficient array is given as:
+
+x ~ [PSI, GAMMA]
+
+y ~ [MU]
+
+z ~ [L]
+
+CAMERA_LOC: camera location in X,Y,Z relative to the VANTAGE frame's origin
+[cm]
+
+CAMERA_ROT: camera rotation H,P,B
+[rad]
+
+FOCAL_LENGTH: Focal length in [mm]
+
+APERTURE: Aperture [mm] - this is the physical sensor diameter (for a rectangular sensor)
+
+H_FOV: horizontal field of view [deg]
+
+V_FOV: vertical field of view [deg]
+
+X_Res: horizontal resolution [Pixel]
+
+Y_Res: vertical resolution [Pixel]
+
+Focus: Focus position (where you actually focus) [mm]
+
 ### Manifest.json
 This is a sample of the file that would be delivered to the VANTAGE system by an operator of the NanoRacks deployer. It contains descriptions of the cubesats to be deployed as well as deployment geometry. It also contains the expected release time of the cubesats. Additionally, it should contain a filepath to the truth data json and the test scenario.
 
