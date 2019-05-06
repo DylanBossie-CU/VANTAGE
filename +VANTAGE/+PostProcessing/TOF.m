@@ -86,8 +86,11 @@ classdef TOF
         % @date     07-Apr-2019
         function [sigmaTOF] = TofWeighting(this,predMeanRange)
             if predMeanRange <= this.ModelRef.Optical.rangeStart
+                % before optical starts to be used, use the TOF only
                 sigmaTOF = 1;
             else
+                % after that point, TOF weight linearly decays from 1 to
+                % 0.1 at 100m
                 sigmaTOF = interp1([this.ModelRef.Optical.rangeStart 100],[1,0.1],predMeanRange,'linear','extrap');
             end
         end
@@ -236,7 +239,7 @@ classdef TOF
         %                           last-out] and containing expectedU and
         %                           actualDims
         %
-        % @return	length-n array of Cubesat_TOF's containing identified
+        % @return   length-n array of Cubesat_TOF's containing identified
         %           TCF centroids
         % @return   raw point cloud from file
         %
@@ -510,9 +513,9 @@ classdef TOF
         %
         % Loads data from a simulation file
         %
-        % @param    filename	filename, string
+        % @param    filename    filename, string
         % 
-        % @return	point cloud obtained from file
+        % @return   point cloud obtained from file
         %
         % @author       Joshua Kirby
         % @date         24-Jan-2019
@@ -555,7 +558,7 @@ classdef TOF
         %                           last-out] and containing expectedU and
         %                           actualDims
         %
-        % @return	array of identified cubesats 
+        % @return   array of identified cubesats 
         %           @see CubeSat_TOF class
         %
         % @author   Joshua Kirby
@@ -1115,10 +1118,10 @@ classdef TOF
         %
         % @param    X   a N by 3 matrix where each line is a sample point
         %
-        % @return 	a unit(column) vector normal to the plane
-        % @return  	a 3 by 2 matrix, the columns of V form an
+        % @return   a unit(column) vector normal to the plane
+        % @return   a 3 by 2 matrix, the columns of V form an
         %           orthonormal basis of the plane
-        % @return  	a point belonging to the plane
+        % @return   a point belonging to the plane
         %
         % @author   Adrien Leygue
         % @date     30-Aug-2013

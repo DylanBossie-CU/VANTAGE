@@ -127,29 +127,42 @@ classdef TimeManager
         function [t] = VantageTime(this,filenames,filetype,TestType)
             filenames = string(filenames);
             t = zeros(length(filenames),1);
+            % if files are not simulation files
             if ~strcmpi(TestType,'simulation')
                 for i = 1:length(filenames)
+                    % if file is TOF
                     if strcmpi(filetype,'TOF')
+                        % get datevector from filename
                         dv = this.datevecFromTofFilename(filenames(i),TestType);
+                    % if file is Optical
                     elseif strcmpi(filetype,'Optical')
+                        % get datevector from filename
                         dv = this.datevecFromOpticalFilename(filenames(i),TestType);
                     else
                         error('filetype must be ''TOF'' or ''Optical''')
                     end
+                    % elapsed time from t0 datevector to current datevector
+                    % is VANTAGE time
                     t(i) = etime(dv,this.DatevecZero);
                 end
-            else
+            else % if files are simulation files
                 for i = 1:length(filenames)
+                    % if file is TOF
                     if strcmpi(filetype,'TOF')
+                        % use hardcoded simulation TOF fps to determine
+                        % vantage time
                         tmp = char(filenames(i));
                         filenum = str2num(tmp(end-8:end-4));
                         tofFps = 10;
-                        try
+                        try 
                         t(i) = filenum/tofFps;
                         catch
                             disp('awoeinawoef')
                         end
+                    % if file is Optical
                     elseif strcmpi(filetype,'Optical')
+                        % use hardcoded simulation Optical fps to determine
+                        % Vantage time
                         tmp = char(filenames(i));
                         filenum = str2num(tmp(end-7:end-4));
                         opticalFps = 2;
