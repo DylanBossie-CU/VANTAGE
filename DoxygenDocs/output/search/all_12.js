@@ -12,8 +12,6 @@ var searchData=
   ['vantage',['VANTAGE',['../namespace_v_a_n_t_a_g_e.html',1,'']]],
   ['vantage_5fmain',['VANTAGE_main',['../_v_a_n_t_a_g_e__main_8m.html#a6774929d1cffa75366a854dee78dd777',1,'VANTAGE_main.m']]],
   ['vantage_5fmain_2em',['VANTAGE_main.m',['../_v_a_n_t_a_g_e__main_8m.html',1,'']]],
-  ['vantage_5fwrapper',['VANTAGE_Wrapper',['../_v_a_n_t_a_g_e___wrapper_8m.html#acd0c4a56c517d4e65f06e16640fc6d0f',1,'VANTAGE_Wrapper.m']]],
-  ['vantage_5fwrapper_2em',['VANTAGE_Wrapper.m',['../_v_a_n_t_a_g_e___wrapper_8m.html',1,'']]],
   ['vantagedateformat',['VantageDateFormat',['../class_v_a_n_t_a_g_e_1_1_post_processing_1_1_time_manager.html#a01036c72cc453b1e65290e3c0546c165',1,'VANTAGE::PostProcessing::TimeManager']]],
   ['vantagetime',['VantageTime',['../class_v_a_n_t_a_g_e_1_1_post_processing_1_1_time_manager.html#a3c83acdd6d12e6bcaec8306edb994925',1,'VANTAGE::PostProcessing::TimeManager']]],
   ['vantagetime2datestr',['VantageTime2DateStr',['../class_v_a_n_t_a_g_e_1_1_post_processing_1_1_time_manager.html#a4a80d469a741e9127351a0954d13ad80',1,'VANTAGE::PostProcessing::TimeManager']]],

@@ -10,7 +10,6 @@ var hierarchy =
     ] ],
     [ "CubeSat", "class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat.html", null ],
     [ "CubeSat_Optical", "class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat___optical.html", null ],
-    [ "CubeSat_TOF", "class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat___t_o_f.html", null ],
     [ "Deployer", "class_v_a_n_t_a_g_e_1_1_post_processing_1_1_deployer.html", null ],
     [ "Optical", "class_v_a_n_t_a_g_e_1_1_post_processing_1_1_optical.html", null ],
     [ "TimeManager", "class_v_a_n_t_a_g_e_1_1_post_processing_1_1_time_manager.html", null ],

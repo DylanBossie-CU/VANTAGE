@@ -6,9 +6,7 @@ var dir_fc5c536a86635085ef90be3c73c39588 =
     [ "CubeSat_Optical.m", "_cube_sat___optical_8m.html", [
       [ "CubeSat_Optical", "class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat___optical.html", "class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat___optical" ]
     ] ],
-    [ "CubeSat_TOF.m", "_cube_sat___t_o_f_8m.html", [
-      [ "CubeSat_TOF", "class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat___t_o_f.html", "class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat___t_o_f" ]
-    ] ],
+    [ "CubeSat_TOF.m", "_cube_sat___t_o_f_8m.html", null ],
     [ "Deployer.m", "_deployer_8m.html", [
       [ "Deployer", "class_v_a_n_t_a_g_e_1_1_post_processing_1_1_deployer.html", "class_v_a_n_t_a_g_e_1_1_post_processing_1_1_deployer" ]
     ] ],

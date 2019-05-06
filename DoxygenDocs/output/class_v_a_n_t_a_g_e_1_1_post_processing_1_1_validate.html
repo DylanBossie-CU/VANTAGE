@@ -251,10 +251,16 @@ Private Member Functions</h2></td></tr>
 <p>Constructs validate class</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"></td><td></td></tr>
+    <tr><td class="paramname">configFileName</td><td><a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html" title="% Properties ">Validate</a> class config </td></tr>
+    <tr><td class="paramname">ModelRef</td><td>Reference to <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_model.html" title="Model is a class used to store the estimation methods that utilize both TOF and camera data...">Model</a> class </td></tr>
+    <tr><td class="paramname">CorrelateTruthData</td><td>Boolean to perform truth data analysis</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>Class instance</dd></dl>
+<dl class="section author"><dt>Author</dt><dd>Dylan Bossie </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>14-Apr-2019</dd></dl>
+<dl class="section user"><dt>Required fields of ModelRef:</dt><dd></dd></dl>
 
 <p>Definition at line <a class="el" href="_validate_8m_source.html#l00048">48</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
@@ -308,12 +314,20 @@ Here is the call graph for this function:</div>
 <p>% Compute time of cs launch </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"></td><td></td></tr>
+    <tr><td class="paramname"><a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat.html" title="% Classdef A class for holding persistent CubeSats and their states over time ">CubeSat</a></td><td><a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat.html" title="% Classdef A class for holding persistent CubeSats and their states over time ">CubeSat</a> centroid array </td></tr>
+    <tr><td class="paramname">Time</td><td><a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat.html" title="% Classdef A class for holding persistent CubeSats and their states over time ">CubeSat</a> time array </td></tr>
+    <tr><td class="paramname">Truth</td><td>Truth data cell array</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>launch_time_diff Error in launch time calculation</dd></dl>
+<dl class="section author"><dt>Author</dt><dd>Dylan Bossie </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>11-Apr-2019</dd></dl>
+<dl class="section user"><dt>Required fields of CubeSat:</dt><dd></dd></dl>
+<dl class="section user"><dt>Required fields of Time:</dt><dd></dd></dl>
+<dl class="section user"><dt>Required fields of Truth:</dt><dd></dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l00260">260</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l00267">267</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 <p>Referenced by <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#af874ea3974cfccb6fe60e9f5a23659b9">Validate.ErrorAnalysis()</a>.</p>
 
@@ -363,12 +377,19 @@ Here is the caller graph for this function:</div>
 <p>Compute mean velocity of all cubesats in current file</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"></td><td></td></tr>
+    <tr><td class="paramname">CubeSats</td><td><a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat.html" title="% Classdef A class for holding persistent CubeSats and their states over time ">CubeSat</a> data cell array </td></tr>
+    <tr><td class="paramname">time</td><td>Time data array </td></tr>
+    <tr><td class="paramname">type</td><td><a class="el" href="namespace_v_a_n_t_a_g_e_1_1_test.html">Test</a> type</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>meanvelocity Mean velocity</dd></dl>
+<dl class="section author"><dt>Author</dt><dd>Dylan Bossie </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>11-Apr-2019</dd></dl>
+<dl class="section user"><dt>Required fields of time:</dt><dd></dd></dl>
+<dl class="section user"><dt>Required fields of CubeSats:</dt><dd></dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l00336">336</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l00345">345</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 <p>References <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_model.html#abafe4a85fd2ca2ca9df9564c06be9c90">Model.Deployer</a>, and <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_deployer.html#ae833b9f0d25e0f0ac09e864cec3cf691">Deployer.testScenario</a>.</p>
 
@@ -403,12 +424,16 @@ Here is the caller graph for this function:</div>
 <p>% Compute truth distance vector </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"></td><td></td></tr>
+    <tr><td class="paramname"><a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_model.html" title="Model is a class used to store the estimation methods that utilize both TOF and camera data...">Model</a></td><td><a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_model.html" title="Model is a class used to store the estimation methods that utilize both TOF and camera data...">Model</a> class reference</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>distance Absolute distance from VCF origin</dd></dl>
+<dl class="section author"><dt>Author</dt><dd>Dylan Bossie </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>11-Apr-2019</dd></dl>
+<dl class="section user"><dt>Required fields of Model:</dt><dd></dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l00230">230</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l00237">237</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 <p>Referenced by <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#af874ea3974cfccb6fe60e9f5a23659b9">Validate.ErrorAnalysis()</a>.</p>
 
@@ -463,7 +488,7 @@ Here is the caller graph for this function:</div>
 <dl class="section user"><dt>Required fields of structure:</dt><dd></dd></dl>
 <dl class="section user"><dt>Generated fields of structure:</dt><dd></dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l01957">1957</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l01914">1914</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 <p>Referenced by <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#a8931a6e0809dc6e477297ea6c9b6c0a4">Validate.masterPlotter()</a>.</p>
 
@@ -531,7 +556,7 @@ offset_vec The translation applied to the truth data</dd></dl>
 <dl class="section user"><dt>Required fields of VANTAGE_Data:</dt><dd></dd></dl>
 <dl class="section user"><dt>Required fields of Truth_Data:</dt><dd></dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l01015">1015</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l00972">972</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 <p>Referenced by <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#a66679ac9c2652025b67df26ecabd2567">Validate.PerformTruthDataCorrelation()</a>, and <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#ac0b2bdd296c81ed3f5be4fadc9f1cb1b">Validate.PerformTruthDataCorrelationMultiple()</a>.</p>
 
@@ -583,7 +608,9 @@ Here is the caller graph for this function:</div>
 <p>Compute mean error for all tests and assimilate cubesat results</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"><a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_model.html" title="Model is a class used to store the estimation methods that utilize both TOF and camera data...">Model</a></td><td><a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_model.html" title="Model is a class used to store the estimation methods that utilize both TOF and camera data...">Model</a> class containing initial data</td></tr>
+    <tr><td class="paramname"><a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_model.html" title="Model is a class used to store the estimation methods that utilize both TOF and camera data...">Model</a></td><td><a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_model.html" title="Model is a class used to store the estimation methods that utilize both TOF and camera data...">Model</a> class containing initial data </td></tr>
+    <tr><td class="paramname">SensorData</td><td>Sensor parameters </td></tr>
+    <tr><td class="paramname">testDef</td><td><a class="el" href="namespace_v_a_n_t_a_g_e_1_1_test.html">Test</a> type</td></tr>
   </table>
   </dd>
 </dl>
@@ -592,7 +619,7 @@ Here is the caller graph for this function:</div>
 <dl class="section date"><dt>Date</dt><dd>14-Apr-2019</dd></dl>
 <dl class="section user"><dt>Required fields of Model:</dt><dd></dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l00406">406</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l00417">417</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 <p>References <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#ac403369cee35a1c1ff4903dd9f319833">Validate.ComputeLaunchTime()</a>, <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#a8cb933171fcbef88e3ec65b00ea650e3">Validate.ComputeMeanVelocity()</a>, <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#ab219f12bda39fd5d609affdd183788f6">Validate.ComputeTruthDistance()</a>, and <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#a2863ea9b926f664aa2978fcaedd6091a">Validate.InterpolateDistance()</a>.</p>
 
@@ -757,7 +784,7 @@ Here is the call graph for this function:</div>
 <dl class="section date"><dt>Date</dt><dd>16-Apr-2019</dd></dl>
 <dl class="section user"><dt>Generated fields of f:</dt><dd></dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l02136">2136</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l02093">2093</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 <p>Referenced by <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#a8931a6e0809dc6e477297ea6c9b6c0a4">Validate.masterPlotter()</a>.</p>
 
@@ -800,7 +827,7 @@ Here is the caller graph for this function:</div>
 <dl class="section date"><dt>Date</dt><dd>16-Apr-2019</dd></dl>
 <dl class="section user"><dt>Generated fields of outputStruct:</dt><dd></dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l02042">2042</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l01999">1999</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 <p>Referenced by <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#a8931a6e0809dc6e477297ea6c9b6c0a4">Validate.masterPlotter()</a>.</p>
 
@@ -872,7 +899,7 @@ Here is the caller graph for this function:</div>
 <dl class="section date"><dt>Date</dt><dd>11-Apr-2019</dd></dl>
 <dl class="section user"><dt>Required fields of Model:</dt><dd></dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l00148">148</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l00151">151</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 </div>
 </div>
@@ -914,7 +941,7 @@ Here is the caller graph for this function:</div>
 
 <p>%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %% Author: Marshall Herr %% %% Purpose: To make nice plots of the error vs range of <a class="el" href="namespace_v_a_n_t_a_g_e.html">VANTAGE</a> %% %% Inputs: %% - r: A vector of the range of each datapoint %% - mu: The mean error at each range given in r %% - sigma: The standard deviation of the error at each range given in %% r %% %% Outputs: %% - A cool plot %% %% Date Created: 22 March 2019 %% %% Last Editted: 22 March 2019 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% </p>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l00621">621</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l00582">582</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 <p>References <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_model.html#abafe4a85fd2ca2ca9df9564c06be9c90">Model.Deployer</a>, <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_deployer.html#ae833b9f0d25e0f0ac09e864cec3cf691">Deployer.testScenario</a>, and <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_deployer.html#a13ec613e72c0fad38ba737fe13dc5033">Deployer.TruthFileName</a>.</p>
 
@@ -946,7 +973,7 @@ Here is the caller graph for this function:</div>
 <dl class="section author"><dt>Author</dt><dd>Dylan Bossie </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>21-Apr-2019 </dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l00764">764</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l00721">721</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 </div>
 </div>
@@ -990,7 +1017,7 @@ Here is the caller graph for this function:</div>
 <dl class="section user"><dt>Required fields of CSArray:</dt><dd></dd></dl>
 <dl class="section user"><dt>Required fields of timefitted:</dt><dd></dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l00302">302</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l00311">311</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 <p>Referenced by <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#af874ea3974cfccb6fe60e9f5a23659b9">Validate.ErrorAnalysis()</a>.</p>
 
@@ -1031,7 +1058,7 @@ Here is the caller graph for this function:</div>
 <dl class="section author"><dt>Author</dt><dd>Marshall Herr </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>16-Apr-2019 </dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l01721">1721</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l01678">1678</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 <p>References <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#a08c5a723f333855911f2446161248aee">Validate.convolveMeasurements()</a>, <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#abdc1bf8936ede340ea679e68ba7cb6c1">Validate.errorPlot()</a>, and <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#a5e1dfacee0e3abb4bfb85034b6f59b72">Validate.extractMatFileData()</a>.</p>
 
@@ -1128,7 +1155,7 @@ Here is the call graph for this function:</div>
 <dl class="section author"><dt>Author</dt><dd>Marshall Herr </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>21-Apr-2019 </dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l01884">1884</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l01841">1841</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 </div>
 </div>
@@ -1191,7 +1218,7 @@ offset_vec The translation applied to the truth data</dd></dl>
 <dl class="section user"><dt>Required fields of TruthData:</dt><dd></dd></dl>
 <dl class="section user"><dt>Generated fields of updatedTruth:</dt><dd></dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l00879">879</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l00836">836</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 <p>References <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#abedc774f8775234132739448943d9838">Validate.CorrelationMachine()</a>.</p>
 
@@ -1254,7 +1281,7 @@ offset_vec The translation applied to the truth data</dd></dl>
 <dl class="section user"><dt>Required fields of TruthData:</dt><dd></dd></dl>
 <dl class="section user"><dt>Generated fields of updatedTruth:</dt><dd></dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l01514">1514</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l01471">1471</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 <p>References <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#abedc774f8775234132739448943d9838">Validate.CorrelationMachine()</a>.</p>
 
@@ -1310,12 +1337,22 @@ Here is the caller graph for this function:</div>
 <p>Compute error between <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat.html" title="% Classdef A class for holding persistent CubeSats and their states over time ">CubeSat</a> and truth, plot results</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"></td><td></td></tr>
+    <tr><td class="paramname"><a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat.html" title="% Classdef A class for holding persistent CubeSats and their states over time ">CubeSat</a></td><td>Centroid array for a <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat.html" title="% Classdef A class for holding persistent CubeSats and their states over time ">CubeSat</a> </td></tr>
+    <tr><td class="paramname">Truth</td><td>Truth centroid array for a <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat.html" title="% Classdef A class for holding persistent CubeSats and their states over time ">CubeSat</a></td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>Error Absolute Error </dd>
+<dd>
+XError Error in horizontal </dd>
+<dd>
+YError Error in vertical </dd>
+<dd>
+ZError Error in downrange</dd></dl>
+<dl class="section author"><dt>Author</dt><dd>Dylan Bossie </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>11-Apr-2019 </dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l00200">200</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l00203">203</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 </div>
 </div>
@@ -1360,7 +1397,7 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l02291">2291</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l02248">2248</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 <p>Referenced by <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#ada200173b30e15dc238135ce28e58152">Validate.validateTOF()</a>.</p>
 
@@ -1397,7 +1434,7 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l00092">92</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l00095">95</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 <p>References <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#ac5964b4ddd35f86e488a7f624bf84632">Validate.TOFpresentErrorsVsReqs()</a>.</p>
 
@@ -1477,7 +1514,7 @@ Here is the call graph for this function:</div>
 <dl class="section author"><dt>Author</dt><dd>Marshall Herr </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>15-Apr-2019 </dd></dl>
 
-<p>Definition at line <a class="el" href="_validate_8m_source.html#l01674">1674</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
+<p>Definition at line <a class="el" href="_validate_8m_source.html#l01631">1631</a> of file <a class="el" href="_validate_8m_source.html">Validate.m</a>.</p>
 
 <p>Referenced by <a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html#a2f10de6551146dd43cc6db486fdce691">Validate.Validate()</a>.</p>
 
@@ -1551,7 +1588,7 @@ Here is the caller graph for this function:</div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespace_v_a_n_t_a_g_e.html">VANTAGE</a></li><li class="navelem"><a class="el" href="namespace_v_a_n_t_a_g_e_1_1_post_processing.html">PostProcessing</a></li><li class="navelem"><a class="el" href="class_v_a_n_t_a_g_e_1_1_post_processing_1_1_validate.html">Validate</a></li>
-    <li class="footer">Generated on Thu May 2 2019 18:19:59 for VANTAGE Software by
+    <li class="footer">Generated on Mon May 6 2019 04:41:41 for VANTAGE Software by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
   </ul>

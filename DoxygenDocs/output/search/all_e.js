@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['rangeorder',['rangeOrder',['../class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat.html#aee590d0cfdbb71e69dcd3fcb4304922b',1,'VANTAGE::PostProcessing::CubeSat::rangeOrder()'],['../class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat___t_o_f.html#aee590d0cfdbb71e69dcd3fcb4304922b',1,'VANTAGE::PostProcessing::CubeSat_TOF::rangeOrder()']]],
+  ['rangeorder',['rangeOrder',['../class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat.html#aee590d0cfdbb71e69dcd3fcb4304922b',1,'VANTAGE::PostProcessing::CubeSat']]],
   ['rangestart',['rangeStart',['../class_v_a_n_t_a_g_e_1_1_post_processing_1_1_optical.html#ab0abaeda932f8887930278e85af314a2',1,'VANTAGE::PostProcessing::Optical']]],
   ['ransacline',['ransacLine',['../class_v_a_n_t_a_g_e_1_1_post_processing_1_1_model.html#a77e854d16e55605b456440eb89619801',1,'VANTAGE::PostProcessing::Model']]],
   ['readinputframesfromimages',['readInputFramesFromImages',['../class_v_a_n_t_a_g_e_1_1_post_processing_1_1_optical.html#aaeb5367470e2f4ad5746e79f461843ac',1,'VANTAGE::PostProcessing::Optical']]],

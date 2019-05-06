@@ -4,6 +4,28 @@ warning: Tag `XML_SCHEMA' at line 1329 of file `/home/user/Downloads/VANTAGE/Dox
          To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
 warning: Tag `XML_DTD' at line 1335 of file `/home/user/Downloads/VANTAGE/DoxygenDocs/config/Doxyfile' has become obsolete.
          To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
+MTOC++:+VANTAGE/+PostProcessing/CubeSat_TOF.m: PARSE ERROR in line 39 (Most common issue: wrong MatLab-indentation)
+Message: Grrrr!!!!
+Next 20 characters to parse: 
+'n',[],...          
+------------------------------------
+States are: ClassPart: Property
+PropParams: constant = 0
+MethodParams: 
+AccessStruct: full = Public get  = Public set  = Public
+
+------------------------------------
+MTOC++:+VANTAGE/+PostProcessing/CubeSat_TOF.m: PARSE ERROR in line 39 (Most common issue: wrong MatLab-indentation)
+Message: Grrrr!!!!
+Next 20 characters to parse: 
+'n',[],...          
+------------------------------------
+States are: ClassPart: Property
+PropParams: constant = 0
+MethodParams: 
+AccessStruct: full = Public get  = Public set  = Public
+
+------------------------------------
 /home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/CubeSat.m:113: warning: argument 'occlusion' of command @param is not found in the argument list of CubeSat::CubeSat(matlabtypesubstitute name, matlabtypesubstitute rangeOrder, matlabtypesubstitute expectedU, matlabtypesubstitute actualDims)
 /home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/CubeSat.m:101: warning: The following parameters of VANTAGE::PostProcessing::CubeSat::CubeSat(matlabtypesubstitute name, matlabtypesubstitute rangeOrder, matlabtypesubstitute expectedU, matlabtypesubstitute actualDims) are not documented:
   parameter 'actualDims'
@@ -46,10 +68,7 @@ warning: Tag `XML_DTD' at line 1335 of file `/home/user/Downloads/VANTAGE/Doxyge
 /home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Optical.m:1114: warning: argument 'posCase' of command @param is not found in the argument list of Optical::occlusionCut(matlabtypesubstitute x, matlabtypesubstitute y, matlabtypesubstitute numCubesats)
 /home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Optical.m:307: warning: The following parameters of VANTAGE::PostProcessing::Optical::OpticalProcessing(matlabtypesubstitute image, matlabtypesubstitute BackgroundPixels, matlabtypesubstitute firstFrame) are not documented:
   parameter 'firstFrame'
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Optical.m:1308: warning: argument 'predRange' of command @param is not found in the argument list of Optical::OpticalWeighting(matlabtypesubstitute unused1)
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Optical.m:1180: warning: argument 'CubeSats' of command @param is not found in the argument list of Optical::PixelToUnitVec(matlabtypesubstitute isSystemCentroid)
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Optical.m:1136: warning: The following parameters of VANTAGE::PostProcessing::Optical::PixelToUnitVec(matlabtypesubstitute isSystemCentroid) are not documented:
-  parameter 'isSystemCentroid'
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Optical.m:1306: warning: argument 'predRange' of command @param is not found in the argument list of Optical::OpticalWeighting(matlabtypesubstitute unused1)
 /home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Optical.m:564: warning: argument 'CubeSats' of command @param is not found in the argument list of Optical::plotObjectBoundaries(matlabtypesubstitute grayImage, matlabtypesubstitute boundaries, matlabtypesubstitute centroids, matlabtypesubstitute isSystemCentroid, matlabtypesubstitute binarizedImage)
 /home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Optical.m:564: warning: argument 'centerpoint' of command @param is not found in the argument list of Optical::plotObjectBoundaries(matlabtypesubstitute grayImage, matlabtypesubstitute boundaries, matlabtypesubstitute centroids, matlabtypesubstitute isSystemCentroid, matlabtypesubstitute binarizedImage)
 /home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Optical.m:534: warning: The following parameters of VANTAGE::PostProcessing::Optical::plotObjectBoundaries(matlabtypesubstitute grayImage, matlabtypesubstitute boundaries, matlabtypesubstitute centroids, matlabtypesubstitute isSystemCentroid, matlabtypesubstitute binarizedImage) are not documented:
@@ -65,35 +84,31 @@ warning: Tag `XML_DTD' at line 1335 of file `/home/user/Downloads/VANTAGE/Doxyge
 /home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:109: warning: The following parameters of VANTAGE::PostProcessing::TOF::TOF(matlabtypesubstitute ModelRef, matlabtypesubstitute configFilename) are not documented:
   parameter 'ModelRef'
   parameter 'configFilename'
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:380: warning: The following parameters of VANTAGE::PostProcessing::TOF::associateCentroids(matlabtypesubstitute CubeSats_TOF, matlabtypesubstitute CubeSats, matlabtypesubstitute numConsOutliers, matlabtypesubstitute SensorData) are not documented:
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:383: warning: The following parameters of VANTAGE::PostProcessing::TOF::associateCentroids(matlabtypesubstitute CubeSats_TOF, matlabtypesubstitute CubeSats, matlabtypesubstitute numConsOutliers, matlabtypesubstitute SensorData) are not documented:
   parameter 'SensorData'
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:980: warning: argument 'CubeSat' of command @param is not found in the argument list of TOF::centroid1(matlabtypesubstitute CubeSat_TOF)
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:934: warning: The following parameters of VANTAGE::PostProcessing::TOF::centroid1(matlabtypesubstitute CubeSat_TOF) are not documented:
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:983: warning: argument 'CubeSat' of command @param is not found in the argument list of TOF::centroid1(matlabtypesubstitute CubeSat_TOF)
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:937: warning: The following parameters of VANTAGE::PostProcessing::TOF::centroid1(matlabtypesubstitute CubeSat_TOF) are not documented:
   parameter 'CubeSat_TOF'
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:1057: warning: argument 'CubeSat' of command @param is not found in the argument list of TOF::centroid2(matlabtypesubstitute CubeSat_TOF)
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:1006: warning: The following parameters of VANTAGE::PostProcessing::TOF::centroid2(matlabtypesubstitute CubeSat_TOF) are not documented:
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:1060: warning: argument 'CubeSat' of command @param is not found in the argument list of TOF::centroid2(matlabtypesubstitute CubeSat_TOF)
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:1009: warning: The following parameters of VANTAGE::PostProcessing::TOF::centroid2(matlabtypesubstitute CubeSat_TOF) are not documented:
   parameter 'CubeSat_TOF'
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:1310: warning: Found unknown command `\params'
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:1376: warning: argument 'faceArea' of command @param is not found in the argument list of TOF::distInFromFace(matlabtypesubstitute CubeSat, matlabtypesubstitute faceIndex)
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:1365: warning: The following parameters of VANTAGE::PostProcessing::TOF::distInFromFace(matlabtypesubstitute CubeSat, matlabtypesubstitute faceIndex) are not documented:
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:1313: warning: Found unknown command `\params'
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:1379: warning: argument 'faceArea' of command @param is not found in the argument list of TOF::distInFromFace(matlabtypesubstitute CubeSat, matlabtypesubstitute faceIndex)
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:1368: warning: The following parameters of VANTAGE::PostProcessing::TOF::distInFromFace(matlabtypesubstitute CubeSat, matlabtypesubstitute faceIndex) are not documented:
   parameter 'faceIndex'
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:875: warning: argument 'CubeSat' of command @param is not found in the argument list of TOF::fitPlanesToCubesat(matlabtypesubstitute CubeSat_TOF)
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:784: warning: The following parameters of VANTAGE::PostProcessing::TOF::fitPlanesToCubesat(matlabtypesubstitute CubeSat_TOF) are not documented:
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:878: warning: argument 'CubeSat' of command @param is not found in the argument list of TOF::fitPlanesToCubesat(matlabtypesubstitute CubeSat_TOF)
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:787: warning: The following parameters of VANTAGE::PostProcessing::TOF::fitPlanesToCubesat(matlabtypesubstitute CubeSat_TOF) are not documented:
   parameter 'CubeSat_TOF'
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:180: warning: The following parameters of VANTAGE::PostProcessing::TOF::TOFProcessing(matlabtypesubstitute SensorData, matlabtypesubstitute Deployer, matlabtypesubstitute varargin) are not documented:
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/TOF.m:183: warning: The following parameters of VANTAGE::PostProcessing::TOF::TOFProcessing(matlabtypesubstitute SensorData, matlabtypesubstitute Deployer, matlabtypesubstitute varargin) are not documented:
   parameter 'varargin'
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:79: warning: expected whitespace after param command
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:282: warning: expected whitespace after param command
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:390: warning: expected whitespace after param command
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:245: warning: expected whitespace after param command
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:406: warning: The following parameters of VANTAGE::PostProcessing::Validate::ErrorAnalysis(matlabtypesubstitute Model, matlabtypesubstitute SensorData, matlabtypesubstitute testDef) are not documented:
-  parameter 'SensorData'
-  parameter 'testDef'
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:2238: warning: argument 'err_S' of command @param is not found in the argument list of Validate::errorPlot(matlabtypesubstitute x_req, matlabtypesubstitute x_S, matlabtypesubstitute x_M, matlabtypesubstitute x_100m, matlabtypesubstitute x_K, matlabtypesubstitute req, matlabtypesubstitute mu_err_S, matlabtypesubstitute mu_err_M, matlabtypesubstitute mu_err_100m, matlabtypesubstitute mu_err_K, matlabtypesubstitute sigma_err_S, matlabtypesubstitute sigma_err_M, matlabtypesubstitute sigma_err_100m, matlabtypesubstitute sigma_err_K, matlabtypesubstitute x_c, matlabtypesubstitute plotLabels, matlabtypesubstitute plotTitle, matlabtypesubstitute x_range)
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:2238: warning: argument 'err_M' of command @param is not found in the argument list of Validate::errorPlot(matlabtypesubstitute x_req, matlabtypesubstitute x_S, matlabtypesubstitute x_M, matlabtypesubstitute x_100m, matlabtypesubstitute x_K, matlabtypesubstitute req, matlabtypesubstitute mu_err_S, matlabtypesubstitute mu_err_M, matlabtypesubstitute mu_err_100m, matlabtypesubstitute mu_err_K, matlabtypesubstitute sigma_err_S, matlabtypesubstitute sigma_err_M, matlabtypesubstitute sigma_err_100m, matlabtypesubstitute sigma_err_K, matlabtypesubstitute x_c, matlabtypesubstitute plotLabels, matlabtypesubstitute plotTitle, matlabtypesubstitute x_range)
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:2238: warning: argument 'err_100m' of command @param is not found in the argument list of Validate::errorPlot(matlabtypesubstitute x_req, matlabtypesubstitute x_S, matlabtypesubstitute x_M, matlabtypesubstitute x_100m, matlabtypesubstitute x_K, matlabtypesubstitute req, matlabtypesubstitute mu_err_S, matlabtypesubstitute mu_err_M, matlabtypesubstitute mu_err_100m, matlabtypesubstitute mu_err_K, matlabtypesubstitute sigma_err_S, matlabtypesubstitute sigma_err_M, matlabtypesubstitute sigma_err_100m, matlabtypesubstitute sigma_err_K, matlabtypesubstitute x_c, matlabtypesubstitute plotLabels, matlabtypesubstitute plotTitle, matlabtypesubstitute x_range)
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:2238: warning: argument 'err_K' of command @param is not found in the argument list of Validate::errorPlot(matlabtypesubstitute x_req, matlabtypesubstitute x_S, matlabtypesubstitute x_M, matlabtypesubstitute x_100m, matlabtypesubstitute x_K, matlabtypesubstitute req, matlabtypesubstitute mu_err_S, matlabtypesubstitute mu_err_M, matlabtypesubstitute mu_err_100m, matlabtypesubstitute mu_err_K, matlabtypesubstitute sigma_err_S, matlabtypesubstitute sigma_err_M, matlabtypesubstitute sigma_err_100m, matlabtypesubstitute sigma_err_K, matlabtypesubstitute x_c, matlabtypesubstitute plotLabels, matlabtypesubstitute plotTitle, matlabtypesubstitute x_range)
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:2136: warning: The following parameters of VANTAGE::PostProcessing::Validate::errorPlot(matlabtypesubstitute x_req, matlabtypesubstitute x_S, matlabtypesubstitute x_M, matlabtypesubstitute x_100m, matlabtypesubstitute x_K, matlabtypesubstitute req, matlabtypesubstitute mu_err_S, matlabtypesubstitute mu_err_M, matlabtypesubstitute mu_err_100m, matlabtypesubstitute mu_err_K, matlabtypesubstitute sigma_err_S, matlabtypesubstitute sigma_err_M, matlabtypesubstitute sigma_err_100m, matlabtypesubstitute sigma_err_K, matlabtypesubstitute x_c, matlabtypesubstitute plotLabels, matlabtypesubstitute plotTitle, matlabtypesubstitute x_range) are not documented:
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:75: warning: argument 'configFileName' of command @param is not found in the argument list of Validate::Validate(matlabtypesubstitute configFilename, matlabtypesubstitute ModelRef, matlabtypesubstitute CorrelateTruthData)
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:48: warning: The following parameters of VANTAGE::PostProcessing::Validate::Validate(matlabtypesubstitute configFilename, matlabtypesubstitute ModelRef, matlabtypesubstitute CorrelateTruthData) are not documented:
+  parameter 'configFilename'
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:2195: warning: argument 'err_S' of command @param is not found in the argument list of Validate::errorPlot(matlabtypesubstitute x_req, matlabtypesubstitute x_S, matlabtypesubstitute x_M, matlabtypesubstitute x_100m, matlabtypesubstitute x_K, matlabtypesubstitute req, matlabtypesubstitute mu_err_S, matlabtypesubstitute mu_err_M, matlabtypesubstitute mu_err_100m, matlabtypesubstitute mu_err_K, matlabtypesubstitute sigma_err_S, matlabtypesubstitute sigma_err_M, matlabtypesubstitute sigma_err_100m, matlabtypesubstitute sigma_err_K, matlabtypesubstitute x_c, matlabtypesubstitute plotLabels, matlabtypesubstitute plotTitle, matlabtypesubstitute x_range)
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:2195: warning: argument 'err_M' of command @param is not found in the argument list of Validate::errorPlot(matlabtypesubstitute x_req, matlabtypesubstitute x_S, matlabtypesubstitute x_M, matlabtypesubstitute x_100m, matlabtypesubstitute x_K, matlabtypesubstitute req, matlabtypesubstitute mu_err_S, matlabtypesubstitute mu_err_M, matlabtypesubstitute mu_err_100m, matlabtypesubstitute mu_err_K, matlabtypesubstitute sigma_err_S, matlabtypesubstitute sigma_err_M, matlabtypesubstitute sigma_err_100m, matlabtypesubstitute sigma_err_K, matlabtypesubstitute x_c, matlabtypesubstitute plotLabels, matlabtypesubstitute plotTitle, matlabtypesubstitute x_range)
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:2195: warning: argument 'err_100m' of command @param is not found in the argument list of Validate::errorPlot(matlabtypesubstitute x_req, matlabtypesubstitute x_S, matlabtypesubstitute x_M, matlabtypesubstitute x_100m, matlabtypesubstitute x_K, matlabtypesubstitute req, matlabtypesubstitute mu_err_S, matlabtypesubstitute mu_err_M, matlabtypesubstitute mu_err_100m, matlabtypesubstitute mu_err_K, matlabtypesubstitute sigma_err_S, matlabtypesubstitute sigma_err_M, matlabtypesubstitute sigma_err_100m, matlabtypesubstitute sigma_err_K, matlabtypesubstitute x_c, matlabtypesubstitute plotLabels, matlabtypesubstitute plotTitle, matlabtypesubstitute x_range)
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:2195: warning: argument 'err_K' of command @param is not found in the argument list of Validate::errorPlot(matlabtypesubstitute x_req, matlabtypesubstitute x_S, matlabtypesubstitute x_M, matlabtypesubstitute x_100m, matlabtypesubstitute x_K, matlabtypesubstitute req, matlabtypesubstitute mu_err_S, matlabtypesubstitute mu_err_M, matlabtypesubstitute mu_err_100m, matlabtypesubstitute mu_err_K, matlabtypesubstitute sigma_err_S, matlabtypesubstitute sigma_err_M, matlabtypesubstitute sigma_err_100m, matlabtypesubstitute sigma_err_K, matlabtypesubstitute x_c, matlabtypesubstitute plotLabels, matlabtypesubstitute plotTitle, matlabtypesubstitute x_range)
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:2093: warning: The following parameters of VANTAGE::PostProcessing::Validate::errorPlot(matlabtypesubstitute x_req, matlabtypesubstitute x_S, matlabtypesubstitute x_M, matlabtypesubstitute x_100m, matlabtypesubstitute x_K, matlabtypesubstitute req, matlabtypesubstitute mu_err_S, matlabtypesubstitute mu_err_M, matlabtypesubstitute mu_err_100m, matlabtypesubstitute mu_err_K, matlabtypesubstitute sigma_err_S, matlabtypesubstitute sigma_err_M, matlabtypesubstitute sigma_err_100m, matlabtypesubstitute sigma_err_K, matlabtypesubstitute x_c, matlabtypesubstitute plotLabels, matlabtypesubstitute plotTitle, matlabtypesubstitute x_range) are not documented:
   parameter 'mu_err_S'
   parameter 'mu_err_M'
   parameter 'mu_err_100m'
@@ -102,14 +117,14 @@ warning: Tag `XML_DTD' at line 1335 of file `/home/user/Downloads/VANTAGE/Doxyge
   parameter 'sigma_err_M'
   parameter 'sigma_err_100m'
   parameter 'sigma_err_K'
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:2109: warning: Illegal command return as part of a title section
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:148: warning: The following parameters of VANTAGE::PostProcessing::Validate::fitCubeSatTraj(matlabtypesubstitute CubeSat, matlabtypesubstitute t, matlabtypesubstitute Type, matlabtypesubstitute t_fit, matlabtypesubstitute Model) are not documented:
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:2066: warning: Illegal command return as part of a title section
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:151: warning: The following parameters of VANTAGE::PostProcessing::Validate::fitCubeSatTraj(matlabtypesubstitute CubeSat, matlabtypesubstitute t, matlabtypesubstitute Type, matlabtypesubstitute t_fit, matlabtypesubstitute Model) are not documented:
   parameter 'Type'
   parameter 't_fit'
   parameter 'Model'
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:879: warning: The following parameters of VANTAGE::PostProcessing::Validate::PerformTruthDataCorrelation(matlabtypesubstitute MeasuredDataArray, matlabtypesubstitute TruthData, matlabtypesubstitute mostTrustedCubesat, matlabtypesubstitute should_debug) are not documented:
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:836: warning: The following parameters of VANTAGE::PostProcessing::Validate::PerformTruthDataCorrelation(matlabtypesubstitute MeasuredDataArray, matlabtypesubstitute TruthData, matlabtypesubstitute mostTrustedCubesat, matlabtypesubstitute should_debug) are not documented:
   parameter 'mostTrustedCubesat'
   parameter 'should_debug'
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:218: warning: expected whitespace after param command
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:2337: warning: expected whitespace after param command
-/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:135: warning: expected whitespace after param command
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:2294: warning: expected whitespace after param command
+/home/user/Downloads/VANTAGE/+VANTAGE/+PostProcessing/Validate.m:138: warning: expected whitespace after param command
+/home/user/Downloads/VANTAGE/README.md:513: warning: Found unknown command `\examples'

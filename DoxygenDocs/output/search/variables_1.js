@@ -1,7 +1,6 @@
 var searchData=
 [
   ['centroid',['centroid',['../class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat___optical.html#a55c2b46c10095ec3ce9c7c9f2dd81792',1,'VANTAGE::PostProcessing::CubeSat_Optical']]],
-  ['centroid_5ftcf',['centroid_TCF',['../class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat___t_o_f.html#a978b9e078c51775a776bb4a0f7b4d0e8',1,'VANTAGE::PostProcessing::CubeSat_TOF']]],
   ['centroids_5fvcf',['centroids_VCF',['../class_v_a_n_t_a_g_e_1_1_post_processing_1_1_cube_sat.html#a732372e329d262adfb5dd9666c780072',1,'VANTAGE::PostProcessing::CubeSat']]],
   ['clean100m',['Clean100m',['../class_v_a_n_t_a_g_e_1_1_post_processing_1_1_optical.html#a26fd420dc50af123608e578dd77c9f10',1,'VANTAGE::PostProcessing::Optical']]],
   ['cleanmodular',['CleanModular',['../class_v_a_n_t_a_g_e_1_1_post_processing_1_1_optical.html#ac5d27c2360ec7905f36bff0925f34ddc',1,'VANTAGE::PostProcessing::Optical']]],
