@@ -86,11 +86,8 @@ classdef TOF
         % @date     07-Apr-2019
         function [sigmaTOF] = TofWeighting(this,predMeanRange)
             if predMeanRange <= this.ModelRef.Optical.rangeStart
-                % before optical starts to be used, use the TOF only
                 sigmaTOF = 1;
             else
-                % after that point, TOF weight linearly decays from 1 to
-                % 0.1 at 100m
                 sigmaTOF = interp1([this.ModelRef.Optical.rangeStart 100],[1,0.1],predMeanRange,'linear','extrap');
             end
         end

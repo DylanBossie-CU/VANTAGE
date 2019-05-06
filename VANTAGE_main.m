@@ -77,17 +77,6 @@ import VANTAGE.PostProcessing.*
 import VANTAGE.PostProcessing.Validate
 
 %%%%%% Modular config direcs
-<<<<<<< HEAD
-configDirecNameModular = 'config/Final_Tests/ModularTest_4_9/Test*';
-%%%%%% 100m config direcs
-configDirecName100m = 'config/Final_Tests/3_25_100m/Test*';
-%%%%%% Simulation config direcs
-configDirecNameSim085 = 'config/Final_Tests/Simulation/_085/Sample*';
-configDirecNameSim030 = 'config/Final_Tests/Simulation/_030/Sample*';
-configDirecNameSim140 = 'config/Final_Tests/Simulation/_140/Sample*';
-configDirecNameSim195 = 'config/Final_Tests/Simulation/_195/Sample*';
-configDirecNameSim250 = 'config/Final_Tests/Simulation/_250/Sample*';
-=======
 configDirecNameModular = 'config/ModularTest_4_9/Test*';
 %%%%%% 100m config direcs
 configDirecName100m = 'config/3_25_100m/Test*';
@@ -97,7 +86,6 @@ configDirecNameSim030 = 'config/Simulation/_030/Sample*';
 configDirecNameSim140 = 'config/Simulation/_140/Sample*';
 configDirecNameSim195 = 'config/Simulation/_195/Sample*';
 configDirecNameSim250 = 'config/Simulation/_250/Sample*';
->>>>>>> f11542262d224879c03116da80e2104d52efe524
 
 %%%%%% Define desired test type here
 testType = 'Modular';
@@ -133,11 +121,7 @@ for iter = 1:numel(configfiles)
     close all;
     rng(99);
 
-<<<<<<< HEAD
-    configfile = [pwd '/config/Final_Tests/' testType '/' configfiles(iter).name];
-=======
     configfile = [pwd '/config/' testType '/' configfiles(iter).name];
->>>>>>> f11542262d224879c03116da80e2104d52efe524
 
     %%% Filenames and configurables
     manifestFilename = strcat(configfile,'/Manifest.json');
@@ -262,11 +246,7 @@ Validator.GenerateOutputFiles(matFileDirectory);
 %{ 
 Directories for Richard
 MANIFEST LOCATION:
-<<<<<<< HEAD
-/home/vantage/Documents/githere/VANTAGE/config/Final_Tests/ModularTest_4_9/Test5/Manifest.json
-=======
 /home/vantage/Documents/githere/VANTAGE/config/ModularTest_4_9/Test5/Manifest.json
->>>>>>> f11542262d224879c03116da80e2104d52efe524
 
 OUTPUT FILE LOCATION:
 /home/vantage/Documents/githere/VANTAGE/Data/Results/matFiles/Modular/jsonOut/Test5_Modular.json

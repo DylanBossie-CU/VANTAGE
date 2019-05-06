@@ -56,7 +56,14 @@ classdef Validate
         
         %% Validate TOF
         %
-        % DEPRECATED / DYSFUNCTIONAL
+        % 
+        % 
+        % @param    
+        %
+        % @return 
+        %
+        % @author   Joshua Kirby
+        % @date     19-Mar-2019
         function validateTOF(this)
             %%% Housekeeping and Allocation
             close all;
